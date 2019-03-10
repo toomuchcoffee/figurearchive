@@ -1,6 +1,7 @@
 package de.toomuchcoffee.figurearchive.repository;
 
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
+import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class FigureRepositoryTest {
 
     @Test
     public void findsAll() {
-        Figure figure = new Figure(1, "Jawa", 1977);
+        Figure figure = new Figure(1, "Jawa", ProductLine.KENNER, 1977);
         figureRepository.save(figure);
         List<Figure> figures = figureRepository.findAll();
         assertThat(figures).hasSize(1);

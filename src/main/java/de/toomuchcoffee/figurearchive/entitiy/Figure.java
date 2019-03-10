@@ -21,5 +21,6 @@ public class Figure {
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
     private String verbatim;
+    private ProductLine productLine;
     private Integer year;
 }

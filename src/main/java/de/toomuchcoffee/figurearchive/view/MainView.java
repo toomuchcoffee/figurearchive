@@ -33,7 +33,7 @@ public class MainView extends VerticalLayout {
         add(actions, grid, editor);
 
         grid.setHeight("300px");
-        grid.setColumns("id", "verbatim", "year");
+        grid.setColumns("id", "verbatim", "line", "year");
         grid.getColumnByKey("id").setWidth("50px").setFlexGrow(0);
 
         filter.setPlaceholder("Filter by verbatim");
