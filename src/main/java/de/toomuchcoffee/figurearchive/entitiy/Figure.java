@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -21,6 +19,8 @@ public class Figure {
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
     private String verbatim;
+    @Enumerated(EnumType.STRING)
     private ProductLine productLine;
     private Integer year;
+    private String image;
 }

@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
@@ -23,7 +24,7 @@ import static java.util.stream.Collectors.toList;
 
 @SpringComponent
 @UIScope
-public class FigureEditor extends VerticalLayout implements KeyNotifier {
+public class FigureEditor extends HorizontalLayout implements KeyNotifier {
 
     private final FigureRepository repository;
 
@@ -32,7 +33,6 @@ public class FigureEditor extends VerticalLayout implements KeyNotifier {
     private TextField tfVerbatim = new TextField("Verbatim");
     private ComboBox<Integer> cbYear = new ComboBox<>("Year");
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
-
 
     private Button save = new Button("Save", VaadinIcon.CHECK.create());
     private Button cancel = new Button("Cancel");
@@ -43,25 +43,29 @@ public class FigureEditor extends VerticalLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
 
     @Autowired
-    public FigureEditor(FigureRepository repository) {
+    public FigureEditor(FigureRepository repository, ImageSelector imageSelector) {
         this.repository = repository;
 
-        add(tfVerbatim, cbLine, cbYear, actions);
-
-        binder = new Binder<>();
-
-        binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.add(tfVerbatim, cbLine, cbYear, actions);
+        add(verticalLayout, imageSelector);
 
         cbYear.setItems(IntStream.range(1977, now().getYear()).boxed().collect(toList()));
-        binder.bind(cbYear, Figure::getYear, Figure::setYear);
-
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
+
+        binder = new Binder<>();
+        binder.bind(imageSelector, Figure::getImage, Figure::setImage);
+        binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
+        binder.bind(cbYear, Figure::getYear, Figure::setYear);
         binder.bind(cbLine, Figure::getProductLine, Figure::setProductLine);
 
         setSpacing(true);
 
         addKeyPressListener(Key.ENTER, e -> save());
+
+        tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
+        tfVerbatim.addValueChangeListener(e -> imageSelector.updateImageUrls(e.getSource().getValue()));
 
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
@@ -84,7 +88,7 @@ public class FigureEditor extends VerticalLayout implements KeyNotifier {
     }
 
     public final void createFigure() {
-        this.figure = new Figure(null, null, null, null);
+        this.figure = new Figure();
 
         binder.setBean(this.figure);
 

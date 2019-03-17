@@ -2,6 +2,8 @@ package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -32,9 +34,11 @@ public class MainView extends VerticalLayout {
         HorizontalLayout actions = new HorizontalLayout(filter, addNewBtn);
         add(actions, grid, editor);
 
-        grid.setHeight("300px");
-        grid.setColumns("id", "verbatim", "line", "year");
+        grid.setHeightByRows(true);
+        grid.setColumns("id", "verbatim", "productLine", "year");
         grid.getColumnByKey("id").setWidth("50px").setFlexGrow(0);
+
+        grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
 
         filter.setPlaceholder("Filter by verbatim");
 
