@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,8 +26,6 @@ public class TumblrService {
 
     private List<TumblrPost> posts;
 
-    private Long timestamp;
-
     private ObjectMapper objectMapper;
 
     private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 8);
@@ -39,19 +36,12 @@ public class TumblrService {
                 .collect(toList());
     }
 
-    public TumblrPost getAnyPost() {
-        int index = new Random().nextInt(posts.size());
-        return posts.get(index);
-    }
-
     @PostConstruct
     private void initialize() throws IOException {
         readPosts();
     }
 
     public void readPosts() {
-        this.timestamp = System.currentTimeMillis();
-
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -72,10 +62,6 @@ public class TumblrService {
                 posts.addAll(Arrays.asList(tumblrPageResponse.posts));
             });
         }
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
     }
 
     private TumblrResponse getTumblrResponse(String tumblrUrl) {
