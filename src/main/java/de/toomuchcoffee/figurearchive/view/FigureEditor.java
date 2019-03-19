@@ -65,7 +65,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> imageSelector.updateImageUrls(e.getSource().getValue()));
+        tfVerbatim.addValueChangeListener(e -> imageSelector.updateImageGallery(e.getSource().getValue()));
 
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
