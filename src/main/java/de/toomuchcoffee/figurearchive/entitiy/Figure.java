@@ -17,7 +17,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 public class Figure {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Integer id;
+    private Long id;
     private String verbatim;
     @Enumerated(EnumType.STRING)
     private ProductLine productLine;

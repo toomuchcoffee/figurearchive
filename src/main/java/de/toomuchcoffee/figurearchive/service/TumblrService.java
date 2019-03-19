@@ -17,8 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.intersection;
-import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.*;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -32,7 +32,10 @@ public class TumblrService {
 
     public List<TumblrPost> getPosts(Set<String> filter) {
         return posts.stream()
-                .filter(tp -> tp.getTags() != null && intersection(filter, newHashSet(tp.getTags())).size() > 0)
+                .filter(tp -> tp.getTags() != null)
+                .filter(tp -> intersection(filter, newHashSet(tp.getTags())).size() > 0)
+                .sorted(comparing(tp -> difference(newHashSet(tp.getTags()), filter).size()))
+                .sorted(comparing(tp -> intersection(filter, newHashSet(((TumblrPost) tp).getTags())).size()).reversed())
                 .collect(toList());
     }
 
@@ -87,6 +90,8 @@ public class TumblrService {
     @Getter
     public static class TumblrPost {
         private String[] tags;
+
+        private Long id;
 
         @JsonProperty("photo-url-1280")
         private String photoUrl1280;

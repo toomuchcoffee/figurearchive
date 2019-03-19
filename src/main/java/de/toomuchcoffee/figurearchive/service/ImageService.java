@@ -15,7 +15,7 @@ public class ImageService {
     private final TumblrService tumblrService;
     private final PermutationService permutationService;
 
-    public List<String> getThumbnailUrls(String verbatim, int max) {
+    public List<String> getImages(String verbatim, int max) {
         Set<String> filter = permutationService.getPermutations(verbatim);
         return tumblrService.getPosts(filter).stream()
                 .filter(p -> p.getPhotoUrl75() != null)

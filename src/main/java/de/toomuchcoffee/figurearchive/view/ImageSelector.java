@@ -1,9 +1,8 @@
 package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.AbstractCompositeField;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,8 +14,8 @@ import de.toomuchcoffee.figurearchive.service.ImageService;
 import java.util.List;
 
 @SpringComponent
-@UIScope
 @Tag("div")
+@UIScope
 public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, String> {
 
     private final ImageService imageService;
@@ -40,7 +39,7 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     public void updateImageUrls(String verbatim) {
         imageGallery.removeAll();
 
-        List<String> imageUrls = imageService.getThumbnailUrls(verbatim, 49);
+        List<String> imageUrls = imageService.getImages(verbatim, 49);
 
         HorizontalLayout row = new HorizontalLayout();
         for (int i = 0; i < imageUrls.size(); i++) {
@@ -54,16 +53,18 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
             Image image = new Image();
             image.setSrc(imageUrl);
             div.add(image);
-            div.addClickListener((ComponentEventListener<ClickEvent<Div>>) clickEvent -> clickEvent.getSource().getChildren()
-                    .filter(e -> e instanceof Image)
-                    .findFirst()
-                    .ifPresent((img -> {
-                        ImageSelector.this.setValue(((Image) img).getSrc());
-                    })));
+            Checkbox checkbox = new Checkbox();
+            checkbox.addValueChangeListener(e -> {
+                if (e.getValue()) {
+                    ImageSelector.this.setValue(imageUrl);
+                } else {
+                    ImageSelector.this.setValue(null);
+                }
+            });
+            div.add(checkbox);
 
             row.add(div);
         }
     }
-
 
 }
