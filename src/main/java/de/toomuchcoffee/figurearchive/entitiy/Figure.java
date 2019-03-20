@@ -23,6 +23,6 @@ public class Figure {
     private ProductLine productLine;
     private String placementNo;
     @Column(name = "year_released")
-    private Integer year;
+    private Short year;
     private String image;
 }

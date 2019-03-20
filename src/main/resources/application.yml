@@ -9,6 +9,10 @@ spring:
     username: figures
     password: s3cr3t
 
+  servlet:
+    multipart:
+      enabled: false  # needs to be disabled because of vaadin-upload bug
+
 ---
 
 spring:

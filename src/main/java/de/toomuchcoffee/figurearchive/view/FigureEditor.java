@@ -32,7 +32,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
 
     private TextField tfVerbatim = new TextField("Verbatim");
     private TextField tfPlacementNo = new TextField("Placement No.");
-    private ComboBox<Integer> cbYear = new ComboBox<>("Year");
+    private ComboBox<Short> cbYear = new ComboBox<>("Year");
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
 
     private Button save = new Button("Save", VaadinIcon.CHECK.create());
@@ -51,7 +51,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
         add(verticalLayout, imageSelector);
 
-        cbYear.setItems(IntStream.range(1977, now().getYear()).boxed().collect(toList()));
+        cbYear.setItems(IntStream.range(1977, now().getYear()).mapToObj(value -> (short) value).collect(toList()));
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
 
