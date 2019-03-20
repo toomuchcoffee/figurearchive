@@ -48,7 +48,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         this.repository = repository;
 
         VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.add(tfVerbatim, cbLine, cbYear, actions);
+        verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
         add(verticalLayout, imageSelector);
 
         cbYear.setItems(IntStream.range(1977, now().getYear()).boxed().collect(toList()));
