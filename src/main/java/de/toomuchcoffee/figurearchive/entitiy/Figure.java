@@ -21,6 +21,8 @@ public class Figure {
     private String verbatim;
     @Enumerated(EnumType.STRING)
     private ProductLine productLine;
+    private String placementNo;
+    @Column(name = "year_released")
     private Integer year;
     private String image;
 }

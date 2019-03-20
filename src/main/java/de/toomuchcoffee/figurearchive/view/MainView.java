@@ -28,9 +28,6 @@ public class MainView extends VerticalLayout {
     private final FigureRepository repo;
 
     private final Grid<Figure> grid = new Grid<>(Figure.class);
-    private final TextField tfVerbatimFilter = new TextField("Verbatim");
-    private ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
-
 
     private FilterParams filterParams = new FilterParams();
 
@@ -46,16 +43,18 @@ public class MainView extends VerticalLayout {
 
         Button addNewBtn = new Button("New figure", VaadinIcon.PLUS.create());
 
+        TextField tfVerbatimFilter = new TextField("Verbatim");
         HorizontalLayout actions = new HorizontalLayout(tfVerbatimFilter, addNewBtn);
         add(actions, grid, editor);
 
         grid.setHeightByRows(true);
-        grid.setColumns("id", "verbatim", "productLine", "year");
-        grid.getColumnByKey("id").setWidth("50px").setFlexGrow(0);
+        grid.setColumns("placementNo", "verbatim", "productLine", "year");
+        grid.getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
 
         grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
 
         tfVerbatimFilter.setPlaceholder("Filter by verbatim");
+        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
         cbProductLineFilter.setItems(ProductLine.values());
 
         tfVerbatimFilter.setValueChangeMode(ValueChangeMode.EAGER);

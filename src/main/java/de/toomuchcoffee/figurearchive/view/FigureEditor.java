@@ -31,6 +31,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
     private Figure figure;
 
     private TextField tfVerbatim = new TextField("Verbatim");
+    private TextField tfPlacementNo = new TextField("Placement No.");
     private ComboBox<Integer> cbYear = new ComboBox<>("Year");
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
 
@@ -57,6 +58,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         binder = new Binder<>();
         binder.bind(imageSelector, Figure::getImage, Figure::setImage);
         binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
+        binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);
         binder.bind(cbLine, Figure::getProductLine, Figure::setProductLine);
 
