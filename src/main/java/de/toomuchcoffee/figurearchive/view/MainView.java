@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,7 +15,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
 import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
@@ -23,13 +23,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.Optional;
 
 @Route
-@UIScope
 public class MainView extends VerticalLayout {
 
     private final FigureRepository figureRepository;
@@ -38,6 +40,9 @@ public class MainView extends VerticalLayout {
     private final Grid<Figure> grid = new Grid<>(Figure.class);
 
     private FilterParams filterParams = new FilterParams();
+
+    @Autowired
+    private HttpServletRequest request;
 
     @Getter
     @Setter
@@ -54,9 +59,13 @@ public class MainView extends VerticalLayout {
 
         MemoryBuffer buffer = new MemoryBuffer();
         Upload csvUpload = new Upload(buffer);
+        csvUpload.setDropAllowed(false);
+        csvUpload.setUploadButton(new Button("Select CSV file", VaadinIcon.UPLOAD.create()));
         csvUpload.setAcceptedFileTypes(".csv");
 
-        HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload);
+        Button btnLogout = new Button("Logout", VaadinIcon.EXIT.create(), e -> requestLogout());
+
+        HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
         add(actions, grid, figureEditor);
 
         grid.setHeightByRows(true);
@@ -123,4 +132,13 @@ public class MainView extends VerticalLayout {
         }
 
     }
+
+    private void requestLogout() {
+        SecurityContextHolder.clearContext();
+        request.getSession(false).invalidate();
+
+        UI.getCurrent().getSession().close();
+        UI.getCurrent().getPage().reload();// to redirect user to the login page
+    }
+
 }
