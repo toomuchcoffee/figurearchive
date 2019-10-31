@@ -51,7 +51,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
         add(verticalLayout, imageSelector);
 
-        cbYear.setItems(IntStream.range(1977, now().getYear()).mapToObj(value -> (short) value).collect(toList()));
+        cbYear.setItems(IntStream.range(1977, now().getYear()+1).mapToObj(value -> (short) value).collect(toList()));
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
 

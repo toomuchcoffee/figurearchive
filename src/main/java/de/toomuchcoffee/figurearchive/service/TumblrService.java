@@ -1,22 +1,21 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.tumblr.jumblr.JumblrClient;
+import com.tumblr.jumblr.types.Blog;
+import com.tumblr.jumblr.types.Photo;
+import com.tumblr.jumblr.types.Post;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -24,18 +23,24 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class TumblrService {
 
-    private List<TumblrPost> posts;
+    private TumblrService(
+            @Value("${tumblr.consumer-key}") String consumerKey,
+            @Value("${tumblr.consumer-secret}") String consumerSecret) {
+        jumblrClient = new JumblrClient(consumerKey, consumerSecret);
+    }
 
-    private ObjectMapper objectMapper;
+    private final JumblrClient jumblrClient;
+
+    private List<PhotoPost> posts;
 
     private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 8);
 
-    public List<TumblrPost> getPosts(Set<String> filter) {
+    public List<PhotoPost> getPosts(Set<String> filter) {
         return posts.stream()
                 .filter(tp -> tp.getTags() != null)
                 .filter(tp -> intersection(filter, newHashSet(tp.getTags())).size() > 0)
                 .sorted(comparing(tp -> difference(newHashSet(tp.getTags()), filter).size()))
-                .sorted(comparing(tp -> intersection(filter, newHashSet(((TumblrPost) tp).getTags())).size()).reversed())
+                .sorted(comparing(tp -> intersection(filter, newHashSet(((PhotoPost) tp).getTags())).size()).reversed())
                 .collect(toList());
     }
 
@@ -45,71 +50,61 @@ public class TumblrService {
     }
 
     public void readPosts() {
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Blog blog = jumblrClient.blogInfo("yaswb.tumblr.com");
+        Integer postCount = blog.getPostCount();
 
-        String tumblrFirstPageUrl = "http://yaswb.tumblr.com/api/read/json?type=photo";
-        TumblrResponse tumblrFirstResponse = getTumblrResponse(tumblrFirstPageUrl);
-        posts = newArrayList(tumblrFirstResponse.posts).stream()
-                .filter(tp -> tp.tags != null)
-                .collect(toList());
+        posts = Lists.newArrayList();
 
-        int offset = 20;
-        int maxPage = (int) Math.ceil(((double) tumblrFirstResponse.postsTotal) / offset);
-        for (int page = 1; page < maxPage; page++) {
-            final int start = page * offset;
-            final String tumblrUrl = String.format("http://yaswb.tumblr.com/api/read/json?type=photo&num=20&start=%s", start);
+        int count = 0;
+        int size = 100;
+        while ((count * size) < postCount) {
+            Map<String, Integer> options = new HashMap<>();
+            options.put("limit", size);
+            options.put("offset", count * size);
             executor.submit(() -> {
-                System.out.println(String.format("Getting tumblr response from url: %s", tumblrUrl));
-                TumblrResponse tumblrPageResponse = getTumblrResponse(tumblrUrl);
-                posts.addAll(Arrays.asList(tumblrPageResponse.posts));
+                List<Post> posts = jumblrClient.blogPosts("yaswb", options);
+                List<PhotoPost> tumblrPosts = posts.stream()
+                        .map(this::translate)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(toList());
+                this.posts.addAll(tumblrPosts);
             });
+            count++;
         }
     }
 
-    private TumblrResponse getTumblrResponse(String tumblrUrl) {
-        String jsonString = new RestTemplate().getForObject(tumblrUrl, String.class);
-        jsonString = jsonString.replaceFirst("var tumblr_api_read =", "").trim();
+    private Optional<PhotoPost> translate(Post post) {
+        if (post instanceof com.tumblr.jumblr.types.PhotoPost) {
+            PhotoPost tumblrPost = new PhotoPost();
 
-        try {
-            return objectMapper.readValue(jsonString, TumblrResponse.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            tumblrPost.setId(post.getId());
+
+            String[] tags = new String[post.getTags().size()];
+            tumblrPost.setTags(post.getTags().toArray(tags));
+
+            Photo photo = ((com.tumblr.jumblr.types.PhotoPost) post).getPhotos().get(0);// TODO get all photos not just first one
+
+            String url = photo.getSizes().stream()
+                    .filter(size -> size.getWidth() == 75 && size.getHeight() == 75)
+                    .findFirst()
+                    .orElse(photo.getOriginalSize())
+                    .getUrl();
+            tumblrPost.setThumbnail(url);
+
+            return Optional.of(tumblrPost);
         }
+        return Optional.empty();
     }
 
-    @JsonIgnoreProperties
-    public static class TumblrResponse {
-        @JsonProperty("posts-total")
-        public int postsTotal;
-
-        public TumblrPost[] posts;
-    }
-
-    @JsonIgnoreProperties
     @Getter
-    public static class TumblrPost {
+    @Setter
+    public static class PhotoPost {
         private String[] tags;
 
         private Long id;
 
-        @JsonProperty("photo-url-1280")
-        private String photoUrl1280;
-
-        @JsonProperty("photo-url-500")
-        private String photoUrl500;
-
-        @JsonProperty("photo-url-400")
-        private String photoUrl400;
-
-        @JsonProperty("photo-url-250")
-        private String photoUrl250;
-
-        @JsonProperty("photo-url-100")
-        private String photoUrl100;
-
-        @JsonProperty("photo-url-75")
-        private String photoUrl75;
+        private String thumbnail;
     }
 
 }

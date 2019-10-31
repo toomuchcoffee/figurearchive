@@ -13,6 +13,9 @@ spring:
     multipart:
       enabled: false  # needs to be disabled because of vaadin-upload bug
 
+tumblr:
+  consumer-key: ${API_KEY}
+  consumer-secret: ${API_SECRET}
 ---
 
 spring:

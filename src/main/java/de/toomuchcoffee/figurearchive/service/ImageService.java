@@ -1,6 +1,6 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import de.toomuchcoffee.figurearchive.service.TumblrService.TumblrPost;
+import de.toomuchcoffee.figurearchive.service.TumblrService.PhotoPost;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +18,8 @@ public class ImageService {
     public List<String> getImages(String verbatim, int max) {
         Set<String> filter = permutationService.getPermutations(verbatim);
         return tumblrService.getPosts(filter).stream()
-                .filter(p -> p.getPhotoUrl75() != null)
-                .map(TumblrPost::getPhotoUrl75)
+                .filter(p -> p.getThumbnail() != null)
+                .map(PhotoPost::getThumbnail)
                 .limit(max)
                 .collect(Collectors.toList());
     }
