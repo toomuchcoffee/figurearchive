@@ -10,10 +10,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
 import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
@@ -30,6 +28,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Route
 public class MainView extends VerticalLayout {
@@ -74,13 +73,12 @@ public class MainView extends VerticalLayout {
 
         grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
 
-        TextField tfVerbatimFilter = new TextField("Verbatim");
-        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
+        ComboBox<String> cbVerbatimFilter = new ComboBox<>("Verbatim");
+        cbVerbatimFilter.setItems(figureRepository.findAll().stream().map(Figure::getVerbatim).sorted().collect(Collectors.toList()));
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
         cbProductLineFilter.setItems(ProductLine.values());
 
-        tfVerbatimFilter.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatimFilter.addValueChangeListener(e -> {
+        cbVerbatimFilter.addValueChangeListener(e -> {
             filterParams.setVerbatim(e.getValue());
             listFigures();
         });
@@ -97,7 +95,7 @@ public class MainView extends VerticalLayout {
         });
 
         HorizontalLayout filter = new HorizontalLayout();
-        filter.add(tfVerbatimFilter);
+        filter.add(cbVerbatimFilter);
         filter.add(cbProductLineFilter);
 
         add(filter, grid);
