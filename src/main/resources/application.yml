@@ -16,6 +16,10 @@ spring:
 tumblr:
   consumer-key: ${API_KEY}
   consumer-secret: ${API_SECRET}
+
+figurearchive:
+  admin-password: ${ADMIN_PASSWORD}
+
 ---
 
 spring:
