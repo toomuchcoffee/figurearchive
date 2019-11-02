@@ -14,13 +14,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
 import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
-import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MainView extends VerticalLayout {
 
-    private final FigureService figureService;
+    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final ImportService importService;
     private final FigureEditor figureEditor;
 
@@ -63,10 +61,9 @@ public class MainView extends VerticalLayout {
 
         HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
         Grid<Figure> grid = new Grid<>(Figure.class);
-        add(actions, grid, figureEditor);
+        add(actions, grid);
 
-        ConfigurableFilterDataProvider<Figure, Void, FigureFilter> dataProvider = getDataProvider(figureService);
-        grid.setDataProvider(dataProvider);
+        grid.setDataProvider(figureDataProvider);
         grid.setPageSize(1000); // TODO
         grid.setHeightByRows(true);
         grid.setColumns("placementNo", "verbatim", "productLine", "year");
@@ -85,7 +82,7 @@ public class MainView extends VerticalLayout {
         tfVerbatimFilter.setValueChangeMode(ValueChangeMode.EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
-            dataProvider.setFilter(figureFilter);
+            figureDataProvider.setFilter(figureFilter);
             displayRowCount(grid, tfCount);
         });
 
@@ -93,7 +90,7 @@ public class MainView extends VerticalLayout {
         cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
-            dataProvider.setFilter(figureFilter);
+            figureDataProvider.setFilter(figureFilter);
             displayRowCount(grid, tfCount);
         });
 
@@ -107,21 +104,10 @@ public class MainView extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(e -> Optional.ofNullable(e.getValue()).ifPresent(figureEditor::editFigure));
 
 
-        figureEditor.setChangeHandler(() -> {
-            figureEditor.setVisible(false);
-            dataProvider.refreshAll();
-            displayRowCount(grid, tfCount);
-        });
     }
 
     private void displayRowCount(Grid<Figure> grid, TextField tfCount) {
         tfCount.setValue(grid.getDataProvider().size(new Query<>()) + " figures found");
-    }
-
-    private ConfigurableFilterDataProvider<Figure, Void, FigureFilter> getDataProvider(FigureService service) {
-        return DataProvider.<Figure, FigureFilter>fromFilteringCallbacks(
-                query -> service.fetch(query.getOffset(), query.getLimit(), query.getFilter().orElse(null)).stream(),
-                query -> service.getCount(query.getFilter().orElse(null))).withConfigurableFilter();
     }
 
     @SneakyThrows

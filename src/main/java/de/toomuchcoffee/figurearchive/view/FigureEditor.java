@@ -4,19 +4,23 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
 import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import lombok.RequiredArgsConstructor;
 
+import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
 import static java.time.LocalDate.now;
@@ -24,9 +28,12 @@ import static java.util.stream.Collectors.toList;
 
 @SpringComponent
 @UIScope
-public class FigureEditor extends HorizontalLayout implements KeyNotifier {
+@RequiredArgsConstructor
+public class FigureEditor extends Dialog implements KeyNotifier {
 
+    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureRepository repository;
+    private final ImageSelector imageSelector;
 
     private Figure figure;
 
@@ -41,17 +48,17 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
     private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
     private Binder<Figure> binder;
-    private ChangeHandler changeHandler;
 
-    @Autowired
-    public FigureEditor(FigureRepository repository, ImageSelector imageSelector) {
-        this.repository = repository;
+    @PostConstruct
+    public void init() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        add(horizontalLayout);
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
-        add(verticalLayout, imageSelector);
+        horizontalLayout.add(verticalLayout, imageSelector);
 
-        cbYear.setItems(IntStream.range(1977, now().getYear()+1).mapToObj(value -> (short) value).collect(toList()));
+        cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
 
@@ -62,7 +69,7 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
         binder.bind(cbYear, Figure::getYear, Figure::setYear);
         binder.bind(cbLine, Figure::getProductLine, Figure::setProductLine);
 
-        setSpacing(true);
+        horizontalLayout.setSpacing(true);
 
         addKeyPressListener(Key.ENTER, e -> save());
 
@@ -71,52 +78,34 @@ public class FigureEditor extends HorizontalLayout implements KeyNotifier {
 
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
-        cancel.addClickListener(e -> cancel());
-        setVisible(false);
+        cancel.addClickListener(e -> close());
     }
 
     private void delete() {
         repository.delete(figure);
-        changeHandler.onChange();
+        figureDataProvider.refreshAll();
+        close();
     }
 
     private void save() {
         repository.save(figure);
-        changeHandler.onChange();
-    }
-
-    public final void cancel() {
-        changeHandler.onChange();
+        figureDataProvider.refreshAll();
+        close();
     }
 
     public final void createFigure() {
+        open();
         this.figure = new Figure();
-
         binder.setBean(this.figure);
-
-        setVisible(true);
-
         tfVerbatim.focus();
     }
 
     public final void editFigure(Figure figure) {
+        open();
         this.figure = repository.findById(figure.getId())
                 .orElseThrow(() -> new IllegalStateException("Couldn't find item from list"));
-
         binder.setBean(this.figure);
-
-        setVisible(true);
-
         tfVerbatim.focus();
-    }
-
-    public interface ChangeHandler {
-        void onChange();
-
-    }
-
-    public void setChangeHandler(ChangeHandler changeHandler) {
-        this.changeHandler = changeHandler;
     }
 
 }
