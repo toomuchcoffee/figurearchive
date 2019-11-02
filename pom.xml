@@ -76,6 +76,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.vaadin.spring</groupId>
+            <artifactId>spring-vaadin-eventbus</artifactId>
+            <version>0.0.5.RELEASE</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>

@@ -7,6 +7,7 @@ import de.toomuchcoffee.figurearchive.service.FigureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.vaadin.spring.events.EventBus;
 
 import static org.springframework.beans.factory.annotation.Autowire.BY_NAME;
 
@@ -14,11 +15,16 @@ import static org.springframework.beans.factory.annotation.Autowire.BY_NAME;
 @RequiredArgsConstructor
 public class DataProviderConfig {
     private final FigureService figureService;
+    private final EventBus.ApplicationEventBus eventBus;
 
     @Bean(autowire = BY_NAME)
     public ConfigurableFilterDataProvider<Figure, Void, FigureService.FigureFilter> getFigureDataProvider() {
         return DataProvider.<Figure, FigureService.FigureFilter>fromFilteringCallbacks(
-                query -> figureService.fetch(query.getOffset(), query.getLimit(), query.getFilter().orElse(null)).stream(),
+                query -> {
+                    eventBus.publish(null, Object.class);
+                    return figureService.fetch(query.getOffset(), query.getLimit(), query.getFilter().orElse(null)).stream();
+                },
                 query -> figureService.getCount(query.getFilter().orElse(null))).withConfigurableFilter();
     }
+
 }
