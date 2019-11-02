@@ -23,43 +23,46 @@ import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.service.ImportService;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.Optional;
 
 @Route
+@RequiredArgsConstructor
 public class MainView extends VerticalLayout {
 
+    private final FigureService figureService;
     private final ImportService importService;
-
-    private final Grid<Figure> grid = new Grid<>(Figure.class);
+    private final FigureEditor figureEditor;
 
     @Autowired
     private HttpServletRequest request;
 
-    public MainView(FigureService figureService, ImportService importService, FigureEditor figureEditor) {
-        this.importService = importService;
-
+    @PostConstruct
+    public void init() {
         Button addNewBtn = new Button("New figure", VaadinIcon.PLUS.create());
+        addNewBtn.addClickListener(e -> figureEditor.createFigure());
 
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload csvUpload = new Upload(buffer);
+        Upload csvUpload = new Upload(new MemoryBuffer());
         csvUpload.setDropAllowed(false);
         csvUpload.setUploadButton(new Button("Select CSV file", VaadinIcon.UPLOAD.create()));
         csvUpload.setAcceptedFileTypes(".csv");
         csvUpload.addSucceededListener(e -> {
             Notification.show("YAY");
-            importCsv(buffer.getInputStream());
+            importCsv(((MemoryBuffer) csvUpload.getReceiver()).getInputStream());
         });
 
         Button btnLogout = new Button("Logout", VaadinIcon.EXIT.create(), e -> requestLogout());
 
         HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
+        Grid<Figure> grid = new Grid<>(Figure.class);
         add(actions, grid, figureEditor);
 
         ConfigurableFilterDataProvider<Figure, Void, FigureFilter> dataProvider = getDataProvider(figureService);
@@ -75,7 +78,7 @@ public class MainView extends VerticalLayout {
 
         TextField tfCount = new TextField("Row count");
         tfCount.setEnabled(false);
-        displayRowCount(tfCount);
+        displayRowCount(grid, tfCount);
 
         TextField tfVerbatimFilter = new TextField("Verbatim");
         tfVerbatimFilter.setPlaceholder("Filter by verbatim");
@@ -83,7 +86,7 @@ public class MainView extends VerticalLayout {
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
             dataProvider.setFilter(figureFilter);
-            displayRowCount(tfCount);
+            displayRowCount(grid, tfCount);
         });
 
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
@@ -91,9 +94,8 @@ public class MainView extends VerticalLayout {
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
             dataProvider.setFilter(figureFilter);
-            displayRowCount(tfCount);
+            displayRowCount(grid, tfCount);
         });
-
 
         HorizontalLayout filter = new HorizontalLayout();
         filter.add(tfVerbatimFilter);
@@ -104,16 +106,15 @@ public class MainView extends VerticalLayout {
 
         grid.asSingleSelect().addValueChangeListener(e -> Optional.ofNullable(e.getValue()).ifPresent(figureEditor::editFigure));
 
-        addNewBtn.addClickListener(e -> figureEditor.createFigure());
 
         figureEditor.setChangeHandler(() -> {
             figureEditor.setVisible(false);
             dataProvider.refreshAll();
-            displayRowCount(tfCount);
+            displayRowCount(grid, tfCount);
         });
     }
 
-    private void displayRowCount(TextField tfCount) {
+    private void displayRowCount(Grid<Figure> grid, TextField tfCount) {
         tfCount.setValue(grid.getDataProvider().size(new Query<>()) + " figures found");
     }
 
