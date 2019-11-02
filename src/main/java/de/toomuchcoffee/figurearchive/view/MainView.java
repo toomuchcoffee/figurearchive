@@ -10,48 +10,39 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
 import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
-import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.service.FigureService;
+import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.service.ImportService;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Route
 public class MainView extends VerticalLayout {
 
-    private final FigureRepository figureRepository;
     private final ImportService importService;
 
     private final Grid<Figure> grid = new Grid<>(Figure.class);
 
-    private FilterParams filterParams = new FilterParams();
-
     @Autowired
     private HttpServletRequest request;
 
-    @Getter
-    @Setter
-    private static class FilterParams {
-        private String verbatim;
-        private ProductLine productLine;
-    }
-
-    public MainView(FigureRepository figureRepository, ImportService importService, FigureEditor figureEditor) {
-        this.figureRepository = figureRepository;
+    public MainView(FigureService figureService, ImportService importService, FigureEditor figureEditor) {
         this.importService = importService;
 
         Button addNewBtn = new Button("New figure", VaadinIcon.PLUS.create());
@@ -67,35 +58,40 @@ public class MainView extends VerticalLayout {
         HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
         add(actions, grid, figureEditor);
 
+        ConfigurableFilterDataProvider<Figure, Void, FigureFilter> dataProvider = getDataProvider(figureService);
+        grid.setDataProvider(dataProvider);
+        grid.setPageSize(500);
         grid.setHeightByRows(true);
         grid.setColumns("placementNo", "verbatim", "productLine", "year");
         grid.getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
 
         grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
 
-        ComboBox<String> cbVerbatimFilter = new ComboBox<>("Verbatim");
-        cbVerbatimFilter.setItems(figureRepository.findAll().stream().map(Figure::getVerbatim).sorted().collect(Collectors.toList()));
+        TextField tfVerbatimFilter = new TextField("Verbatim");
+        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
         cbProductLineFilter.setItems(ProductLine.values());
 
-        cbVerbatimFilter.addValueChangeListener(e -> {
-            filterParams.setVerbatim(e.getValue());
-            listFigures();
+        FigureFilter figureFilter = new FigureFilter();
+
+        tfVerbatimFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        tfVerbatimFilter.addValueChangeListener(e -> {
+            figureFilter.setFilterText(e.getValue());
+            dataProvider.setFilter(figureFilter);
         });
 
         cbProductLineFilter.addValueChangeListener(e -> {
-            filterParams.setProductLine(e.getValue());
-            listFigures();
+            figureFilter.setProductLine(e.getValue());
+            dataProvider.setFilter(figureFilter);
         });
 
         csvUpload.addSucceededListener(e -> {
             Notification.show("YAY");
             importCsv(buffer.getInputStream());
-            listFigures();
         });
 
         HorizontalLayout filter = new HorizontalLayout();
-        filter.add(cbVerbatimFilter);
+        filter.add(tfVerbatimFilter);
         filter.add(cbProductLineFilter);
 
         add(filter, grid);
@@ -106,29 +102,29 @@ public class MainView extends VerticalLayout {
 
         figureEditor.setChangeHandler(() -> {
             figureEditor.setVisible(false);
-            listFigures();
+            dataProvider.refreshAll();
         });
 
-        listFigures();
+    }
+
+    private ConfigurableFilterDataProvider<Figure, Void, FigureFilter> getDataProvider(FigureService service) {
+        CallbackDataProvider<Figure, FigureFilter> dataProvider = DataProvider.fromFilteringCallbacks(
+                query -> {
+                    FigureFilter filter = query.getFilter().orElse(null);
+                    return service.fetch(query.getOffset(), query.getLimit(), filter).stream();
+                },
+                query -> {
+                    FigureFilter filter = query.getFilter().orElse(null);
+                    return service.getCount(filter);
+                });
+
+        return dataProvider.withConfigurableFilter();
     }
 
     @SneakyThrows
     private void importCsv(InputStream is) {
         byte[] bytes = IOUtils.toByteArray(is);
         importService.importCsv(bytes);
-    }
-
-    private void listFigures() {
-        if (StringUtils.isEmpty(filterParams.getVerbatim()) && filterParams.getProductLine() == null) {
-            grid.setItems(figureRepository.findAll());
-        } else if (StringUtils.isEmpty(filterParams.getVerbatim()) && filterParams.getProductLine() != null) {
-            grid.setItems(figureRepository.findByProductLine(filterParams.getProductLine()));
-        } else if (!StringUtils.isEmpty(filterParams.getVerbatim()) && filterParams.getProductLine() == null) {
-            grid.setItems(figureRepository.findByVerbatimStartsWithIgnoreCase(filterParams.getVerbatim()));
-        } else {
-            grid.setItems(figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filterParams.getVerbatim(), filterParams.getProductLine()));
-        }
-
     }
 
     private void requestLogout() {
