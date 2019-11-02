@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 
 @Configuration
 @EnableWebSecurity
+@Profile("!local")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String ADMIN_USERNAME = "admin";
