@@ -3,9 +3,6 @@ package de.toomuchcoffee.figurearchive.view;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
-import java.util.Optional;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
@@ -39,6 +35,7 @@ public class MainView extends VerticalLayout {
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureDataInfo figureDataInfo;
     private final ImportService importService;
+    private final FigureGrid figureGrid;
     private final FigureEditor figureEditor;
 
     @Autowired
@@ -61,16 +58,7 @@ public class MainView extends VerticalLayout {
         Button btnLogout = new Button("Logout", EXIT.create(), e -> requestLogout());
 
         HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
-        Grid<Figure> grid = new Grid<>(Figure.class);
-        add(actions, grid);
-
-        grid.setDataProvider(figureDataProvider);
-        grid.setPageSize(1000); // TODO
-        grid.setHeightByRows(true);
-        grid.setColumns("placementNo", "verbatim", "productLine", "year");
-        grid.getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
-
-        grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
+        add(actions);
 
         FigureFilter figureFilter = new FigureFilter();
 
@@ -94,9 +82,8 @@ public class MainView extends VerticalLayout {
         filter.add(cbProductLineFilter);
         filter.add(figureDataInfo);
 
-        add(filter, grid);
+        add(filter, figureGrid);
 
-        grid.asSingleSelect().addValueChangeListener(e -> Optional.ofNullable(e.getValue()).ifPresent(figureEditor::editFigure));
     }
 
     @SneakyThrows
