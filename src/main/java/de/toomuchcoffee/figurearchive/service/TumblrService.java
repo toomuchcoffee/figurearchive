@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import com.tumblr.jumblr.JumblrClient;
 import com.tumblr.jumblr.types.Blog;
 import com.tumblr.jumblr.types.Photo;
+import com.tumblr.jumblr.types.PhotoSize;
 import com.tumblr.jumblr.types.Post;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import java.util.concurrent.Executors;
 import static com.google.common.collect.Sets.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class TumblrService {
@@ -38,9 +41,9 @@ public class TumblrService {
     public List<PhotoPost> getPosts(Set<String> filter) {
         return posts.stream()
                 .filter(tp -> tp.getTags() != null)
-                .filter(tp -> intersection(filter, newHashSet(tp.getTags())).size() > 0)
-                .sorted(comparing(tp -> difference(newHashSet(tp.getTags()), filter).size()))
-                .sorted(comparing(tp -> intersection(filter, newHashSet(((PhotoPost) tp).getTags())).size()).reversed())
+                .filter(tp -> intersection(filter, tp.getTags()).size() > 0)
+                .sorted(comparing(tp -> difference(tp.getTags(), filter).size()))
+                .sorted(comparing(tp -> intersection(filter, ((PhotoPost) tp).getTags()).size()).reversed())
                 .collect(toList());
     }
 
@@ -64,9 +67,8 @@ public class TumblrService {
             executor.submit(() -> {
                 List<Post> posts = jumblrClient.blogPosts("yaswb", options);
                 List<PhotoPost> tumblrPosts = posts.stream()
-                        .map(this::translate)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .map(this::extractPhotoPosts)
+                        .flatMap(Collection::stream)
                         .collect(toList());
                 this.posts.addAll(tumblrPosts);
             });
@@ -74,36 +76,39 @@ public class TumblrService {
         }
     }
 
-    private Optional<PhotoPost> translate(Post post) {
+    private Set<PhotoPost> extractPhotoPosts(Post post) {
         if (post instanceof com.tumblr.jumblr.types.PhotoPost) {
-            PhotoPost tumblrPost = new PhotoPost();
+            List<Photo> photos = ((com.tumblr.jumblr.types.PhotoPost) post).getPhotos();
+            return photos.stream()
+                    .map(photo -> extractPhotoPost(post, photo))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(toSet());
 
-            tumblrPost.setId(post.getId());
-
-            String[] tags = new String[post.getTags().size()];
-            tumblrPost.setTags(post.getTags().toArray(tags));
-
-            Photo photo = ((com.tumblr.jumblr.types.PhotoPost) post).getPhotos().get(0);// TODO get all photos not just first one
-
-            String url = photo.getSizes().stream()
-                    .filter(size -> size.getWidth() == 75 && size.getHeight() == 75)
-                    .findFirst()
-                    .orElse(photo.getOriginalSize())
-                    .getUrl();
-            tumblrPost.setThumbnail(url);
-
-            return Optional.of(tumblrPost);
         }
-        return Optional.empty();
+        return Collections.emptySet();
+    }
+
+    private Optional<PhotoPost> extractPhotoPost(Post post, Photo photo) {
+        return photo.getSizes().stream()
+                .filter(size -> size.getWidth() == 75)
+                .min(comparing(PhotoSize::getHeight))
+                .map(photoSize -> {
+                    PhotoPost photoPost = new PhotoPost();
+                    photoPost.setThumbnail(photoSize.getUrl());
+                    photoPost.setPostId(post.getId());
+                    photoPost.setTags(newHashSet(post.getTags()));
+                    return Optional.of(photoPost);
+                })
+                .orElse(Optional.empty());
     }
 
     @Getter
     @Setter
+    @EqualsAndHashCode
     public static class PhotoPost {
-        private String[] tags;
-
-        private Long id;
-
+        private Long postId;
+        private Set<String> tags;
         private String thumbnail;
     }
 
