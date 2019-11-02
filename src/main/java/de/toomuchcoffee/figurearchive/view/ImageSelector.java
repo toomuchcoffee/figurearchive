@@ -11,7 +11,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.service.ImageService;
+import de.toomuchcoffee.figurearchive.service.PhotoService;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -21,16 +21,16 @@ import java.util.List;
 @UIScope
 public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, String> {
 
-    private final ImageService imageService;
+    private final PhotoService photoService;
 
     private VerticalLayout imageGallery = new VerticalLayout();
 
     private Button btnRemoveImage = new Button(VaadinIcon.TRASH.create());
 
-    public ImageSelector(ImageService imageService) {
+    public ImageSelector(PhotoService photoService) {
         super("");
 
-        this.imageService = imageService;
+        this.photoService = photoService;
 
         updateSelectedImage();
 
@@ -62,7 +62,7 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     public void updateImageGallery(String verbatim) {
         imageGallery.removeAll();
 
-        List<String> imageUrls = imageService.getImages(verbatim, 49);
+        List<String> imageUrls = photoService.getUrls(verbatim, 49);
 
         HorizontalLayout row = new HorizontalLayout();
         for (int i = 0; i < imageUrls.size(); i++) {
