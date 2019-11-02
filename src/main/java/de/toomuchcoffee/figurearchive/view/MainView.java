@@ -2,18 +2,12 @@ package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.router.Route;
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
-import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
-import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -26,15 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 
 @Route
 @RequiredArgsConstructor
 public class MainView extends VerticalLayout {
 
-    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
-    private final FigureDataInfo figureDataInfo;
     private final ImportService importService;
+    private final FigureFilterPanel figureFilterPanel;
     private final FigureGrid figureGrid;
     private final FigureEditor figureEditor;
 
@@ -60,30 +52,7 @@ public class MainView extends VerticalLayout {
         HorizontalLayout actions = new HorizontalLayout(addNewBtn, csvUpload, btnLogout);
         add(actions);
 
-        FigureFilter figureFilter = new FigureFilter();
-
-        TextField tfVerbatimFilter = new TextField("Verbatim");
-        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
-        tfVerbatimFilter.setValueChangeMode(EAGER);
-        tfVerbatimFilter.addValueChangeListener(e -> {
-            figureFilter.setFilterText(e.getValue());
-            figureDataProvider.setFilter(figureFilter);
-        });
-
-        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
-        cbProductLineFilter.setItems(ProductLine.values());
-        cbProductLineFilter.addValueChangeListener(e -> {
-            figureFilter.setProductLine(e.getValue());
-            figureDataProvider.setFilter(figureFilter);
-        });
-
-        HorizontalLayout filter = new HorizontalLayout();
-        filter.add(tfVerbatimFilter);
-        filter.add(cbProductLineFilter);
-        filter.add(figureDataInfo);
-
-        add(filter, figureGrid);
-
+        add(figureFilterPanel, figureGrid);
     }
 
     @SneakyThrows
