@@ -6,7 +6,7 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;

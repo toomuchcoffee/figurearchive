@@ -1,7 +1,7 @@
 package de.toomuchcoffee.figurearchive.repository;
 
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
-import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
+import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

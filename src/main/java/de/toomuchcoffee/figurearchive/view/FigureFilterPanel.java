@@ -6,8 +6,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
-import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
+import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
 

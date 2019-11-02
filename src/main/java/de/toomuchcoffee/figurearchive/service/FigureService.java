@@ -1,8 +1,8 @@
 package de.toomuchcoffee.figurearchive.service;
 
 
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
-import de.toomuchcoffee.figurearchive.entitiy.ProductLine;
+import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

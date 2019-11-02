@@ -2,7 +2,7 @@ package de.toomuchcoffee.figurearchive.config;
 
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
-import de.toomuchcoffee.figurearchive.entitiy.Figure;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

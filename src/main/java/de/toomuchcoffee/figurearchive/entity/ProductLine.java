@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.entitiy;
+package de.toomuchcoffee.figurearchive.entity;
 
 
 import lombok.Getter;
