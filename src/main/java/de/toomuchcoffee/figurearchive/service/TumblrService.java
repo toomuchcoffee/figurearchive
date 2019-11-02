@@ -1,6 +1,6 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 import com.tumblr.jumblr.JumblrClient;
 import com.tumblr.jumblr.types.Blog;
 import com.tumblr.jumblr.types.Photo;
@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -56,14 +58,8 @@ public class TumblrService {
         Blog blog = jumblrClient.blogInfo("yaswb.tumblr.com");
         Integer postCount = blog.getPostCount();
 
-        posts = Lists.newArrayList();
-
-        int count = 0;
-        int size = 100;
-        while ((count * size) < postCount) {
-            Map<String, Integer> options = new HashMap<>();
-            options.put("limit", size);
-            options.put("offset", count * size);
+        BiConsumer<Integer, Integer> function = (offset, pageSize) -> {
+            Map<String, Integer> options = ImmutableMap.of("limit", pageSize, "offset", offset);
             executor.submit(() -> {
                 List<Post> posts = jumblrClient.blogPosts("yaswb", options);
                 List<PhotoPost> tumblrPosts = posts.stream()
@@ -72,8 +68,10 @@ public class TumblrService {
                         .collect(toList());
                 this.posts.addAll(tumblrPosts);
             });
-            count++;
-        }
+        };
+
+        posts = new BatchedExecutor(100, postCount).execute(newArrayList(), function);
+
     }
 
     private Set<PhotoPost> extractPhotoPosts(Post post) {
@@ -84,7 +82,6 @@ public class TumblrService {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(toSet());
-
         }
         return Collections.emptySet();
     }
