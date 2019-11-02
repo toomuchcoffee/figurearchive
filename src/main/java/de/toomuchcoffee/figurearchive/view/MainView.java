@@ -13,9 +13,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.entitiy.Figure;
@@ -52,6 +52,10 @@ public class MainView extends VerticalLayout {
         csvUpload.setDropAllowed(false);
         csvUpload.setUploadButton(new Button("Select CSV file", VaadinIcon.UPLOAD.create()));
         csvUpload.setAcceptedFileTypes(".csv");
+        csvUpload.addSucceededListener(e -> {
+            Notification.show("YAY");
+            importCsv(buffer.getInputStream());
+        });
 
         Button btnLogout = new Button("Logout", VaadinIcon.EXIT.create(), e -> requestLogout());
 
@@ -60,39 +64,41 @@ public class MainView extends VerticalLayout {
 
         ConfigurableFilterDataProvider<Figure, Void, FigureFilter> dataProvider = getDataProvider(figureService);
         grid.setDataProvider(dataProvider);
-        grid.setPageSize(500);
+        grid.setPageSize(1000); // TODO
         grid.setHeightByRows(true);
         grid.setColumns("placementNo", "verbatim", "productLine", "year");
         grid.getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
 
         grid.addComponentColumn(f -> f.getImage() == null ? new Span() : new Image(f.getImage(), "n/a")).setHeader("Image");
 
-        TextField tfVerbatimFilter = new TextField("Verbatim");
-        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
-        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
-        cbProductLineFilter.setItems(ProductLine.values());
-
         FigureFilter figureFilter = new FigureFilter();
 
+        TextField tfCount = new TextField("Row count");
+        tfCount.setEnabled(false);
+        displayRowCount(tfCount);
+
+        TextField tfVerbatimFilter = new TextField("Verbatim");
+        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
         tfVerbatimFilter.setValueChangeMode(ValueChangeMode.EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
             dataProvider.setFilter(figureFilter);
+            displayRowCount(tfCount);
         });
 
+        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
+        cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
             dataProvider.setFilter(figureFilter);
+            displayRowCount(tfCount);
         });
 
-        csvUpload.addSucceededListener(e -> {
-            Notification.show("YAY");
-            importCsv(buffer.getInputStream());
-        });
 
         HorizontalLayout filter = new HorizontalLayout();
         filter.add(tfVerbatimFilter);
         filter.add(cbProductLineFilter);
+        filter.add(tfCount);
 
         add(filter, grid);
 
@@ -103,22 +109,18 @@ public class MainView extends VerticalLayout {
         figureEditor.setChangeHandler(() -> {
             figureEditor.setVisible(false);
             dataProvider.refreshAll();
+            displayRowCount(tfCount);
         });
+    }
 
+    private void displayRowCount(TextField tfCount) {
+        tfCount.setValue(grid.getDataProvider().size(new Query<>()) + " figures found");
     }
 
     private ConfigurableFilterDataProvider<Figure, Void, FigureFilter> getDataProvider(FigureService service) {
-        CallbackDataProvider<Figure, FigureFilter> dataProvider = DataProvider.fromFilteringCallbacks(
-                query -> {
-                    FigureFilter filter = query.getFilter().orElse(null);
-                    return service.fetch(query.getOffset(), query.getLimit(), filter).stream();
-                },
-                query -> {
-                    FigureFilter filter = query.getFilter().orElse(null);
-                    return service.getCount(filter);
-                });
-
-        return dataProvider.withConfigurableFilter();
+        return DataProvider.<Figure, FigureFilter>fromFilteringCallbacks(
+                query -> service.fetch(query.getOffset(), query.getLimit(), query.getFilter().orElse(null)).stream(),
+                query -> service.getCount(query.getFilter().orElse(null))).withConfigurableFilter();
     }
 
     @SneakyThrows
