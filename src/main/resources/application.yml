@@ -19,6 +19,8 @@ tumblr:
 
 figurearchive:
   admin-password: ${ADMIN_PASSWORD}
+  tumblr:
+    initialize: true
 
 ---
 

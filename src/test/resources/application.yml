@@ -1,3 +1,16 @@
 spring:
   flyway:
-    enabled: false
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation=true:
+
+tumblr:
+  consumer-key: foo
+  consumer-secret: bar
+
+figurearchive:
+  admin-password: baz
