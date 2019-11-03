@@ -22,7 +22,8 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     private final PhotoService photoService;
 
     private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
-    private static final int MAX_PAGE_SIZE = 49;
+    private static final int ROW_SIZE = 5;
+    private static final int COLUMN_SIZE = 5;
 
     private VerticalLayout imageGallery = new VerticalLayout();
 
@@ -52,11 +53,11 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
         imageGallery.removeAll();
 
         List<Photo> imageUrls = photoService.findPhotosForVerbatim(verbatim);
-        int pageSize = Math.min(imageUrls.size(), MAX_PAGE_SIZE);
+        int pageSize = Math.min(imageUrls.size(), ROW_SIZE * COLUMN_SIZE);
 
         HorizontalLayout row = new HorizontalLayout();
         for (int i = 0; i < pageSize; i++) {
-            if (i % 7 == 0) {
+            if (i % ROW_SIZE == 0) {
                 row = new HorizontalLayout();
             }
             imageGallery.add(row);

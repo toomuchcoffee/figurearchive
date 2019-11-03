@@ -26,7 +26,7 @@ public class Figure {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(
             name = "figure_to_photo",
             joinColumns = { @JoinColumn(name = "figure_id") },

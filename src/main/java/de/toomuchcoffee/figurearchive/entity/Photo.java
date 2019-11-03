@@ -36,7 +36,7 @@ public class Photo {
     @Column(columnDefinition = "text[]")
     private String[] tags;
 
-    @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<Figure> figures = new HashSet<>();
 
     @Data
