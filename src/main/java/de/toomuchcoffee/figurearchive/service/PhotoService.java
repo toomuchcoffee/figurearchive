@@ -18,7 +18,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final PermutationService permutationService;
 
-    public List<Photo> getThumbnails(String verbatim) {
+    public List<Photo> findPhotosForVerbatim(String verbatim) {
         Set<String> filter = permutationService.getPermutations(verbatim);
         return photoRepository.findAll().stream()
                 .filter(tp -> tp.getTags() != null)

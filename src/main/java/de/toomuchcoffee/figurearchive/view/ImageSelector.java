@@ -1,12 +1,7 @@
 package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.AbstractCompositeField;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -19,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 
 @UIScope
 @SpringComponent
@@ -27,22 +21,17 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, Set<Photo>> {
     private final PhotoService photoService;
 
+    private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
     private static final int MAX_PAGE_SIZE = 49;
 
     private VerticalLayout imageGallery = new VerticalLayout();
 
-    private Button btnRemoveImage = new Button(VaadinIcon.TRASH.create());
-
     public ImageSelector(PhotoService photoService) {
-        super(new HashSet<>());
-
+        super(DEFAULT_VALUE);
         this.photoService = photoService;
 
         updateSelectedImage();
-
         addValueChangeListener(e -> updateSelectedImage());
-
-        btnRemoveImage.addClickListener(e -> setValue(new HashSet<>()));
     }
 
     private void updateSelectedImage() {
@@ -50,14 +39,8 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
         if (getValue().isEmpty()) {
             getContent().add(imageGallery);
         } else {
-            AbsoluteLayout div = new AbsoluteLayout();
-            div.setWidth("500px");
-            div.setHeight("750px");
-            Image image = new Image(getImageUrl(getValue().iterator().next(), 500), "N/A");
-            image.setWidth("500px");
-            div.add(image, 0, 0);
-            div.add(btnRemoveImage,0, 450);
-            getContent().add(div);
+            Photo photo = getValue().iterator().next();
+            getContent().add(new ImageButton(photo, 500, e -> setValue(DEFAULT_VALUE)));
         }
     }
 
@@ -68,13 +51,7 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     public void updateImageGallery(String verbatim) {
         imageGallery.removeAll();
 
-        List<Photo> imageUrls = photoService.getThumbnails(verbatim);
-
-        int startIndex = 0;
-        int offset = startIndex * MAX_PAGE_SIZE;
-
-        // List<Photo> page = imageUrls.subList(offset, offset + MAX_PAGE_SIZE);
-
+        List<Photo> imageUrls = photoService.findPhotosForVerbatim(verbatim);
         int pageSize = Math.min(imageUrls.size(), MAX_PAGE_SIZE);
 
         HorizontalLayout row = new HorizontalLayout();
@@ -83,31 +60,11 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
                 row = new HorizontalLayout();
             }
             imageGallery.add(row);
+
             Photo photo = imageUrls.get(i);
-            AbsoluteLayout div = new AbsoluteLayout();
-            div.setHeight("75px");
-            div.setWidth("75px");
-            Image image = new Image();
-            image.setSrc(getImageUrl(photo, 75));
-            div.add(image, 0, 0);
-            Button button = new Button(VaadinIcon.PLUS.create());
-            button.addClickListener(e -> ImageSelector.this.setValue(newHashSet(photo)));
-            div.add(button, -5, 40);
-            row.add(div);
+            row.add(new ImageButton(photo, 75, e -> setValue(newHashSet(photo))));
         }
     }
 
-    public static class AbsoluteLayout extends Div {
-        AbsoluteLayout() {
-            getElement().getStyle().set("position", "relative");
-        }
-
-        void add(Component component, int top, int left) {
-            add(component);
-            component.getElement().getStyle().set("position", "absolute");
-            component.getElement().getStyle().set("top", top + "px");
-            component.getElement().getStyle().set("left", left + "px");
-        }
-    }
 
 }
