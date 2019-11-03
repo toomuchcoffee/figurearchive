@@ -26,10 +26,6 @@ public class Figure {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
-
-    @Deprecated
-    private String image;
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(
             name = "figure_to_photo",

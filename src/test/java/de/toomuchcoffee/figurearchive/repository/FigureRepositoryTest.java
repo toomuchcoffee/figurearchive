@@ -25,7 +25,7 @@ public class FigureRepositoryTest {
 
     @Test
     public void findsAll() {
-        Figure figure = new Figure(null, "Jawa", ProductLine.KENNER, "10012", (short) 1977, null, newHashSet());
+        Figure figure = new Figure(null, "Jawa", ProductLine.KENNER, "10012", (short) 1977, newHashSet());
         figureRepository.save(figure);
         List<Figure> figures = figureRepository.findAll();
         assertThat(figures).hasSize(1);
