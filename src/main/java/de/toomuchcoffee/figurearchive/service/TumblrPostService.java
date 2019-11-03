@@ -3,8 +3,8 @@ package de.toomuchcoffee.figurearchive.service;
 import com.google.common.collect.ImmutableMap;
 import com.tumblr.jumblr.JumblrClient;
 import com.tumblr.jumblr.types.Blog;
-import com.tumblr.jumblr.types.Photo;
-import com.tumblr.jumblr.types.Post;
+import com.tumblr.jumblr.types.PhotoPost;
+import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.entity.Photo.PhotoUrl;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
@@ -23,6 +22,8 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class TumblrPostService {
+    private static final int MAX_PAGE_SIZE = 50;
+
     private final boolean shouldInitialize;
     private final JumblrClient jumblrClient;
     private final PhotoRepository photoRepository;
@@ -42,11 +43,11 @@ public class TumblrPostService {
     @PostConstruct
     private void initialize() throws IOException {
         if (shouldInitialize) {
-            readPosts();
+            loadPosts();
         }
     }
 
-    public void readPosts() {
+    public void loadPosts() {
         Blog blog = jumblrClient.blogInfo("yaswb.tumblr.com");
         Integer postCount = blog.getPostCount();
 
@@ -54,29 +55,25 @@ public class TumblrPostService {
             Map<String, Integer> options = ImmutableMap.of("limit", pageSize, "offset", offset);
             executor.submit(() ->
                     jumblrClient.blogPosts("yaswb", options).stream()
+                            .filter(post -> post instanceof PhotoPost)
+                            .map(post -> (PhotoPost) post)
                             .filter(post -> !photoRepository.existsByPostId(post.getId()))
-                            .forEach(this::extractPhotoPosts));
+                            .forEach(post -> post.getPhotos().stream()
+                                    .map(photo -> mapToPhotoEntity(post, photo))
+                                    .forEach(photoRepository::save)));
         };
 
-        new BatchedExecutor(100, postCount).execute(function);
+        new BatchedExecutor(MAX_PAGE_SIZE, postCount).execute(function);
     }
 
-    private void extractPhotoPosts(Post post) {
-        if (post instanceof com.tumblr.jumblr.types.PhotoPost) {
-            List<Photo> photos = ((com.tumblr.jumblr.types.PhotoPost) post).getPhotos();
-            photos.forEach(photo -> extractPhotoPost(post, photo));
-        }
-    }
-
-    private void extractPhotoPost(Post post, Photo photo) {
-        de.toomuchcoffee.figurearchive.entity.Photo photoEntity =
-                new de.toomuchcoffee.figurearchive.entity.Photo();
+    private Photo mapToPhotoEntity(PhotoPost post, com.tumblr.jumblr.types.Photo photo) {
+        Photo photoEntity = new Photo();
         photoEntity.setPostId(post.getId());
         photoEntity.setTags(post.getTags().toArray(new String[0]));
         photoEntity.setUrls(photo.getSizes().stream()
                 .map(s -> new PhotoUrl(s.getWidth(), s.getHeight(), s.getUrl()))
                 .collect(toList()));
-        photoRepository.save(photoEntity);
+        return photoEntity;
     }
 
 }
