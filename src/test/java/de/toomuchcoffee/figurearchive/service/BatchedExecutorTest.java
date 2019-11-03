@@ -25,7 +25,7 @@ public class BatchedExecutorTest {
         BiConsumer<Integer, Integer> f = (offset, pageSize) ->
                 target.addAll(source.subList(offset, Math.min(offset + pageSize, totalCount)));
 
-        batchedExecutor.execute(target, f);
+        batchedExecutor.execute(f);
 
         assertThat(target.size()).isEqualTo(source.size());
     }

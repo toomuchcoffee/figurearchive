@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.stream.Collectors.toList;
 
@@ -59,7 +58,7 @@ public class TumblrPostService {
                             .forEach(this::extractPhotoPosts));
         };
 
-        new BatchedExecutor(100, postCount).execute(newArrayList(), function);
+        new BatchedExecutor(100, postCount).execute(function);
     }
 
     private void extractPhotoPosts(Post post) {

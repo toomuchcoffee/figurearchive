@@ -29,14 +29,10 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-
-    @Column(name = "post_id")
     private Long postId;
-
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private List<PhotoUrl> urls;
-
     @Type(type = "string-array")
     @Column(columnDefinition = "text[]")
     private String[] tags;
