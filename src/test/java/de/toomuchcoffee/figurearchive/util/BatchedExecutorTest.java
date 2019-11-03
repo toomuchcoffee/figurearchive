@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.service;
+package de.toomuchcoffee.figurearchive.util;
 
 
 import org.junit.Test;

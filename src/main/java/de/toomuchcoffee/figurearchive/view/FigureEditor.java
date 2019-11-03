@@ -63,7 +63,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         cbLine.setItemLabelGenerator(ProductLine::name);
 
         binder = new Binder<>();
-        binder.bind(imageSelector, Figure::getImage, Figure::setImage);
+        binder.bind(imageSelector, Figure::getPhotos, Figure::setPhotos);
         binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
         binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);

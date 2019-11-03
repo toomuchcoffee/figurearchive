@@ -1,15 +1,15 @@
-package de.toomuchcoffee.figurearchive.service;
+package de.toomuchcoffee.figurearchive.util;
 
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
-class BatchedExecutor {
+public class BatchedExecutor {
     private final int pageSize;
     private final int totalCount;
 
-    <T> void execute(BiConsumer<Integer, Integer> function) {
+    public <T> void execute(BiConsumer<Integer, Integer> function) {
         int count = 0;
         while ((count * pageSize) < totalCount) {
             int offset = count * pageSize;

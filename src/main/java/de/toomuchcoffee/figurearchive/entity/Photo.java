@@ -7,12 +7,11 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -36,6 +35,9 @@ public class Photo {
     @Type(type = "string-array")
     @Column(columnDefinition = "text[]")
     private String[] tags;
+
+    @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Figure> figures = new HashSet<>();
 
     @Data
     @NoArgsConstructor

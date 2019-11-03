@@ -11,24 +11,30 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
-import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
+
+@UIScope
 @SpringComponent
 @Tag("div")
-@UIScope
-public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, String> {
-
+public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, Set<Photo>> {
     private final PhotoService photoService;
+
+    private static final int MAX_PAGE_SIZE = 49;
 
     private VerticalLayout imageGallery = new VerticalLayout();
 
     private Button btnRemoveImage = new Button(VaadinIcon.TRASH.create());
 
     public ImageSelector(PhotoService photoService) {
-        super("");
+        super(new HashSet<>());
 
         this.photoService = photoService;
 
@@ -36,18 +42,18 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
 
         addValueChangeListener(e -> updateSelectedImage());
 
-        btnRemoveImage.addClickListener(e -> setValue(""));
+        btnRemoveImage.addClickListener(e -> setValue(new HashSet<>()));
     }
 
     private void updateSelectedImage() {
         getContent().removeAll();
-        if (StringUtils.isEmpty(getValue())) {
+        if (getValue().isEmpty()) {
             getContent().add(imageGallery);
         } else {
             AbsoluteLayout div = new AbsoluteLayout();
             div.setWidth("500px");
             div.setHeight("750px");
-            Image image = new Image(getValue().replaceFirst("_75sq.jpg", "_500.jpg"), "could not resolve image");
+            Image image = new Image(getImageUrl(getValue().iterator().next(), 500), "N/A");
             image.setWidth("500px");
             div.add(image, 0, 0);
             div.add(btnRemoveImage,0, 450);
@@ -56,29 +62,36 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     }
 
     @Override
-    protected void setPresentationValue(String s) {
+    protected void setPresentationValue(Set<Photo> s) {
     }
 
     public void updateImageGallery(String verbatim) {
         imageGallery.removeAll();
 
-        List<String> imageUrls = photoService.getUrls(verbatim, 49);
+        List<Photo> imageUrls = photoService.getThumbnails(verbatim);
+
+        int startIndex = 0;
+        int offset = startIndex * MAX_PAGE_SIZE;
+
+        // List<Photo> page = imageUrls.subList(offset, offset + MAX_PAGE_SIZE);
+
+        int pageSize = Math.min(imageUrls.size(), MAX_PAGE_SIZE);
 
         HorizontalLayout row = new HorizontalLayout();
-        for (int i = 0; i < imageUrls.size(); i++) {
+        for (int i = 0; i < pageSize; i++) {
             if (i % 7 == 0) {
                 row = new HorizontalLayout();
             }
             imageGallery.add(row);
-            String imageUrl = imageUrls.get(i);
+            Photo photo = imageUrls.get(i);
             AbsoluteLayout div = new AbsoluteLayout();
             div.setHeight("75px");
             div.setWidth("75px");
             Image image = new Image();
-            image.setSrc(imageUrl);
+            image.setSrc(getImageUrl(photo, 75));
             div.add(image, 0, 0);
             Button button = new Button(VaadinIcon.PLUS.create());
-            button.addClickListener(e -> ImageSelector.this.setValue(imageUrl));
+            button.addClickListener(e -> ImageSelector.this.setValue(newHashSet(photo)));
             div.add(button, -5, 40);
             row.add(div);
         }

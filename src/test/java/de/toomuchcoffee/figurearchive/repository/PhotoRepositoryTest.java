@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.DOCKER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.newArrayList;
@@ -23,7 +24,7 @@ public class PhotoRepositoryTest {
 
     @Test
     public void findsAll() {
-        Photo photo = new Photo(null, 123L, newArrayList(), new String[0]);
+        Photo photo = new Photo(null, 123L, newArrayList(), new String[0], newHashSet());
         photoRepository.save(photo);
         List<Photo> photos = photoRepository.findAll();
         assertThat(photos).hasSize(1);
@@ -32,8 +33,8 @@ public class PhotoRepositoryTest {
 
     @Test
     public void existsByPostId() {
-        Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[0]);
-        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[0]);
+        Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[0], newHashSet());
+        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[0], newHashSet());
         photoRepository.saveAll(newArrayList(photo1, photo2));
         assertThat(photoRepository.existsByPostId(123L)).isTrue();
         assertThat(photoRepository.existsByPostId(456L)).isFalse();

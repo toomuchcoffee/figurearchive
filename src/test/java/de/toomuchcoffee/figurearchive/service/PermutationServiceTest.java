@@ -1,12 +1,11 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class PermutationServiceTest {
 
@@ -15,7 +14,7 @@ public class PermutationServiceTest {
     @Test
     public void testGetVerbatimPermutations() throws Exception {
         Set<String> permutations = permutationService.getPermutations("Imperial TIE Fighter Pilot");
-        assertEquals(Sets.newHashSet(
+        assertThat(newHashSet(
                 "imperial tie fighter pilot",
                 "imperial tie fighter",
                          "tie fighter pilot",
@@ -36,13 +35,13 @@ public class PermutationServiceTest {
                         "tie",
                            "fighter",
                                   "pilot"
-        ), permutations);
+        )).isEqualTo(permutations);
     }
 
     @Test
     public void testGetVerbatimPermutationsWithParenthesis() throws Exception {
         Set<String> permutations = permutationService.getPermutations("(Twin Pod) Cloud Car Pilot");
-        assertTrue(permutations.containsAll(Sets.newHashSet("cloudcar", "cloudcarpilot")));
+        assertThat(permutations.containsAll(newHashSet("cloudcar", "cloudcarpilot"))).isTrue();
     }
 
 }

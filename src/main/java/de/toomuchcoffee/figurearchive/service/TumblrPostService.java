@@ -7,6 +7,7 @@ import com.tumblr.jumblr.types.PhotoPost;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.entity.Photo.PhotoUrl;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
+import de.toomuchcoffee.figurearchive.util.BatchedExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
