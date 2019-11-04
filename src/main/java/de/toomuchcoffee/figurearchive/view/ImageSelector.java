@@ -9,11 +9,10 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.google.common.collect.Sets.newHashSet;
 
 @UIScope
 @SpringComponent
@@ -22,27 +21,25 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     private final PhotoService photoService;
 
     private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
-    private static final int ROW_SIZE = 5;
-    private static final int COLUMN_SIZE = 5;
 
-    private VerticalLayout imageGallery = new VerticalLayout();
+    private ImageGallery imageGallery = new ImageGallery(75,5, 5, (photos) -> this.setValue(photos));
+    private ImageGallery selectedImage = new ImageGallery(500, 1, 1, (photos) -> this.setValue(DEFAULT_VALUE));
 
     public ImageSelector(PhotoService photoService) {
         super(DEFAULT_VALUE);
         this.photoService = photoService;
+
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.add(selectedImage);
+        verticalLayout.add(imageGallery);
+        getContent().add(verticalLayout);
 
         updateSelectedImage();
         addValueChangeListener(e -> updateSelectedImage());
     }
 
     private void updateSelectedImage() {
-        getContent().removeAll();
-        if (getValue().isEmpty()) {
-            getContent().add(imageGallery);
-        } else {
-            Photo photo = getValue().iterator().next();
-            getContent().add(new ImageButton(photo, 500, e -> setValue(DEFAULT_VALUE)));
-        }
+        selectedImage.update(new ArrayList<>(getValue()));
     }
 
     @Override
@@ -50,22 +47,8 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
     }
 
     public void updateImageGallery(String verbatim) {
-        imageGallery.removeAll();
-
-        List<Photo> imageUrls = photoService.findPhotosForVerbatim(verbatim);
-        int pageSize = Math.min(imageUrls.size(), ROW_SIZE * COLUMN_SIZE);
-
-        HorizontalLayout row = new HorizontalLayout();
-        for (int i = 0; i < pageSize; i++) {
-            if (i % ROW_SIZE == 0) {
-                row = new HorizontalLayout();
-            }
-            imageGallery.add(row);
-
-            Photo photo = imageUrls.get(i);
-            row.add(new ImageButton(photo, 75, e -> setValue(newHashSet(photo))));
-        }
+        List<Photo> photos = photoService.findPhotosForVerbatim(verbatim);
+        imageGallery.update(photos);
     }
-
 
 }
