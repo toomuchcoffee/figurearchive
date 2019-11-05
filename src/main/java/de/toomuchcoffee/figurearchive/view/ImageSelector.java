@@ -2,7 +2,6 @@ package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -17,29 +16,32 @@ import java.util.Set;
 @UIScope
 @SpringComponent
 @Tag("div")
-public class ImageSelector extends AbstractCompositeField<HorizontalLayout, ImageSelector, Set<Photo>> {
+public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageSelector, Set<Photo>> {
     private final PhotoService photoService;
 
     private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
 
-    private ImageGallery imageGallery = new ImageGallery(75,5, 5, (photos) -> this.setValue(photos));
-    private ImageGallery selectedImage = new ImageGallery(500, 1, 1, (photos) -> this.setValue(DEFAULT_VALUE));
+    private ImageGallery availableImages = new ImageGallery(75,5, 2, (photo) -> {
+        this.getValue().add(photo);
+        updateSelectedImage();
+    });
+    private ImageGallery selectedImages = new ImageGallery(250, 2, 1, (photo) -> {
+        this.getValue().remove(photo);
+        updateSelectedImage();
+    });
 
     public ImageSelector(PhotoService photoService) {
         super(DEFAULT_VALUE);
         this.photoService = photoService;
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.add(selectedImage);
-        verticalLayout.add(imageGallery);
-        getContent().add(verticalLayout);
+        getContent().add(selectedImages);
+        getContent().add(availableImages);
 
-        updateSelectedImage();
         addValueChangeListener(e -> updateSelectedImage());
     }
 
     private void updateSelectedImage() {
-        selectedImage.update(new ArrayList<>(getValue()));
+        selectedImages.update(new ArrayList<>(getValue()));
     }
 
     @Override
@@ -48,7 +50,7 @@ public class ImageSelector extends AbstractCompositeField<HorizontalLayout, Imag
 
     public void updateImageGallery(String verbatim) {
         List<Photo> photos = photoService.findPhotosForVerbatim(verbatim);
-        imageGallery.update(photos);
+        availableImages.update(photos);
     }
 
 }

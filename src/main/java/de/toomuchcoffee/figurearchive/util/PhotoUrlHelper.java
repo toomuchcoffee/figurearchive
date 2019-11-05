@@ -8,6 +8,6 @@ public class PhotoUrlHelper {
                 .filter(s -> s.getWidth() == width)
                 .findFirst()
                 .map(Photo.PhotoUrl::getUrl)
-                .orElse(null);
+                .orElse("");
     }
 }

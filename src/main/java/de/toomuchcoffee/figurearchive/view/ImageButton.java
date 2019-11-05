@@ -18,6 +18,9 @@ public class ImageButton extends Div {
 
     public ImageButton(Photo photo, int size, ComponentEventListener<ClickEvent<Button>> listener) {
         getElement().getStyle().set("position", "relative");
+        getElement().getStyle().set("border", "1px solid #9E9E9E");
+        getElement().getStyle().set("padding", "3px");
+        getElement().getStyle().set("margin", "3px");
         setHeight(size + "px");
         setWidth(size + "px");
         Image image = new Image(getImageUrl(photo, size), "N/A");
@@ -32,8 +35,8 @@ public class ImageButton extends Div {
     private void add(Component component) {
         super.add(component);
         component.getElement().getStyle().set("position", "absolute");
-        component.getElement().getStyle().set("top", 0 + "px");
-        component.getElement().getStyle().set("left", 0 + "px");
+        component.getElement().getStyle().set("top", 3 + "px");
+        component.getElement().getStyle().set("left", 3 + "px");
     }
 
 }
