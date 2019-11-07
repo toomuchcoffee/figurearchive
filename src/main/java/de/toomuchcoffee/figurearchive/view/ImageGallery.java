@@ -1,7 +1,7 @@
 package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.vaadin.flow.component.icon.VaadinIcon.MINUS;
+import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
 
 @UIScope
 @Tag("div")
@@ -22,28 +25,38 @@ public class ImageGallery extends HorizontalLayout {
     private final Consumer<Photo> consumer;
 
     public void update(List<Photo> photos) {
+        update(photos, 0);
+    }
+
+    public void update(List<Photo> photos, int pageNumber) {
         removeAll();
-        int maxSize = rowSize * columnSize;
+        int pageSize = rowSize * columnSize;
 
-        VerticalLayout container = newVerticalLayout();
-        add(container);
+        HorizontalLayout horizontalLayout = newHorizontalLayout();
+        VerticalLayout verticalLayout = newVerticalLayout();
 
-        int pageSize = Math.min(photos.size(), maxSize);
+        int startIndex = pageNumber * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, photos.size());
+
+        if (pageNumber > 0) {
+            horizontalLayout.add(new Button(MINUS.create(), e -> update(photos, pageNumber-1)));
+        }
 
         HorizontalLayout row = null;
-        for (int i = 0; i < pageSize; i++) {
+        for (int i = startIndex; i < endIndex; i++) {
             if (i % rowSize == 0) {
                 row = newHorizontalLayout();
             }
-            container.add(row);
+            verticalLayout.add(row);
 
             Photo photo = photos.get(i);
             row.add(new ImageButton(photo, tileSize, e -> consumer.accept(photo)));
         }
-
-        if (maxSize < photos.size()) {
-            add(new Label("More..."));
+        horizontalLayout.add(verticalLayout);
+        if (endIndex < photos.size()) {
+            horizontalLayout.add(new Button(PLUS.create(), e -> update(photos, pageNumber+1)));
         }
+        add(horizontalLayout);
     }
 
     private HorizontalLayout newHorizontalLayout() {
