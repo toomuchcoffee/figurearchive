@@ -10,7 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import static com.vaadin.flow.component.icon.VaadinIcon.EXIT;
+import static com.vaadin.flow.component.icon.VaadinIcon.SIGN_OUT;
 
 @UIScope
 @SpringComponent
@@ -22,7 +22,7 @@ public class LogoutButton extends Button {
     @PostConstruct
     public void init() {
         setText("Logout");
-        setIcon(EXIT.create());
+        setIcon(SIGN_OUT.create());
         addClickListener(e -> requestLogout());
     }
 

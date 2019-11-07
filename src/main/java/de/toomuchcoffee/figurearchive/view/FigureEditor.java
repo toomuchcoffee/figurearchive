@@ -5,7 +5,6 @@ import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -19,10 +18,12 @@ import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
+import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
+import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 
@@ -34,6 +35,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureRepository repository;
     private final ImageSelector imageSelector;
+    private final EventBus.SessionEventBus eventBus;
 
     private Figure figure;
 
@@ -42,9 +44,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private ComboBox<Short> cbYear = new ComboBox<>("Year");
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
 
-    private Button save = new Button("Save", VaadinIcon.CHECK.create());
-    private Button cancel = new Button("Cancel");
-    private Button delete = new Button("Delete", VaadinIcon.TRASH.create());
+    private Button save = new Button("Save", CHECK.create());
+    private Button cancel = new Button("Cancel", EXIT.create());
+    private Button delete = new Button("Delete", TRASH.create());
     private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
     private Binder<Figure> binder;
@@ -74,7 +76,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> imageSelector.updateImageGallery(e.getSource().getValue()));
+        tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, e.getSource().getValue()));
 
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
@@ -93,14 +95,14 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         close();
     }
 
-    public final void createFigure() {
+    final void createFigure() {
         open();
         this.figure = new Figure();
         binder.setBean(this.figure);
         tfVerbatim.focus();
     }
 
-    public final void editFigure(Figure figure) {
+    final void editFigure(Figure figure) {
         open();
         this.figure = repository.findById(figure.getId())
                 .orElseThrow(() -> new IllegalStateException("Couldn't find item from list"));
