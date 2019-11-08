@@ -32,6 +32,8 @@ public class MainView extends VerticalLayout {
         HorizontalLayout actions = new HorizontalLayout(createButton, csvUploader, refreshButton, logoutButton);
         add(actions);
 
+        figureGrid.asSingleSelect().addValueChangeListener(e -> figureEditor.editFigure(e.getValue()));
+
         add(figureFilterPanel, figureGrid);
     }
 
