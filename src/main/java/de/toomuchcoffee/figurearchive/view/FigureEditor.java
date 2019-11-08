@@ -44,9 +44,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private ComboBox<Short> cbYear = new ComboBox<>("Year");
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
 
-    private Button save = new Button("Save", CHECK.create());
-    private Button cancel = new Button("Cancel", EXIT.create());
-    private Button delete = new Button("Delete", TRASH.create());
+    private Button save = new Button("Save", CHECK.create(), e -> save());
+    private Button cancel = new Button("Cancel", EXIT.create(), e -> close());
+    private Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
     private Binder<Figure> binder;
@@ -77,10 +77,6 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
         tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, e.getSource().getValue()));
-
-        save.addClickListener(e -> save());
-        delete.addClickListener(e -> delete());
-        cancel.addClickListener(e -> close());
     }
 
     private void delete() {
