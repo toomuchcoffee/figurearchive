@@ -38,27 +38,25 @@ public class MainView extends VerticalLayout {
         FigureGrid figureGrid = new FigureGrid(
                 figureDataProvider, e -> Optional.ofNullable(e.getValue()).ifPresent(figureEditor::editFigure));
 
-        Button createButton = new Button("New figure", PLUS.create(), e -> figureEditor.createFigure());
+        Button createButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
 
-        Button refreshButton = new Button("Refresh Tumblr", REFRESH.create(), e -> tumblrPostService.loadPosts());
+        Button refreshButton = new Button(" Tumblr", REFRESH.create(), e -> tumblrPostService.loadPosts());
 
-        HorizontalLayout actions = new HorizontalLayout(createButton, csvUploader, refreshButton, logoutButton);
-        add(actions);
-
-        VerticalLayout tabSheet = new VerticalLayout(figureGrid);
 
         Map<Tab, Component> tabsToPages = ImmutableMap.of(
                 new Tab("Figures"), figureGrid,
                 new Tab("Photos"), photoEditor);
         Tabs tabs = new Tabs(tabsToPages.keySet().toArray(new Tab[0]));
 
+        VerticalLayout tabSheet = new VerticalLayout(figureGrid);
         tabs.addSelectedChangeListener(event -> {
             tabSheet.removeAll();
             Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
             tabSheet.add(selectedPage);
         });
 
-        add(tabs);
+        HorizontalLayout actions = new HorizontalLayout(tabs, createButton, csvUploader, refreshButton, logoutButton);
+        add(actions);
 
         add(figureFilterPanel, tabSheet);
     }

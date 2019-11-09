@@ -26,7 +26,7 @@ public class CsvUploader extends Upload {
     public void init() {
         setReceiver(new MemoryBuffer());
         setDropAllowed(false);
-        setUploadButton(new Button("Select CSV file", UPLOAD.create()));
+        setUploadButton(new Button("CSV Import", UPLOAD.create()));
         setAcceptedFileTypes(".csv");
         addSucceededListener(e -> {
             Notification.show("YAY");
