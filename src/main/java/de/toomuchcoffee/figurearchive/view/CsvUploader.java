@@ -4,8 +4,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,6 +24,7 @@ import static com.vaadin.flow.component.icon.VaadinIcon.UPLOAD;
 @RequiredArgsConstructor
 public class CsvUploader extends Upload {
     private final ImportService importService;
+    private final ConfigurableFilterDataProvider<Figure, Void, FigureService.FigureFilter> figureDataProvider;
 
     @PostConstruct
     public void init() {
@@ -38,6 +42,7 @@ public class CsvUploader extends Upload {
     private void importCsv(InputStream is) {
         byte[] bytes = IOUtils.toByteArray(is);
         importService.importCsv(bytes);
+        figureDataProvider.refreshAll();
     }
 
 }

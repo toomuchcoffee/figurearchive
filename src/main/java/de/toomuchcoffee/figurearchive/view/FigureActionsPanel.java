@@ -18,32 +18,33 @@ import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class FigureFilterPanel extends HorizontalLayout {
+public class FigureActionsPanel extends HorizontalLayout {
 
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureDataInfo figureDataInfo;
+    private final NewFigureButton newFigureButton;
+    private final CsvUploader csvUploader;
 
     @PostConstruct
     public void init() {
         FigureFilter figureFilter = new FigureFilter();
 
-        TextField tfVerbatimFilter = new TextField("Verbatim");
-        tfVerbatimFilter.setPlaceholder("Filter by verbatim");
+        TextField tfVerbatimFilter = new TextField();
+        tfVerbatimFilter.setPlaceholder("Filter by Verbatim");
         tfVerbatimFilter.setValueChangeMode(EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
             figureDataProvider.setFilter(figureFilter);
         });
 
-        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>("Product line");
+        ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>();
+        cbProductLineFilter.setPlaceholder("Flter by Product Line");
         cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
             figureDataProvider.setFilter(figureFilter);
         });
 
-        add(tfVerbatimFilter);
-        add(cbProductLineFilter);
-        add(figureDataInfo);
+        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, csvUploader);
     }
 }

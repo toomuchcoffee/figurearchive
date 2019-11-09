@@ -24,7 +24,6 @@ public class FigureDataInfo extends Composite<TextField> {
     @PostConstruct
     public void init() {
         TextField textField = getContent();
-        textField.setLabel("Row count");
         textField.setEnabled(false);
 
         eventBus.subscribe(this);
