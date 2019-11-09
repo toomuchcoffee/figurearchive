@@ -10,6 +10,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureModifiedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
@@ -82,7 +83,7 @@ public class PhotoEditor extends VerticalLayout {
     }
 
     @EventBusListenerMethod
-    public void update(String event) {
+    public void update(FigureModifiedEvent event) {
         Optional<Photo> photo = repository.findById(this.photo.getId());
         if (photo.isPresent()) {
             updateComponent(photo.get());

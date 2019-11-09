@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 import org.vaadin.spring.events.EventBus;
@@ -62,8 +63,8 @@ public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageS
     }
 
     @EventBusListenerMethod
-    public void update(String event) {
-        this.searchTerm = event;
+    public void update(PhotoSearchEvent event) {
+        this.searchTerm = event.getValue();
         availableImages.update(availablePhotos());
     }
 
