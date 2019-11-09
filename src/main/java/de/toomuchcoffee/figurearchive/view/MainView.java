@@ -6,6 +6,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.router.Route;
+import de.toomuchcoffee.figurearchive.view.controls.LogoutButton;
+import de.toomuchcoffee.figurearchive.view.controls.TabMenu;
+import de.toomuchcoffee.figurearchive.view.controls.TumblrSyncButton;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;

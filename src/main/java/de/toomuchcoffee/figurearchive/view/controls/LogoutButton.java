@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view;
+package de.toomuchcoffee.figurearchive.view.controls;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;

@@ -1,8 +1,9 @@
-package de.toomuchcoffee.figurearchive.view;
+package de.toomuchcoffee.figurearchive.view.controls;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.view.FigureEditor;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;

@@ -9,6 +9,8 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import de.toomuchcoffee.figurearchive.view.controls.CsvUploader;
+import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;

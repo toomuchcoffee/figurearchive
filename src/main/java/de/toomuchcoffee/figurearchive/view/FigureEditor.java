@@ -98,7 +98,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         close();
     }
 
-    final void createFigure() {
+    public final void createFigure() {
         open();
         this.figure = new Figure();
         binder.setBean(this.figure);
