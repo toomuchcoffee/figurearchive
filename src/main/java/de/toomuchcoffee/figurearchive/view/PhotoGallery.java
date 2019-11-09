@@ -16,7 +16,7 @@ import static com.vaadin.flow.component.icon.VaadinIcon.ARROW_FORWARD;
 
 @UIScope
 @RequiredArgsConstructor
-public class ImageGallery extends HorizontalLayout {
+public class PhotoGallery extends HorizontalLayout {
     private final int tileSize;
     private final int rowSize;
     private final int columnSize;

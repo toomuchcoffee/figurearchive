@@ -37,7 +37,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureRepository repository;
-    private final ImageSelector imageSelector;
+    private final PhotoSelector photoSelector;
     private final EventBus.SessionEventBus sessionEventBus;
     private final EventBus.ApplicationEventBus applicationEventBus;
 
@@ -62,14 +62,14 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
-        horizontalLayout.add(verticalLayout, imageSelector);
+        horizontalLayout.add(verticalLayout, photoSelector);
 
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
 
         binder = new Binder<>();
-        binder.bind(imageSelector, Figure::getPhotos, Figure::setPhotos);
+        binder.bind(photoSelector, Figure::getPhotos, Figure::setPhotos);
         binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
         binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);

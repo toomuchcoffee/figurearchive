@@ -14,7 +14,7 @@ import java.util.Optional;
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class FiguresPanel extends VerticalLayout {
+public class FigurePanel extends VerticalLayout {
 
     private final ConfigurableFilterDataProvider<Figure, Void, FigureService.FigureFilter> figureDataProvider;
     private final FigureActionsPanel figureActionsPanel;

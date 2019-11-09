@@ -40,7 +40,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         });
 
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>();
-        cbProductLineFilter.setPlaceholder("Flter by Product Line");
+        cbProductLineFilter.setPlaceholder("Filter by Product Line");
         cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());

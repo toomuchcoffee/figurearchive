@@ -1,111 +1,74 @@
 package de.toomuchcoffee.figurearchive.view;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureModifiedEvent;
-import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
-import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import de.toomuchcoffee.figurearchive.service.PhotoService.PhotoFilter;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Optional;
 
-import static com.vaadin.flow.component.icon.VaadinIcon.ROTATE_RIGHT;
-import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
-import static java.util.stream.Collectors.joining;
+import static com.vaadin.flow.component.icon.VaadinIcon.CHECK;
+import static com.vaadin.flow.component.icon.VaadinIcon.EXIT;
 
 @SpringComponent
 @UIScope
 @RequiredArgsConstructor
-public class PhotoEditor extends VerticalLayout {
+public class PhotoEditor extends Dialog implements KeyNotifier {
 
-    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
+    private final ConfigurableFilterDataProvider<Photo, Void, PhotoFilter> photoDataProvider;
     private final PhotoRepository repository;
-    private final EventBus.ApplicationEventBus eventBus;
+    private final FigureSelector figureSelector;
+    private final EventBus.SessionEventBus sessionEventBus;
+    // private final EventBus.ApplicationEventBus applicationEventBus;
 
-    private Image image;
     private Photo photo;
 
-    private UnorderedList figureList;
+    private Button save = new Button("Save", CHECK.create(), e -> save());
+    private Button cancel = new Button("Cancel", EXIT.create(), e -> close());
+    private HorizontalLayout actions = new HorizontalLayout(save, cancel);
+
+    private Binder<Photo> binder;
 
     @PostConstruct
     public void init() {
-        repository.findTop1ByFiguresIsEmpty().ifPresent(this::updateComponent);
-
-        eventBus.subscribe(this);
-    }
-
-    private void updateComponent(Photo photo) {
-        removeAll();
-
-        this.photo = photo;
-
         HorizontalLayout horizontalLayout = new HorizontalLayout();
+        add(horizontalLayout);
 
         VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.add(actions);
+        horizontalLayout.add(verticalLayout, figureSelector);
 
-        this.image = new Image();
-        image.setSrc(getImageUrl(photo, 250));
-        verticalLayout.add(image);
+        binder = new Binder<>();
+        binder.bind(figureSelector, Photo::getFigures, Photo::setFigures);
 
-        TextArea tags = new TextArea("Tags");
-        tags.setHeight("50%");
-        tags.setReadOnly(true);
-        tags.setValue(Arrays.stream(photo.getTags()).map(t -> "#" + t).collect(joining(", ")));
+        horizontalLayout.setSpacing(true);
 
-        figureList = new UnorderedList();
-        updateFigureList();
-
-        FigureGrid figureGrid = new FigureGrid(figureDataProvider, e -> {
-            Optional.ofNullable(e.getValue()).ifPresent(figure -> {
-                photo.getFigures().add(figure);
-                figure.getPhotos().add(photo);
-                updateFigureList();
-            });
-        });
-        horizontalLayout.add(verticalLayout, tags, figureList);
-
-        Button save = new Button("Save & next", ROTATE_RIGHT.create(), e -> saveAndNext());
-        add(figureGrid, horizontalLayout, save);
+        addKeyPressListener(Key.ENTER, e -> save());
     }
 
-    @EventBusListenerMethod
-    public void update(FigureModifiedEvent event) {
-        Optional<Photo> photo = repository.findById(this.photo.getId());
-        if (photo.isPresent()) {
-            updateComponent(photo.get());
-        } else {
-            init();
-        }
-    }
-
-    private void updateFigureList() {
-        figureList.removeAll();
-        photo.getFigures().forEach(figure -> figureList.add(new ListItem(getDisplayName(figure))));
-    }
-
-    private String getDisplayName(Figure figure) {
-        return figure.getVerbatim() + Optional.ofNullable(figure.getProductLine()).map(l -> ", " + l.name()).orElse("");
-    }
-
-    private void saveAndNext() {
+    private void save() {
         repository.save(photo);
-        figureDataProvider.refreshAll();
+        photoDataProvider.refreshAll();
+        //applicationEventBus.publish(this, SAVED);
+        close();
+    }
 
-        repository.findTop1ByFiguresIsEmpty().ifPresent(this::updateComponent);
+    final void editPhoto(Photo figure) {
+        open();
+        this.photo = repository.findById(figure.getId())
+                .orElseThrow(() -> new IllegalStateException("Couldn't find item from list"));
+        binder.setBean(this.photo);
     }
 
 }

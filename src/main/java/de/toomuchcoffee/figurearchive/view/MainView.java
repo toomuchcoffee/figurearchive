@@ -8,7 +8,6 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.view.controls.LogoutButton;
 import de.toomuchcoffee.figurearchive.view.controls.TabMenu;
-import de.toomuchcoffee.figurearchive.view.controls.TumblrSyncButton;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;
@@ -18,21 +17,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MainView extends VerticalLayout {
 
-    private final FiguresPanel figuresPanel;
-    private final PhotoEditor photoEditor;
+    private final FigurePanel figurePanel;
+    private final PhotoPanel photoPanel;
     private final LogoutButton logoutButton;
-    private final TumblrSyncButton tumblrSyncButton;
 
     @PostConstruct
     public void init() {
         Map<Tab, Component> tabsToPages = ImmutableMap.of(
-                new Tab("Figures"), figuresPanel,
-                new Tab("Photos"), photoEditor);
+                new Tab("Figures"), figurePanel,
+                new Tab("Photos"), photoPanel);
 
         VerticalLayout tabSheet = new VerticalLayout();
         TabMenu tabMenu = new TabMenu(tabsToPages, tabSheet, 0);
 
-        HorizontalLayout actions = new HorizontalLayout(tabMenu, tumblrSyncButton, logoutButton);
+        HorizontalLayout actions = new HorizontalLayout(tabMenu, logoutButton);
 
         add(actions, tabSheet);
     }

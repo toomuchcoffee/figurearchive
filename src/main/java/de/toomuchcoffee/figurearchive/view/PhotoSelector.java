@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toSet;
 @UIScope
 @SpringComponent
 @Tag("div")
-public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageSelector, Set<Photo>> {
+public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoSelector, Set<Photo>> {
     private final PhotoService photoService;
     private final EventBus.SessionEventBus eventBus;
 
@@ -32,18 +32,18 @@ public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageS
 
     private String searchTerm = "";
 
-    private ImageGallery availableImages = new ImageGallery(75,5, 2, photo -> {
+    private PhotoGallery availableImages = new PhotoGallery(75,5, 2, photo -> {
         Set<Photo> photos = newHashSet(getValue());
         photos.add(photo);
         this.setValue(photos);
     });
-    private ImageGallery selectedImages = new ImageGallery(250, 2, 1, photo -> {
+    private PhotoGallery selectedImages = new PhotoGallery(250, 2, 1, photo -> {
         Set<Photo> photos = newHashSet(getValue());
         photos.remove(photo);
         this.setValue(photos);
     });
 
-    public ImageSelector(PhotoService photoService, EventBus.SessionEventBus eventBus) {
+    public PhotoSelector(PhotoService photoService, EventBus.SessionEventBus eventBus) {
         super(DEFAULT_VALUE);
         this.photoService = photoService;
         this.eventBus = eventBus;
@@ -69,7 +69,7 @@ public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageS
     }
 
     private List<Photo> availablePhotos() {
-        return photoService.findPhotosForVerbatim(searchTerm).stream()
+        return photoService.findPhotos(searchTerm).stream()
                 .filter(this::isSelected)
                 .collect(toList());
     }

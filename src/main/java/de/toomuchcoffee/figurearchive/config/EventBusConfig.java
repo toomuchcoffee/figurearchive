@@ -1,5 +1,7 @@
 package de.toomuchcoffee.figurearchive.config;
 
+import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import de.toomuchcoffee.figurearchive.service.PhotoService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +10,20 @@ import org.vaadin.spring.events.annotation.EnableVaadinEventBus;
 @Configuration
 @EnableVaadinEventBus
 public class EventBusConfig {
-    public static class FiguresQueryEvent {
-        public static final FiguresQueryEvent DUMMY = new FiguresQueryEvent();
+    @Getter
+    @RequiredArgsConstructor
+    public static class FigureQueryEvent {
+        private final FigureFilter value;
     }
 
-    @RequiredArgsConstructor
     @Getter
+    @RequiredArgsConstructor
+    public static class PhotoQueryEvent {
+        private final PhotoService.PhotoFilter value;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
     public static class FigureModifiedEvent {
         private final String value;
         public static final FigureModifiedEvent SAVED = new FigureModifiedEvent("saved");
