@@ -31,12 +31,12 @@ public class ImageSelector extends AbstractCompositeField<VerticalLayout, ImageS
 
     private String searchTerm = "";
 
-    private ImageGallery availableImages = new ImageGallery(75,5, 2, (photo) -> {
+    private ImageGallery availableImages = new ImageGallery(75,5, 2, photo -> {
         Set<Photo> photos = newHashSet(getValue());
         photos.add(photo);
         this.setValue(photos);
     });
-    private ImageGallery selectedImages = new ImageGallery(250, 2, 1, (photo) -> {
+    private ImageGallery selectedImages = new ImageGallery(250, 2, 1, photo -> {
         Set<Photo> photos = newHashSet(getValue());
         photos.remove(photo);
         this.setValue(photos);

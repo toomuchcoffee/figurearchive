@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static javax.persistence.CascadeType.*;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -36,7 +37,7 @@ public class Photo {
     @Column(columnDefinition = "text[]")
     private String[] tags;
 
-    @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = {MERGE, REMOVE, REFRESH, DETACH})
     private Set<Figure> figures = new HashSet<>();
 
     @Data
