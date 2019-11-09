@@ -35,7 +35,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureRepository repository;
     private final ImageSelector imageSelector;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.SessionEventBus sessionEventBus;
+    private final EventBus.ApplicationEventBus applicationEventBus;
 
     private Figure figure;
 
@@ -76,18 +77,20 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, e.getSource().getValue()));
+        tfVerbatim.addValueChangeListener(e -> sessionEventBus.publish(this, e.getSource().getValue()));
     }
 
     private void delete() {
         repository.delete(figure);
         figureDataProvider.refreshAll();
+        applicationEventBus.publish(this, "figure_deleted");
         close();
     }
 
     private void save() {
         repository.save(figure);
         figureDataProvider.refreshAll();
+        applicationEventBus.publish(this, "figure_saved");
         close();
     }
 

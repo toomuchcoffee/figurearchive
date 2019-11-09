@@ -42,7 +42,6 @@ public class MainView extends VerticalLayout {
 
         Button refreshButton = new Button(" Tumblr", REFRESH.create(), e -> tumblrPostService.loadPosts());
 
-
         Map<Tab, Component> tabsToPages = ImmutableMap.of(
                 new Tab("Figures"), figureGrid,
                 new Tab("Photos"), photoEditor);

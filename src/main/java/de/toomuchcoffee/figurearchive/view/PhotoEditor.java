@@ -1,7 +1,6 @@
 package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.UnorderedList;
@@ -16,6 +15,8 @@ import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -32,28 +33,41 @@ public class PhotoEditor extends VerticalLayout {
 
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final PhotoRepository repository;
+    private final EventBus.ApplicationEventBus eventBus;
 
-    private Div imageContainer = new Div();
+    private Image image;
     private Photo photo;
 
     private UnorderedList figureList;
+
     @PostConstruct
     public void init() {
+        repository.findTop1ByFiguresIsEmpty().ifPresent(this::updateComponent);
+
+        eventBus.subscribe(this);
+    }
+
+    private void updateComponent(Photo photo) {
+        removeAll();
+
+        this.photo = photo;
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+
+        VerticalLayout verticalLayout = new VerticalLayout();
+
+        this.image = new Image();
+        image.setSrc(getImageUrl(photo, 250));
+        verticalLayout.add(image);
+
         TextArea tags = new TextArea("Tags");
         tags.setHeight("50%");
         tags.setReadOnly(true);
+        tags.setValue(Arrays.stream(photo.getTags()).map(t -> "#" + t).collect(joining(", ")));
+
         figureList = new UnorderedList();
-        Image image = new Image();
-        imageContainer.add(image);
-        repository.findTop1ByFiguresIsEmpty().ifPresent(photo -> {
-            this.photo = photo;
-            tags.setValue(Arrays.stream(photo.getTags()).map(t -> "#" + t).collect(joining(", ")));
-            image.setSrc(getImageUrl(photo, 400));
-            updateFigureList();
-        });
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        VerticalLayout verticalLayout = new VerticalLayout();
-        Button save = new Button("Save & next", ROTATE_RIGHT.create(), e -> saveAndNext());
+        updateFigureList();
+
         FigureGrid figureGrid = new FigureGrid(figureDataProvider, e -> {
             Optional.ofNullable(e.getValue()).ifPresent(figure -> {
                 photo.getFigures().add(figure);
@@ -61,31 +75,36 @@ public class PhotoEditor extends VerticalLayout {
                 updateFigureList();
             });
         });
-        verticalLayout.add(imageContainer);
         horizontalLayout.add(verticalLayout, tags, figureList);
+
+        Button save = new Button("Save & next", ROTATE_RIGHT.create(), e -> saveAndNext());
         add(figureGrid, horizontalLayout, save);
     }
 
+    @EventBusListenerMethod
+    public void update(String event) {
+        Optional<Photo> photo = repository.findById(this.photo.getId());
+        if (photo.isPresent()) {
+            updateComponent(photo.get());
+        } else {
+            init();
+        }
+    }
 
     private void updateFigureList() {
         figureList.removeAll();
-        photo.getFigures().forEach(figure -> figureList.add(new ListItem(figure.getVerbatim() + ", " + figure.getProductLine().name())));
+        photo.getFigures().forEach(figure -> figureList.add(new ListItem(getDisplayName(figure))));
+    }
+
+    private String getDisplayName(Figure figure) {
+        return figure.getVerbatim() + Optional.ofNullable(figure.getProductLine()).map(l -> ", " + l.name()).orElse("");
     }
 
     private void saveAndNext() {
         repository.save(photo);
         figureDataProvider.refreshAll();
 
-        repository.findTop1ByFiguresIsEmpty().ifPresent(photo -> {
-            this.photo = photo;
-            imageContainer.removeAll();
-            Image image = new Image();
-            image.setSrc(getImageUrl(photo, 400));
-            imageContainer.add(image);
-            updateFigureList();
-        });
-
+        repository.findTop1ByFiguresIsEmpty().ifPresent(this::updateComponent);
     }
-
 
 }
