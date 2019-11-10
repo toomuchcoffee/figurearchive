@@ -34,8 +34,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private final FigureRepository repository;
     private final PhotoSelector photoSelector;
-    private final EventBus.SessionEventBus sessionEventBus;
-    private final EventBus.ApplicationEventBus applicationEventBus;
+    private final EventBus.SessionEventBus eventBus;
 
     private Figure figure;
 
@@ -76,19 +75,19 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> sessionEventBus
+        tfVerbatim.addValueChangeListener(e -> eventBus
                 .publish(this, new PhotoSearchEvent(e.getSource().getValue())));
     }
 
     private void delete() {
         repository.delete(figure);
-        applicationEventBus.publish(this, DUMMY);
+        eventBus.publish(this, DUMMY);
         close();
     }
 
     private void save() {
         repository.save(figure);
-        applicationEventBus.publish(this, DUMMY);
+        eventBus.publish(this, DUMMY);
         close();
     }
 

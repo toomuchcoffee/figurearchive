@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 public class FigureDataInfo extends Composite<TextField> {
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
-    private final EventBus.ApplicationEventBus eventBus;
+    private final EventBus.SessionEventBus eventBus;
 
     @PostConstruct
     public void init() {

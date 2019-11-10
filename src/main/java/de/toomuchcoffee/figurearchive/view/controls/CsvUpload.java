@@ -21,9 +21,9 @@ import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEv
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class CsvUploader extends Upload {
+public class CsvUpload extends Upload {
     private final ImportService importService;
-    private final EventBus.ApplicationEventBus eventBus;
+    private final EventBus.SessionEventBus eventBus;
 
     @PostConstruct
     public void init() {

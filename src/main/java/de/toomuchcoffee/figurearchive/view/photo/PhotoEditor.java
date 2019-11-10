@@ -34,8 +34,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
 
     private final FigureRepository figureRepository;
     private final FigureSelector figureSelector;
-    //private final EventBus.SessionEventBus sessionEventBus;
-    private final EventBus.ApplicationEventBus applicationEventBus;
+    private final EventBus.SessionEventBus eventBus;
 
     private Photo photo;
     private Set<Figure> figuresBeforeChange;
@@ -73,7 +72,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         figuresAfterChange = photo.getFigures();
         manageOwningSiteOfRelation();
         imageDiv.removeAll();
-        applicationEventBus.publish(this, DUMMY);
+        eventBus.publish(this, DUMMY);
         close();
     }
 

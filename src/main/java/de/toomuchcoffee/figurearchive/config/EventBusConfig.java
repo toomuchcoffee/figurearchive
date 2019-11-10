@@ -1,7 +1,6 @@
 package de.toomuchcoffee.figurearchive.config;
 
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
-import de.toomuchcoffee.figurearchive.service.PhotoService.PhotoFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +13,6 @@ public class EventBusConfig {
     @RequiredArgsConstructor
     public static class FigureQueryEvent {
         private final FigureFilter value;
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class PhotoQueryEvent {
-        private final PhotoFilter value;
     }
 
     public static class DataChangedEvent {

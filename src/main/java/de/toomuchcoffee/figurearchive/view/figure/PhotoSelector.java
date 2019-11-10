@@ -62,7 +62,7 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
     }
 
     private List<Photo> availablePhotos() {
-        return photoService.findPhotos(searchTerm).stream()
+        return photoService.findPhotos(0, 50, searchTerm).stream()
                 .filter(this::isSelected)
                 .collect(toList());
     }

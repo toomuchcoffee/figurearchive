@@ -9,7 +9,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
-import de.toomuchcoffee.figurearchive.view.controls.CsvUploader;
+import de.toomuchcoffee.figurearchive.view.controls.CsvUpload;
 import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ public class FigureActionsPanel extends HorizontalLayout {
     private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureDataInfo figureDataInfo;
     private final NewFigureButton newFigureButton;
-    private final CsvUploader csvUploader;
+    private final CsvUpload csvUpload;
 
     @PostConstruct
     public void init() {
@@ -47,6 +47,6 @@ public class FigureActionsPanel extends HorizontalLayout {
             figureDataProvider.setFilter(figureFilter);
         });
 
-        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, csvUploader);
+        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, csvUpload);
     }
 }
