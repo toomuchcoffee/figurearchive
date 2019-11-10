@@ -1,14 +1,14 @@
 package de.toomuchcoffee.figurearchive.service;
 
 
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.vaadin.spring.events.EventBus;
 
 import java.util.List;
 
@@ -16,37 +16,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FigureService {
     private final FigureRepository figureRepository;
+    private final EventBus.ApplicationEventBus eventBus;
 
-    public List<Figure> findFigures(String query) {
-        if (!StringUtils.isBlank(query)) {
-            return figureRepository.findByVerbatimContainingIgnoreCase(query);
-        }
-        return figureRepository.findAll();
-    }
-
-    public List<Figure> fetch(int offset, int limit, FigureFilter filter) {
-        return _fetch(filter);
-    }
-
-    public int getCount(FigureFilter filter) {
-        return _fetch(filter).size();
-    }
-
-    private List<Figure> _fetch(FigureFilter filter) {
+    public List<Figure> findFigures(FigureFilter filter) {
+        List<Figure> figures;
         if (filter != null) {
             if (!StringUtils.isBlank(filter.getFilterText()) && filter.getProductLine() != null) {
-                return figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
+                figures = figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
             } else if (!StringUtils.isBlank(filter.getFilterText())) {
-                return figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText());
+                figures = figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText());
             } else if (filter.getProductLine() != null) {
-                return figureRepository.findByProductLine(filter.getProductLine());
+                figures = figureRepository.findByProductLine(filter.getProductLine());
+            } else {
+                figures = figureRepository.findAll();
             }
+        } else {
+            figures = figureRepository.findAll();
         }
-        return figureRepository.findAll();
+        eventBus.publish(this, new FigureSearchResultEvent(figures.size()));
+        return figures;
     }
 
     @Getter
     @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class FigureFilter {
         private String filterText;
         private ProductLine productLine;

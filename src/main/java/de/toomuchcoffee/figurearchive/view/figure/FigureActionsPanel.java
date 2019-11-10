@@ -3,15 +3,15 @@ package de.toomuchcoffee.figurearchive.view.figure;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.view.controls.CsvUpload;
 import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import lombok.RequiredArgsConstructor;
+import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 
@@ -22,7 +22,7 @@ import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 @RequiredArgsConstructor
 public class FigureActionsPanel extends HorizontalLayout {
 
-    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
+    private final EventBus.SessionEventBus eventBus;
     private final FigureDataInfo figureDataInfo;
     private final NewFigureButton newFigureButton;
     private final CsvUpload csvUpload;
@@ -36,7 +36,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         tfVerbatimFilter.setValueChangeMode(EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
-            figureDataProvider.setFilter(figureFilter);
+            eventBus.publish(this, new FigureSearchEvent(figureFilter));
         });
 
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>();
@@ -44,7 +44,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
-            figureDataProvider.setFilter(figureFilter);
+            eventBus.publish(this, new FigureSearchEvent(figureFilter));
         });
 
         add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, csvUpload);

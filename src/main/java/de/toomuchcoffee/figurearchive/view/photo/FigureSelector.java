@@ -11,12 +11,10 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService;
+import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
@@ -45,14 +43,16 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         TextField tfSearchTerm = new TextField();
         tfSearchTerm.setPlaceholder("Search by Tag");
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
-        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(e.getValue())));
+        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(new FigureFilter(e.getValue(), null))));
 
         getContent().add(new VerticalLayout(new Label("Selected Figures"), selectedFigures));
         getContent().add(new VerticalLayout(tfSearchTerm, availableFigures));
 
-        availableFigures.asSingleSelect().addValueChangeListener(e -> add(this, e.getValue()));
+        availableFigures.asSingleSelect().addValueChangeListener(e ->
+                Optional.ofNullable(e.getValue()).ifPresent(v -> add(this, v)));
 
-        selectedFigures.asSingleSelect().addValueChangeListener(e -> remove(this, e.getValue()));
+        selectedFigures.asSingleSelect().addValueChangeListener(e ->
+                Optional.ofNullable(e.getValue()).ifPresent(v -> remove(this, v)));
 
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));
@@ -60,7 +60,7 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         });
     }
 
-    private List<Figure> availableFigures(String query) {
+    private List<Figure> availableFigures(FigureFilter query) {
         return figureService.findFigures(query).stream()
                 .filter(this::isSelected)
                 .limit(50)

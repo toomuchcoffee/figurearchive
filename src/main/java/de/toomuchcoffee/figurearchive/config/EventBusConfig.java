@@ -9,12 +9,6 @@ import org.vaadin.spring.events.annotation.EnableVaadinEventBus;
 @Configuration
 @EnableVaadinEventBus
 public class EventBusConfig {
-    @Getter
-    @RequiredArgsConstructor
-    public static class FigureQueryEvent {
-        private final FigureFilter value;
-    }
-
     public static class DataChangedEvent {
         public static final DataChangedEvent DUMMY = new DataChangedEvent();
     }
@@ -23,5 +17,17 @@ public class EventBusConfig {
     @Getter
     public static class PhotoSearchEvent {
         private final String value;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class FigureSearchEvent {
+        private final FigureFilter value;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class FigureSearchResultEvent {
+        private final int count;
     }
 }

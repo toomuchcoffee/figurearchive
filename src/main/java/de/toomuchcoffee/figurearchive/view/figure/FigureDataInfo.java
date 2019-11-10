@@ -2,13 +2,9 @@ package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureQueryEvent;
-import de.toomuchcoffee.figurearchive.entity.Figure;
-import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -19,7 +15,6 @@ import javax.annotation.PostConstruct;
 @SpringComponent
 @RequiredArgsConstructor
 public class FigureDataInfo extends Composite<TextField> {
-    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final EventBus.SessionEventBus eventBus;
 
     @PostConstruct
@@ -31,8 +26,8 @@ public class FigureDataInfo extends Composite<TextField> {
     }
 
     @EventBusListenerMethod
-    public void update(FigureQueryEvent event) {
-        getContent().setValue(figureDataProvider.size(new Query<>()) + " figures found");
+    public void update(FigureSearchResultEvent event) {
+        getContent().setValue(event.getCount() + " figures found");
     }
 
 }
