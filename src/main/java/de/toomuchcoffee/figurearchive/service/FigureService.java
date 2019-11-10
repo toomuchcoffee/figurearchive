@@ -39,7 +39,7 @@ public class FigureService {
     }
 
     public List<Figure> findFigures(String query) {
-        return figureRepository.findByVerbatimContainingIgnoreCase(query);
+        return figureRepository.findByVerbatimContainingIgnoreCase(query).subList(0, 10); // TODO
     }
 
     @Getter

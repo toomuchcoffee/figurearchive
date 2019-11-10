@@ -5,6 +5,7 @@ import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class PhotoService {
                 .map(PhotoFilter::getFilterText)
                 .filter(StringUtils::isBlank)
                 .map(this::findPhotos)
-                .orElse(photoRepository.findAll());
+                .orElse(photoRepository.findAll(PageRequest.of(0, 100)).getContent()); // TODO
     }
 
     @Getter

@@ -44,7 +44,7 @@ public class PhotoGrid extends Grid<Photo> {
                 .map(ListItem::new)
                 .collect(toList())
                 .toArray(new ListItem[0])))
-                .setHeader("Figures Count");
+                .setHeader("Figures");
     }
 
 }

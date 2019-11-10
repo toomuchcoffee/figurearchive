@@ -9,7 +9,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -17,7 +16,6 @@ import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
-import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
@@ -25,8 +23,7 @@ import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureModifiedEvent.DELETED;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureModifiedEvent.SAVED;
+import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.DUMMY;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 
@@ -35,7 +32,6 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class FigureEditor extends Dialog implements KeyNotifier {
 
-    private final ConfigurableFilterDataProvider<Figure, Void, FigureFilter> figureDataProvider;
     private final FigureRepository repository;
     private final PhotoSelector photoSelector;
     private final EventBus.SessionEventBus sessionEventBus;
@@ -86,15 +82,13 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private void delete() {
         repository.delete(figure);
-        figureDataProvider.refreshAll();
-        applicationEventBus.publish(this, DELETED);
+        applicationEventBus.publish(this, DUMMY);
         close();
     }
 
     private void save() {
         repository.save(figure);
-        figureDataProvider.refreshAll();
-        applicationEventBus.publish(this, SAVED);
+        applicationEventBus.publish(this, DUMMY);
         close();
     }
 

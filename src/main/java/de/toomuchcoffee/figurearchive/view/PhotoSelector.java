@@ -17,7 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.gwt.thirdparty.guava.common.collect.Sets.newHashSet;
+import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
+import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -32,16 +33,8 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     private String searchTerm = "";
 
-    private PhotoGallery availableImages = new PhotoGallery(75,5, 2, photo -> {
-        Set<Photo> photos = newHashSet(getValue());
-        photos.add(photo);
-        this.setValue(photos);
-    });
-    private PhotoGallery selectedImages = new PhotoGallery(250, 2, 1, photo -> {
-        Set<Photo> photos = newHashSet(getValue());
-        photos.remove(photo);
-        this.setValue(photos);
-    });
+    private PhotoGallery availableImages = new PhotoGallery(75,5, 2, photo -> add(this, photo));
+    private PhotoGallery selectedImages = new PhotoGallery(250, 2, 1, photo -> remove(this, photo));
 
     public PhotoSelector(PhotoService photoService, EventBus.SessionEventBus eventBus) {
         super(DEFAULT_VALUE);

@@ -2,8 +2,8 @@ package de.toomuchcoffee.figurearchive.view;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -19,13 +19,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
+import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @UIScope
 @SpringComponent
 @Tag("div")
-public class FigureSelector extends AbstractCompositeField<VerticalLayout, FigureSelector, Set<Figure>> {
+public class FigureSelector extends AbstractCompositeField<HorizontalLayout, FigureSelector, Set<Figure>> {
     private final FigureService figureService;
     private final EventBus.SessionEventBus eventBus;
 
@@ -33,8 +35,8 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
     private String searchTerm = "";
 
-    private Grid<Figure> availableFigures = new Grid<Figure>();
-    private Grid<Figure> selectedFigures = new Grid<Figure>();
+    private FigureList availableFigures = new FigureList();
+    private FigureList selectedFigures = new FigureList();
 
     public FigureSelector(FigureService figureService, EventBus.SessionEventBus eventBus) {
         super(DEFAULT_VALUE);
@@ -44,14 +46,16 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
     @PostConstruct
     public void init() {
-        getContent().add(new Label("Selected Figures"));
-        getContent().add(selectedFigures);
-        getContent().add(new Label("Available Figures"));
-        getContent().add(availableFigures);
+        getContent().add(new VerticalLayout(new Label("Selected Figures"), selectedFigures));
+        getContent().add(new VerticalLayout(new Label("Available Figures"), availableFigures));
+
+        availableFigures.asSingleSelect().addValueChangeListener(e -> add(this, e.getValue()));
+
+        selectedFigures.asSingleSelect().addValueChangeListener(e -> remove(this, e.getValue()));
 
         addValueChangeListener(e -> {
-            selectedFigures.setItems(new ArrayList<>(getValue()));
-            availableFigures.setItems(availableFigures());
+            selectedFigures.update(new ArrayList<>(getValue()));
+            availableFigures.update(availableFigures());
         });
 
         eventBus.subscribe(this);
@@ -60,7 +64,7 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
         this.searchTerm = event.getValue();
-        availableFigures.setItems(availableFigures());
+        availableFigures.update(availableFigures());
     }
 
     private List<Figure> availableFigures() {
@@ -69,8 +73,8 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
                 .collect(toList());
     }
 
-    private boolean isSelected(Figure photo) {
-        return !getValue().stream().map(Figure::getId).collect(toSet()).contains(photo.getId());
+    private boolean isSelected(Figure figure) {
+        return !getValue().stream().map(Figure::getId).collect(toSet()).contains(figure.getId());
     }
 
     @Override
