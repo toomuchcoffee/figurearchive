@@ -21,6 +21,10 @@ figurearchive:
   admin-password: ${ADMIN_PASSWORD}
   tumblr:
     initialize: true
+  figures:
+    page-size: 1000
+  photos:
+    page-size: 5000
 
 ---
 
