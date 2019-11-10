@@ -17,6 +17,13 @@ import java.util.List;
 public class FigureService {
     private final FigureRepository figureRepository;
 
+    public List<Figure> findFigures(String query) {
+        if (!StringUtils.isBlank(query)) {
+            return figureRepository.findByVerbatimContainingIgnoreCase(query);
+        }
+        return figureRepository.findAll();
+    }
+
     public List<Figure> fetch(int offset, int limit, FigureFilter filter) {
         return _fetch(filter);
     }
@@ -27,19 +34,15 @@ public class FigureService {
 
     private List<Figure> _fetch(FigureFilter filter) {
         if (filter != null) {
-            if (!StringUtils.isEmpty(filter.getFilterText()) && filter.getProductLine() != null) {
+            if (!StringUtils.isBlank(filter.getFilterText()) && filter.getProductLine() != null) {
                 return figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
-            } else if (!StringUtils.isEmpty(filter.getFilterText())) {
+            } else if (!StringUtils.isBlank(filter.getFilterText())) {
                 return figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText());
             } else if (filter.getProductLine() != null) {
                 return figureRepository.findByProductLine(filter.getProductLine());
             }
         }
         return figureRepository.findAll();
-    }
-
-    public List<Figure> findFigures(String query) {
-        return figureRepository.findByVerbatimContainingIgnoreCase(query).subList(0, 10); // TODO
     }
 
     @Getter

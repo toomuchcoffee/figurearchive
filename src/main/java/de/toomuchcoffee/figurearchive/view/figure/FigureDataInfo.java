@@ -6,7 +6,7 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureQueryEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class FigureDataInfo extends Composite<TextField> {
     }
 
     @EventBusListenerMethod
-    public void update(EventBusConfig.FigureQueryEvent event) {
+    public void update(FigureQueryEvent event) {
         getContent().setValue(figureDataProvider.size(new Query<>()) + " figures found");
     }
 
