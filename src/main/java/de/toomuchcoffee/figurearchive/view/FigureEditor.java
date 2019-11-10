@@ -101,8 +101,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     final void editFigure(Figure figure) {
         open();
-        this.figure = repository.findById(figure.getId())
-                .orElseThrow(() -> new IllegalStateException("Couldn't find item from list"));
+        this.figure = figure;
         binder.setBean(this.figure);
         tfVerbatim.focus();
     }

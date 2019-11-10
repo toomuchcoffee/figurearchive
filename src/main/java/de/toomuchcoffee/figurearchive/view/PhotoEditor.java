@@ -11,13 +11,17 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
-import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
+import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 
+import static com.google.common.collect.Sets.difference;
+import static com.google.common.collect.Sets.union;
 import static com.vaadin.flow.component.icon.VaadinIcon.CHECK;
 import static com.vaadin.flow.component.icon.VaadinIcon.EXIT;
 import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.DUMMY;
@@ -28,12 +32,14 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 @RequiredArgsConstructor
 public class PhotoEditor extends Dialog implements KeyNotifier {
 
-    private final PhotoRepository repository;
+    private final FigureRepository figureRepository;
     private final FigureSelector figureSelector;
     //private final EventBus.SessionEventBus sessionEventBus;
     private final EventBus.ApplicationEventBus applicationEventBus;
 
     private Photo photo;
+    private Set<Figure> figuresBeforeChange;
+    private Set<Figure> figuresAfterChange;
 
     private Button save = new Button("Save", CHECK.create(), e -> save());
     private Button cancel = new Button("Cancel", EXIT.create(), e -> close());
@@ -54,20 +60,29 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
     }
 
+    final void editPhoto(Photo photo) {
+        open();
+        this.photo = photo;
+        binder.setBean(photo);
+        figuresBeforeChange = photo.getFigures();
+        imageDiv.removeAll();
+        imageDiv.add(new Image(getImageUrl(this.photo, 500), "N/A"));
+    }
+
     private void save() {
-        repository.save(photo);
+        figuresAfterChange = photo.getFigures();
+        manageOwningSiteOfRelation();
         imageDiv.removeAll();
         applicationEventBus.publish(this, DUMMY);
         close();
     }
 
-    final void editPhoto(Photo figure) {
-        open();
-        this.photo = repository.findById(figure.getId())
-                .orElseThrow(() -> new IllegalStateException("Couldn't find item from list"));
-        binder.setBean(this.photo);
-        imageDiv.removeAll();
-        imageDiv.add(new Image(getImageUrl(photo, 500), "N/A"));
+    private void manageOwningSiteOfRelation() {
+        Set<Figure> deletedFigures = difference(figuresBeforeChange, figuresAfterChange);
+        deletedFigures.forEach(f -> f.getPhotos().remove(photo));
+        Set<Figure> addedFigures = difference(figuresAfterChange, figuresBeforeChange);
+        addedFigures.forEach(f -> f.getPhotos().add(photo));
+        figureRepository.saveAll(union(addedFigures, deletedFigures));
     }
 
 }
