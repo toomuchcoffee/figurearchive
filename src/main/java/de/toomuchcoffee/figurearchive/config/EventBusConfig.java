@@ -15,8 +15,20 @@ public class EventBusConfig {
 
     @RequiredArgsConstructor
     @Getter
+    public static class PhotoSearchByVerbatimEvent {
+        private final String value;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
     public static class PhotoSearchEvent {
         private final String value;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class PhotoSearchResultEvent {
+        private final int count;
     }
 
     @RequiredArgsConstructor

@@ -22,7 +22,7 @@ import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 public class FigureActionsPanel extends HorizontalLayout {
 
     private final EventBus.SessionEventBus eventBus;
-    private final FigureDataInfo figureDataInfo;
+    private final FigureQueryInfo figureQueryInfo;
     private final NewFigureButton newFigureButton;
     private final FigureImport figureImport;
 
@@ -46,6 +46,6 @@ public class FigureActionsPanel extends HorizontalLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter));
         });
 
-        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, figureImport);
+        add(tfVerbatimFilter, cbProductLineFilter, figureQueryInfo, newFigureButton, figureImport);
     }
 }

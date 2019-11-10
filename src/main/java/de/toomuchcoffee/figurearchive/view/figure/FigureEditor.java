@@ -12,7 +12,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchByVerbatimEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
@@ -76,7 +76,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
         tfVerbatim.addValueChangeListener(e -> eventBus
-                .publish(this, new PhotoSearchEvent(e.getSource().getValue())));
+                .publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue())));
     }
 
     private void delete() {

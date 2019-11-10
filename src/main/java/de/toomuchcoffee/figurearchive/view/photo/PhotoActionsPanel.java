@@ -19,6 +19,7 @@ import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 public class PhotoActionsPanel extends HorizontalLayout {
 
     private final EventBus.SessionEventBus eventBus;
+    private final PhotoQueryInfo photoQueryInfo;
     private final TumblrSyncButton tumblrSyncButton;
 
     @PostConstruct
@@ -28,6 +29,6 @@ public class PhotoActionsPanel extends HorizontalLayout {
         tfFilter.setValueChangeMode(EAGER);
         tfFilter.addValueChangeListener(e -> eventBus.publish(this, new PhotoSearchEvent(e.getValue())));
 
-        add(tfFilter, tumblrSyncButton);
+        add(tfFilter, photoQueryInfo, tumblrSyncButton);
     }
 }

@@ -21,7 +21,7 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 import static java.util.stream.Collectors.toList;
 
 public class PhotoGrid extends Grid<Photo> {
-    private static final int PAGE_SIZE = 100;
+    private static final int PAGE_SIZE = 250;
 
     private final PhotoService photoService;
 

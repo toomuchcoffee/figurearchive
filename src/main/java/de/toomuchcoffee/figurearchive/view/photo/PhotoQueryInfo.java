@@ -1,10 +1,10 @@
-package de.toomuchcoffee.figurearchive.view.figure;
+package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class FigureDataInfo extends Composite<TextField> {
+public class PhotoQueryInfo extends Composite<TextField> {
     private final EventBus.SessionEventBus eventBus;
 
     @PostConstruct
@@ -26,8 +26,8 @@ public class FigureDataInfo extends Composite<TextField> {
     }
 
     @EventBusListenerMethod
-    public void update(FigureSearchResultEvent event) {
-        getContent().setValue(event.getCount() + " figures found");
+    public void update(EventBusConfig.PhotoSearchResultEvent event) {
+        getContent().setValue(event.getCount() + " photos found");
     }
 
 }

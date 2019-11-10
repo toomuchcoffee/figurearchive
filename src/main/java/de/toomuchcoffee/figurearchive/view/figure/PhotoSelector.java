@@ -5,7 +5,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchByVerbatimEvent;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 import org.vaadin.spring.events.EventBus;
@@ -33,7 +33,7 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     private String searchTerm = "";
 
-    private PhotoGallery availableImages = new PhotoGallery(75,5, 2, photo -> add(this, photo));
+    private PhotoGallery availableImages = new PhotoGallery(75, 5, 2, photo -> add(this, photo));
     private PhotoGallery selectedImages = new PhotoGallery(250, 2, 1, photo -> remove(this, photo));
 
     public PhotoSelector(PhotoService photoService, EventBus.SessionEventBus eventBus) {
@@ -56,13 +56,13 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
     }
 
     @EventBusListenerMethod
-    public void update(PhotoSearchEvent event) {
+    public void update(PhotoSearchByVerbatimEvent event) {
         this.searchTerm = event.getValue();
         availableImages.update(availablePhotos());
     }
 
     private List<Photo> availablePhotos() {
-        return photoService.findPhotos(0, 50, searchTerm).stream()
+        return photoService.findPhotos(searchTerm).stream()
                 .filter(this::isSelected)
                 .collect(toList());
     }
