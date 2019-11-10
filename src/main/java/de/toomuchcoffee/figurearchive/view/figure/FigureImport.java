@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view.controls;
+package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
@@ -21,7 +21,7 @@ import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEv
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class CsvUpload extends Upload {
+public class FigureImport extends Upload {
     private final ImportService importService;
     private final EventBus.SessionEventBus eventBus;
 

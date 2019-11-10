@@ -2,9 +2,7 @@ package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -29,9 +27,6 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
 
     private static final Set<Figure> DEFAULT_VALUE = new HashSet<>();
 
-    private FigureList availableFigures = new FigureList();
-    private FigureList selectedFigures = new FigureList();
-
     public FigureSelector(FigureService figureService) {
         super(DEFAULT_VALUE);
         this.figureService = figureService;
@@ -39,20 +34,24 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
 
     @PostConstruct
     public void init() {
+        FigureList availableFigures = new FigureList();
+        FigureList selectedFigures = new FigureList();
 
         TextField tfSearchTerm = new TextField();
         tfSearchTerm.setPlaceholder("Search by Tag");
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
         tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(new FigureFilter(e.getValue(), null))));
 
-        getContent().add(new VerticalLayout(new Label("Selected Figures"), selectedFigures));
-        getContent().add(new VerticalLayout(tfSearchTerm, availableFigures));
+        getContent().add(selectedFigures);
+        getContent().add(availableFigures);
 
-        availableFigures.asSingleSelect().addValueChangeListener(e ->
-                Optional.ofNullable(e.getValue()).ifPresent(v -> add(this, v)));
-
+        selectedFigures.setHeader("Selected Figures");
         selectedFigures.asSingleSelect().addValueChangeListener(e ->
                 Optional.ofNullable(e.getValue()).ifPresent(v -> remove(this, v)));
+
+        availableFigures.setHeader(tfSearchTerm);
+        availableFigures.asSingleSelect().addValueChangeListener(e ->
+                Optional.ofNullable(e.getValue()).ifPresent(v -> add(this, v)));
 
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));

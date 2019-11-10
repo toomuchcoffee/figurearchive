@@ -21,7 +21,11 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 import static java.util.stream.Collectors.toList;
 
 public class PhotoGrid extends Grid<Photo> {
+    private static final int PAGE_SIZE = 100;
+
     private final PhotoService photoService;
+
+    private int currentPage = 0; // TODO
 
     public PhotoGrid(
             EventBus.SessionEventBus eventBus,
@@ -33,7 +37,7 @@ public class PhotoGrid extends Grid<Photo> {
         eventBus.subscribe(this);
 
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(photoService.findPhotos(0, 100, null));
+        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, null));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
@@ -59,12 +63,12 @@ public class PhotoGrid extends Grid<Photo> {
 
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
-        setItems(photoService.findPhotos(0, 100, event.getValue()));
+        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, event.getValue()));
     }
 
     @EventBusListenerMethod
     public void update(DataChangedEvent event) {
-        setItems(photoService.findPhotos(0, 100, null));
+        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, null));
     }
 
 }

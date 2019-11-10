@@ -8,7 +8,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
-import de.toomuchcoffee.figurearchive.view.controls.CsvUpload;
 import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
@@ -25,7 +24,7 @@ public class FigureActionsPanel extends HorizontalLayout {
     private final EventBus.SessionEventBus eventBus;
     private final FigureDataInfo figureDataInfo;
     private final NewFigureButton newFigureButton;
-    private final CsvUpload csvUpload;
+    private final FigureImport figureImport;
 
     @PostConstruct
     public void init() {
@@ -47,6 +46,6 @@ public class FigureActionsPanel extends HorizontalLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter));
         });
 
-        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, csvUpload);
+        add(tfVerbatimFilter, cbProductLineFilter, figureDataInfo, newFigureButton, figureImport);
     }
 }
