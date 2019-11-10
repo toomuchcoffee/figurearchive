@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view;
+package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.Tag;

@@ -8,6 +8,8 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.router.Route;
 import de.toomuchcoffee.figurearchive.view.controls.LogoutButton;
 import de.toomuchcoffee.figurearchive.view.controls.TabMenu;
+import de.toomuchcoffee.figurearchive.view.figure.FigurePanel;
+import de.toomuchcoffee.figurearchive.view.photo.PhotoPanel;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;

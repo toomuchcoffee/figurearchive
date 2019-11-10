@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view;
+package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;

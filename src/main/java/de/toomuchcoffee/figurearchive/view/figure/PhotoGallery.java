@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view;
+package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
