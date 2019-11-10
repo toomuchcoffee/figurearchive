@@ -24,7 +24,7 @@ public class PhotoService {
 
     public List<Photo> findPhotos(String query) {
         Set<String> filter = permutationService.getPermutations(query);
-        return photoRepository.findAll().stream()
+         return photoRepository.findAll().stream()
                 .filter(photo -> photo.getTags() != null)
                 .filter(photo -> intersection(filter, newHashSet(photo.getTags())).size() > 0)
                 .sorted(comparing(photo -> difference(newHashSet(photo.getTags()), filter).size()))
@@ -43,7 +43,7 @@ public class PhotoService {
     private List<Photo> _fetch(PhotoFilter filter) {
         return Optional.ofNullable(filter)
                 .map(PhotoFilter::getFilterText)
-                .filter(StringUtils::isBlank)
+                .filter(StringUtils::isNotBlank)
                 .map(this::findPhotos)
                 .orElse(photoRepository.findAll(PageRequest.of(0, 100)).getContent()); // TODO
     }

@@ -18,13 +18,13 @@ import java.util.Optional;
 public class PhotoPanel extends VerticalLayout {
 
     private final ConfigProperties properties;
-    private final ConfigurableFilterDataProvider<Photo, Void, PhotoFilter> figureDataProvider;
+    private final ConfigurableFilterDataProvider<Photo, Void, PhotoFilter> photoDataProvider;
     private final PhotoActionsPanel photoActionsPanel;
     private final PhotoEditor photoEditor;
 
     @PostConstruct
     public void init() {
-        PhotoGrid photoGrid = new PhotoGrid(figureDataProvider, properties,
+        PhotoGrid photoGrid = new PhotoGrid(photoDataProvider, properties,
                 e -> Optional.ofNullable(e.getValue()).ifPresent(photoEditor::editPhoto));
 
         add(photoActionsPanel, photoGrid);
