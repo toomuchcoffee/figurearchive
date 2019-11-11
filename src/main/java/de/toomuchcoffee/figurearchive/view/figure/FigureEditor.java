@@ -44,7 +44,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private ComboBox<ProductLine> cbLine = new ComboBox<>("Line");
 
     private Button save = new Button("Save", CHECK.create(), e -> save());
-    private Button cancel = new Button("Cancel", EXIT.create(), e -> close());
+    private Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
     private Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
@@ -82,12 +82,20 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private void delete() {
         repository.delete(figure);
         eventBus.publish(this, DUMMY);
-        close();
+
+        resetAndClose();
     }
 
     private void save() {
         repository.save(figure);
         eventBus.publish(this, DUMMY);
+
+        resetAndClose();
+    }
+
+    private void resetAndClose() {
+        this.figure = null;
+        this.binder.removeBean();
         close();
     }
 

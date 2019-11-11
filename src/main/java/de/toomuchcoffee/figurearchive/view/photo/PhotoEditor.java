@@ -14,6 +14,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
@@ -35,14 +36,12 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
     private final FigureRepository figureRepository;
     private final FigureSelector figureSelector;
     private final EventBus.SessionEventBus eventBus;
+    private final NewFigureButton newFigureButton;
 
     private Photo photo;
     private Set<Figure> figuresBeforeChange;
     private Set<Figure> figuresAfterChange;
 
-    private Button save = new Button("Save", CHECK.create(), e -> save());
-    private Button cancel = new Button("Cancel", EXIT.create(), e -> close());
-    private HorizontalLayout actions = new HorizontalLayout(save, cancel);
 
     private Binder<Photo> binder;
 
@@ -50,6 +49,13 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
 
     @PostConstruct
     public void init() {
+        Button save = new Button("Save", CHECK.create(), e -> save());
+        Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
+
+        newFigureButton.addClickListener(e -> this.close());
+
+        HorizontalLayout actions = new HorizontalLayout(save, cancel, newFigureButton);
+
         VerticalLayout verticalLayout = new VerticalLayout(imageDiv, figureSelector, actions);
         add(verticalLayout);
 
@@ -73,6 +79,13 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         manageOwningSiteOfRelation();
         imageDiv.removeAll();
         eventBus.publish(this, DUMMY);
+
+        resetAndClose();
+    }
+
+    private void resetAndClose() {
+        this.photo = null;
+        binder.removeBean();
         close();
     }
 

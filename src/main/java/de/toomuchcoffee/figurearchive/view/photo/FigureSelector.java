@@ -38,7 +38,7 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         FigureList selectedFigures = new FigureList();
 
         TextField tfSearchTerm = new TextField();
-        tfSearchTerm.setPlaceholder("Search by Tag");
+        tfSearchTerm.setPlaceholder("Search...");
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
         tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(new FigureFilter(e.getValue(), null))));
 

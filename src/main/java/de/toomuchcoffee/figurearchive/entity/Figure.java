@@ -27,11 +27,11 @@ public class Figure {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE, REMOVE, REFRESH, DETACH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
     @JoinTable(
             name = "figure_to_photo",
-            joinColumns = { @JoinColumn(name = "figure_id") },
-            inverseJoinColumns = { @JoinColumn(name = "photo_id") }
+            joinColumns = {@JoinColumn(name = "figure_id")},
+            inverseJoinColumns = {@JoinColumn(name = "photo_id")}
     )
     private Set<Photo> photos = new HashSet<>();
 }

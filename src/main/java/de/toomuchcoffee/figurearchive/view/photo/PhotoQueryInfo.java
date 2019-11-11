@@ -4,7 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -26,7 +26,7 @@ public class PhotoQueryInfo extends Composite<TextField> {
     }
 
     @EventBusListenerMethod
-    public void update(EventBusConfig.PhotoSearchResultEvent event) {
+    public void update(PhotoSearchResultEvent event) {
         getContent().setValue(event.getCount() + " photos found");
     }
 
