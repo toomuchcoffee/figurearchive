@@ -25,9 +25,7 @@ public class PhotoGrid extends Grid<Photo> {
 
     private final PhotoService photoService;
 
-    private int currentPage = 0; // TODO
-
-    public PhotoGrid(
+    PhotoGrid(
             EventBus.SessionEventBus eventBus,
             PhotoService photoService,
             ConfigProperties properties,
@@ -37,7 +35,7 @@ public class PhotoGrid extends Grid<Photo> {
         eventBus.subscribe(this);
 
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, null));
+        setItems(photoService.findPhotos(0, PAGE_SIZE, null));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
@@ -63,12 +61,12 @@ public class PhotoGrid extends Grid<Photo> {
 
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
-        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, event.getValue()));
+        setItems(photoService.findPhotos(event.getPage(), PAGE_SIZE, event.getQuery()));
     }
 
     @EventBusListenerMethod
     public void update(DataChangedEvent event) {
-        setItems(photoService.findPhotos(currentPage, PAGE_SIZE, null));
+        setItems(photoService.findPhotos(0, PAGE_SIZE, null));
     }
 
 }

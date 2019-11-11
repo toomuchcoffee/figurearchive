@@ -55,7 +55,7 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
 
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));
-            availableFigures.update(availableFigures(null));
+            availableFigures.update(new ArrayList<>());
         });
     }
 

@@ -1,6 +1,6 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import de.toomuchcoffee.figurearchive.config.EventBusConfig;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,9 @@ public class PhotoService {
 
     public List<Photo> findPhotos(int page, int size, String query) {
         List<Photo> photos;
+        long count;
         if (StringUtils.isBlank(query)) {
+            count = photoRepository.count();
             photos = photoRepository.findAll(PageRequest.of(page, size)).getContent();
         } else {
             Set<String> filter = permutationService.getPermutations(query);
@@ -49,11 +51,12 @@ public class PhotoService {
                     .sorted(comparing(photo -> difference(newHashSet(photo.getTags()), filter).size()))
                     .sorted(comparing(photo -> intersection(filter, newHashSet(((Photo) photo).getTags())).size()).reversed())
                     .collect(toList());
+            count = photos.size();
             int startIndex = page * size;
             int endIndex = Math.min(startIndex + size, photos.size());
             photos = photos.subList(startIndex, endIndex);
         }
-        eventBus.publish(this, new EventBusConfig.PhotoSearchResultEvent(photos.size()));
+        eventBus.publish(this, new PhotoSearchResultEvent(count, page, size, query));
         return photos;
     }
 

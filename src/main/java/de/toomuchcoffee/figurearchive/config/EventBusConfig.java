@@ -22,13 +22,17 @@ public class EventBusConfig {
     @RequiredArgsConstructor
     @Getter
     public static class PhotoSearchEvent {
-        private final String value;
+        private final String query;
+        private final int page;
     }
 
     @RequiredArgsConstructor
     @Getter
     public static class PhotoSearchResultEvent {
-        private final int count;
+        private final long count;
+        private final int page;
+        private final int size;
+        private final String query;
     }
 
     @RequiredArgsConstructor
