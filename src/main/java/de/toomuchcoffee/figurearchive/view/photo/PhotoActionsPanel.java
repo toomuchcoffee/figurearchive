@@ -1,17 +1,14 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs;
 import de.toomuchcoffee.figurearchive.view.controls.TumblrSyncButton;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
 
@@ -25,26 +22,13 @@ public class PhotoActionsPanel extends HorizontalLayout {
     private final TumblrSyncButton tumblrSyncButton;
     private final PhotoRepository photoRepository;
 
-    private Div paginationDiv = new Div();
-
     @PostConstruct
     public void init() {
         PhotoTagFilter photoTagFilter = new PhotoTagFilter(photoRepository, e -> {
             eventBus.publish(this, new PhotoSearchEvent(e.getValue(), 0));
         });
 
-        add(photoTagFilter, paginationDiv, photoQueryInfo, tumblrSyncButton);
-
-        eventBus.subscribe(this);
-    }
-
-    @EventBusListenerMethod
-    public void update(PhotoSearchResultEvent event) {
-        if (event.getPage() == 0) {
-            paginationDiv.removeAll();
-            int pages = (int) Math.ceil((double) event.getCount() / (double) event.getSize());
-            paginationDiv.add(new PaginationTabs(pages, event.getQuery(), eventBus));
-        }
+        add(photoTagFilter, new PaginationTabs(eventBus), photoQueryInfo, tumblrSyncButton);
     }
 
 }
