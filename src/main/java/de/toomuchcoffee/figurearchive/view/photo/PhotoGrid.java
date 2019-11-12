@@ -16,6 +16,7 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 import static java.util.stream.Collectors.toList;
@@ -56,7 +57,9 @@ public class PhotoGrid extends Grid<Photo> {
                 .map(ListItem::new)
                 .collect(toList())
                 .toArray(new ListItem[0])))
-                .setHeader("Figures");
+                .setHeader("Figures")
+                .setComparator(Comparator.comparing(photo -> photo.getFigures().size(), Comparator.nullsFirst(Comparator.naturalOrder())));
+        ;
     }
 
     @EventBusListenerMethod
