@@ -16,9 +16,9 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
+import static java.util.Comparator.*;
 import static java.util.stream.Collectors.toList;
 
 public class PhotoGrid extends Grid<Photo> {
@@ -36,7 +36,7 @@ public class PhotoGrid extends Grid<Photo> {
         eventBus.subscribe(this);
 
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(photoService.findPhotos(0, PAGE_SIZE, null));
+        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
@@ -58,18 +58,18 @@ public class PhotoGrid extends Grid<Photo> {
                 .collect(toList())
                 .toArray(new ListItem[0])))
                 .setHeader("Figures")
-                .setComparator(Comparator.comparing(photo -> photo.getFigures().size(), Comparator.nullsFirst(Comparator.naturalOrder())));
+                .setComparator(comparing(photo -> photo.getFigures().size(), nullsFirst(naturalOrder())));
         ;
     }
 
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
-        setItems(photoService.findPhotos(event.getPage(), PAGE_SIZE, event.getQuery()));
+        setItems(photoService.findPhotosByTag(event.getPage(), PAGE_SIZE, event.getQuery()));
     }
 
     @EventBusListenerMethod
     public void update(DataChangedEvent event) {
-        setItems(photoService.findPhotos(0, PAGE_SIZE, null));
+        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
     }
 
 }

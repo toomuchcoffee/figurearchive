@@ -6,7 +6,9 @@ import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class PhotoTagFilter extends ComboBox<String> {
 
@@ -16,10 +18,11 @@ public class PhotoTagFilter extends ComboBox<String> {
         setItems(photoRepository.findAll().stream()
                 .map(Photo::getTags)
                 .flatMap(Arrays::stream)
-                .collect(Collectors.toSet())
+                .map(String::toLowerCase)
+                .collect(toSet())
                 .stream()
                 .sorted()
-                .collect(Collectors.toList()));
+                .collect(toList()));
 
     }
 }

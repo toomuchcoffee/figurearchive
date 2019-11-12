@@ -6,8 +6,8 @@ public class PhotoUrlHelper {
     public static String getImageUrl(Photo photo, int width) {
         return photo.getUrls().stream()
                 .filter(s -> s.getWidth() == width)
-                .findFirst()
+                .findAny()
                 .map(Photo.PhotoUrl::getUrl)
-                .orElse("");
+                .orElse(photo.getUrls().get(0).getUrl());
     }
 }
