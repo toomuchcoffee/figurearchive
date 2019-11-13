@@ -7,6 +7,8 @@ import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.vaadin.spring.events.EventBus;
 
@@ -18,22 +20,33 @@ public class FigureService {
     private final FigureRepository figureRepository;
     private final EventBus.ApplicationEventBus eventBus;
 
-    public List<Figure> findFigures(FigureFilter filter) {
+    public List<Figure> suggestFigures(String query) {
+        return figureRepository.findByVerbatimContainingIgnoreCase(query);
+    }
+
+    public List<Figure> findFigures(int page, int size, FigureFilter filter) {
         List<Figure> figures;
+        long count;
+        Pageable pageable = PageRequest.of(page, size);
         if (filter != null) {
             if (!StringUtils.isBlank(filter.getFilterText()) && filter.getProductLine() != null) {
-                figures = figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
+                count = figureRepository.countByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
+                figures = figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine(), pageable).getContent();
             } else if (!StringUtils.isBlank(filter.getFilterText())) {
-                figures = figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText());
+                count = figureRepository.countByVerbatimStartsWithIgnoreCase(filter.getFilterText());
+                figures = figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText(), pageable).getContent();
             } else if (filter.getProductLine() != null) {
-                figures = figureRepository.findByProductLine(filter.getProductLine());
+                count = figureRepository.countByProductLine(filter.getProductLine());
+                figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
             } else {
-                figures = figureRepository.findAll();
+                count = figureRepository.count();
+                figures = figureRepository.findAll(pageable).getContent();
             }
         } else {
-            figures = figureRepository.findAll();
+            count = figureRepository.count();
+            figures = figureRepository.findAll(pageable).getContent();
         }
-        eventBus.publish(this, new FigureSearchResultEvent(figures.size()));
+        eventBus.publish(this, new FigureSearchResultEvent(count, page, size, filter));
         return figures;
     }
 

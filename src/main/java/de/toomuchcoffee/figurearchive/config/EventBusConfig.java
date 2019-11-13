@@ -1,8 +1,9 @@
 package de.toomuchcoffee.figurearchive.config;
 
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs.SearchEvent;
+import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs.SearchResultEvent;
+import lombok.*;
 import org.springframework.context.annotation.Configuration;
 import org.vaadin.spring.events.annotation.EnableVaadinEventBus;
 
@@ -19,31 +20,39 @@ public class EventBusConfig {
         private final String value;
     }
 
-    @RequiredArgsConstructor
     @Getter
-    public static class PhotoSearchEvent {
-        private final String query;
-        private final int page;
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoSearchEvent implements SearchEvent<String> {
+        private String filter;
+        private int page;
     }
 
-    @RequiredArgsConstructor
+    @Setter
     @Getter
-    public static class PhotoSearchResultEvent {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FigureSearchEvent implements SearchEvent<FigureFilter> {
+        private FigureFilter filter;
+        private int page;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class PhotoSearchResultEvent implements SearchResultEvent<String> {
         private final long count;
         private final int page;
         private final int size;
-        private final String query;
+        private final String filter;
     }
 
-    @RequiredArgsConstructor
     @Getter
-    public static class FigureSearchEvent {
-        private final FigureFilter value;
-    }
-
     @RequiredArgsConstructor
-    @Getter
-    public static class FigureSearchResultEvent {
-        private final int count;
+    public static class FigureSearchResultEvent implements SearchResultEvent<FigureFilter> {
+        private final long count;
+        private final int page;
+        private final int size;
+        private final FigureFilter filter;
     }
 }

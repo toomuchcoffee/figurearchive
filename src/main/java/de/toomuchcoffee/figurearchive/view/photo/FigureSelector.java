@@ -9,7 +9,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService;
-import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -40,7 +39,7 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         TextField tfSearchTerm = new TextField();
         tfSearchTerm.setPlaceholder("Search...");
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
-        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(new FigureFilter(e.getValue(), null))));
+        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(e.getValue())));
 
         getContent().add(selectedFigures);
         getContent().add(availableFigures);
@@ -59,8 +58,8 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         });
     }
 
-    private List<Figure> availableFigures(FigureFilter query) {
-        return figureService.findFigures(query).stream()
+    private List<Figure> availableFigures(String query) {
+        return figureService.suggestFigures(query).stream()
                 .filter(this::isSelected)
                 .limit(50)
                 .collect(toList());

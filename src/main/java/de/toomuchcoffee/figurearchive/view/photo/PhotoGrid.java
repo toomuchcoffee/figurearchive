@@ -64,7 +64,7 @@ public class PhotoGrid extends Grid<Photo> {
 
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
-        setItems(photoService.findPhotosByTag(event.getPage(), PAGE_SIZE, event.getQuery()));
+        setItems(photoService.findPhotosByTag(event.getPage(), PAGE_SIZE, event.getFilter()));
     }
 
     @EventBusListenerMethod

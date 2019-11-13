@@ -6,9 +6,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
+import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
@@ -35,7 +37,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         tfVerbatimFilter.setValueChangeMode(EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
-            eventBus.publish(this, new FigureSearchEvent(figureFilter));
+            eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
 
         ComboBox<ProductLine> cbProductLineFilter = new ComboBox<>();
@@ -43,9 +45,12 @@ public class FigureActionsPanel extends HorizontalLayout {
         cbProductLineFilter.setItems(ProductLine.values());
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
-            eventBus.publish(this, new FigureSearchEvent(figureFilter));
+            eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
 
-        add(tfVerbatimFilter, cbProductLineFilter, figureQueryInfo, newFigureButton, figureImport);
+        PaginationTabs pagination = new PaginationTabs<FigureSearchResultEvent, FigureSearchEvent, FigureFilter>(
+                eventBus, FigureSearchResultEvent.class, FigureSearchEvent.class);
+
+        add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo, newFigureButton, figureImport);
     }
 }
