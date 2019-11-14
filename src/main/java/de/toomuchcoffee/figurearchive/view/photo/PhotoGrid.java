@@ -59,7 +59,6 @@ public class PhotoGrid extends Grid<Photo> {
                 .toArray(new ListItem[0])))
                 .setHeader("Figures")
                 .setComparator(comparing(photo -> photo.getFigures().size(), nullsFirst(naturalOrder())));
-        ;
     }
 
     @EventBusListenerMethod
