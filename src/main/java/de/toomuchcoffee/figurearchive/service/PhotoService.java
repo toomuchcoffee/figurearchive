@@ -3,9 +3,9 @@ package de.toomuchcoffee.figurearchive.service;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import lombok.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.vaadin.spring.events.EventBus;
 
@@ -16,6 +16,7 @@ import java.util.Set;
 import static com.google.common.collect.Sets.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class PhotoService {
     private final PermutationService permutationService;
 
     public List<Photo> suggestPhotos(String query) {
-        if (StringUtils.isBlank(query)) {
+        if (isBlank(query)) {
             return photoRepository.findAll();
         } else {
             Set<String> filter = permutationService.getPermutations(query);
@@ -37,14 +38,22 @@ public class PhotoService {
         }
     }
 
-    public List<Photo> findPhotosByTag(int page, int size, String tag) {
+    public List<Photo> findPhotosByTag(int page, int size, String tag, boolean withFigures) {
         List<Photo> photos;
         long count;
-        if (StringUtils.isBlank(tag)) {
-            count = photoRepository.count();
-            photos = photoRepository.findAll(PageRequest.of(page, size)).getContent();
+        if (isBlank(tag)) {
+            Pageable pageable = PageRequest.of(page, size);
+            if (withFigures) {
+                count = photoRepository.countByFiguresNotEmpty();
+                photos = photoRepository.findByFiguresNotEmpty(pageable).getContent();
+            } else {
+                count = photoRepository.countByFiguresEmpty();
+                photos = photoRepository.findByFiguresEmpty(pageable).getContent();
+            }
         } else {
-            photos = photoRepository.findAll().stream()
+
+            List<Photo> unfiltered = withFigures ? photoRepository.findByFiguresNotEmpty() : photoRepository.findByFiguresEmpty();
+            photos = unfiltered.stream()
                     .filter(photo -> Arrays.stream(photo.getTags()).anyMatch(t -> t.equalsIgnoreCase(tag)))
                     .collect(toList());
             count = photos.size();
@@ -54,6 +63,15 @@ public class PhotoService {
         }
         eventBus.publish(this, new PhotoSearchResultEvent(count, page, size, tag));
         return photos;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoFilter {
+        private String query;
+        private boolean withFigures;
     }
 
 }

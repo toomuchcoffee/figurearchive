@@ -42,6 +42,7 @@ public class PaginationTabs<R extends PaginationTabs.SearchResultEvent, S extend
     }
 
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     private S newSearchEvent(F filter, int page) {
         S instance = searchEventType.newInstance();
         instance.setFilter(filter);

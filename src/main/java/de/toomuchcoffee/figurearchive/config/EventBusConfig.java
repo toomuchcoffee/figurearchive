@@ -1,6 +1,7 @@
 package de.toomuchcoffee.figurearchive.config;
 
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
+import de.toomuchcoffee.figurearchive.service.PhotoService.PhotoFilter;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs.SearchEvent;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs.SearchResultEvent;
 import lombok.*;
@@ -24,8 +25,8 @@ public class EventBusConfig {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PhotoSearchEvent implements SearchEvent<String> {
-        private String filter;
+    public static class PhotoSearchEvent implements SearchEvent<PhotoFilter> {
+        private PhotoFilter filter;
         private int page;
     }
 

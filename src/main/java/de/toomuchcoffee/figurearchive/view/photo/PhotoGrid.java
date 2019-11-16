@@ -36,7 +36,7 @@ public class PhotoGrid extends Grid<Photo> {
         eventBus.subscribe(this);
 
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
+        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null, false));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
@@ -63,12 +63,12 @@ public class PhotoGrid extends Grid<Photo> {
 
     @EventBusListenerMethod
     public void update(PhotoSearchEvent event) {
-        setItems(photoService.findPhotosByTag(event.getPage(), PAGE_SIZE, event.getFilter()));
+        setItems(photoService.findPhotosByTag(event.getPage(), PAGE_SIZE, event.getFilter().getQuery(), event.getFilter().isWithFigures()));
     }
 
     @EventBusListenerMethod
     public void update(DataChangedEvent event) {
-        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
+        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null, false));
     }
 
 }
