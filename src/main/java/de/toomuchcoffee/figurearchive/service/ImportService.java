@@ -24,7 +24,7 @@ public class ImportService {
     private final FigureRepository figureRepository;
 
     @Transactional
-    public void importCsv(byte[] data) throws IOException {
+    public List<Figure> importCsv(byte[] data) throws IOException {
         CSVParser parser = new CSVParser(
                 new InputStreamReader(new ByteArrayInputStream(data)),
                 CSVFormat.DEFAULT
@@ -39,6 +39,7 @@ public class ImportService {
                 .map(this::toFigure)
                 .collect(toList());
         figureRepository.saveAll(figures);
+        return figures;
     }
 
     private Figure toFigure(CSVRecord record) {

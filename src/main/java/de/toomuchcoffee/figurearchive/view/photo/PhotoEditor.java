@@ -10,10 +10,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
-import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
+import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
@@ -24,9 +25,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Sets.difference;
 import static com.google.common.collect.Sets.union;
-import static com.vaadin.flow.component.icon.VaadinIcon.CHECK;
-import static com.vaadin.flow.component.icon.VaadinIcon.EXIT;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.DUMMY;
+import static com.vaadin.flow.component.icon.VaadinIcon.*;
+import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.UPDATED;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 
 @SpringComponent
@@ -37,7 +37,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
     private final FigureRepository figureRepository;
     private final FigureSelector figureSelector;
     private final EventBus.SessionEventBus eventBus;
-    private final NewFigureButton newFigureButton;
+    private final FigureEditor figureEditor;
 
     private Photo photo;
     private Set<Figure> figuresBeforeChange;
@@ -52,6 +52,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         Button save = new Button("Save", CHECK.create(), e -> save());
         Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
 
+        Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
         newFigureButton.addClickListener(e -> this.close());
 
         details = new HorizontalLayout();
@@ -90,7 +91,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         figuresAfterChange = photo.getFigures();
         manageOwningSiteOfRelation();
         details.removeAll();
-        eventBus.publish(this, DUMMY);
+        eventBus.publish(this, new DataChangedEvent<>(photo, UPDATED));
 
         resetAndClose();
     }

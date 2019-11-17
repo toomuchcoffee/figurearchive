@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -9,13 +10,13 @@ import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
-import de.toomuchcoffee.figurearchive.view.controls.NewFigureButton;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 
+import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
 import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
 
 @UIScope
@@ -25,7 +26,7 @@ public class FigureActionsPanel extends HorizontalLayout {
 
     private final EventBus.SessionEventBus eventBus;
     private final FigureQueryInfo figureQueryInfo;
-    private final NewFigureButton newFigureButton;
+    private final FigureEditor figureEditor;
     private final FigureImport figureImport;
 
     @PostConstruct
@@ -50,6 +51,8 @@ public class FigureActionsPanel extends HorizontalLayout {
 
         PaginationTabs pagination = new PaginationTabs<FigureSearchResultEvent, FigureSearchEvent, FigureFilter>(
                 eventBus, FigureSearchResultEvent.class, FigureSearchEvent.class);
+
+        Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
 
         add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo, newFigureButton, figureImport);
     }

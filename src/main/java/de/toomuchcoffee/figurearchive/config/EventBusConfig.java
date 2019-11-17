@@ -11,8 +11,15 @@ import org.vaadin.spring.events.annotation.EnableVaadinEventBus;
 @Configuration
 @EnableVaadinEventBus
 public class EventBusConfig {
-    public static class DataChangedEvent {
-        public static final DataChangedEvent DUMMY = new DataChangedEvent();
+    @RequiredArgsConstructor
+    @Getter
+    public static class DataChangedEvent<T> {
+        private final T value;
+        private final Operation operation;
+
+        public enum Operation {
+            CREATED, UPDATED, DELETED
+        }
     }
 
     @RequiredArgsConstructor

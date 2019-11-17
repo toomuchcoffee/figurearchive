@@ -6,6 +6,8 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -14,9 +16,10 @@ import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
+import java.util.List;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.UPLOAD;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.DUMMY;
+import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.CREATED;
 
 @UIScope
 @SpringComponent
@@ -40,8 +43,8 @@ public class FigureImport extends Upload {
     @SneakyThrows
     private void importCsv(InputStream is) {
         byte[] bytes = IOUtils.toByteArray(is);
-        importService.importCsv(bytes);
-        eventBus.publish(this, DUMMY);
+        List<Figure> figures = importService.importCsv(bytes);
+        eventBus.publish(this, new DataChangedEvent<>(figures, CREATED));
     }
 
 }

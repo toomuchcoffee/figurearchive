@@ -6,7 +6,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig;
+import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService;
@@ -46,7 +46,7 @@ public class FigureGrid extends Grid<Figure> {
     }
 
     @EventBusListenerMethod
-    public void update(EventBusConfig.DataChangedEvent event) {
+    public void update(DataChangedEvent event) {
         setItems(figureService.findFigures(0, PAGE_SIZE, null));
     }
 
