@@ -45,10 +45,10 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     @PostConstruct
     public void init() {
-        selectedImages = new PhotoGallery(250, 2, 1, photo -> remove(this, photo));
+        selectedImages = new PhotoGallery(250, 2, photo -> remove(this, photo));
         getContent().add(selectedImages);
 
-        availableImages = new PhotoGallery(75, 5, 2, photo -> add(this, photo));
+        availableImages = new PhotoGallery(75, 5, photo -> add(this, photo));
         getContent().add(availableImages);
 
         addValueChangeListener(e -> {

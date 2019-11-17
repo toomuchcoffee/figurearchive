@@ -75,7 +75,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
         tfVerbatim.addValueChangeListener(e -> {
-            if (isNotBlank(e.getValue())) {
+            if (isNotBlank(e.getValue()) && e.getValue().length() >= 2) {
                 eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0));
             }
         });
