@@ -36,9 +36,9 @@ public class Photo {
     @Type(type = "string-array")
     @Column(columnDefinition = "text[]")
     private String[] tags;
-
     @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
     private Set<Figure> figures = new HashSet<>();
+    private boolean completed;
 
     @Data
     @NoArgsConstructor

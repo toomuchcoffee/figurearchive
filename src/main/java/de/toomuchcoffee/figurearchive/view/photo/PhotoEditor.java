@@ -2,6 +2,7 @@ package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -14,6 +15,7 @@ import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
@@ -34,6 +36,7 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 @RequiredArgsConstructor
 public class PhotoEditor extends Dialog implements KeyNotifier {
 
+    private final PhotoRepository photoRepository;
     private final FigureRepository figureRepository;
     private final FigureSelector figureSelector;
     private final EventBus.SessionEventBus eventBus;
@@ -57,13 +60,16 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
 
         details = new HorizontalLayout();
         details.setWidth("100%");
+
+        Checkbox cbCompleted = new Checkbox("Mark as Completed");
+
         HorizontalLayout actions = new HorizontalLayout(save, cancel, newFigureButton);
-        VerticalLayout verticalLayout = new VerticalLayout(details, figureSelector, actions);
+        VerticalLayout verticalLayout = new VerticalLayout(details, figureSelector, cbCompleted, actions);
         add(verticalLayout);
 
         binder = new Binder<>();
         binder.bind(figureSelector, Photo::getFigures, Photo::setFigures);
-
+        binder.bind(cbCompleted, Photo::isCompleted, Photo::setCompleted);
     }
 
     private void updateDetails() {
@@ -88,6 +94,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
     }
 
     private void save() {
+        photoRepository.save(photo);
         figuresAfterChange = photo.getFigures();
         manageOwningSiteOfRelation();
         details.removeAll();

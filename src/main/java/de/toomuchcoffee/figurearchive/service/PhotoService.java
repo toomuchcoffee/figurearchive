@@ -27,10 +27,10 @@ public class PhotoService {
 
     public List<Photo> suggestPhotos(String query) {
         if (isBlank(query)) {
-            return photoRepository.findAll();
+            return photoRepository.findByCompleted(false);
         } else {
             Set<String> filter = permutationService.getPermutations(query);
-            return photoRepository.findAll().stream()
+            return photoRepository.findByCompleted(false).stream()
                     .filter(photo -> intersection(filter, newHashSet(photo.getTags())).size() > 0)
                     .sorted(comparing(photo -> difference(newHashSet(photo.getTags()), filter).size()))
                     .sorted(comparing(photo -> intersection(filter, newHashSet(((Photo) photo).getTags())).size()).reversed())
@@ -44,9 +44,9 @@ public class PhotoService {
         if (isBlank(tag)) {
             Pageable pageable = PageRequest.of(page, size);
                 count = photoRepository.count();
-                photos = photoRepository.findAll(pageable).getContent();
+                photos = photoRepository.findAllByOrderByCompletedAsc(pageable).getContent();
         } else {
-            photos = photoRepository.findAll().stream()
+            photos = photoRepository.findAllByOrderByCompletedAsc().stream()
                     .filter(photo -> Arrays.stream(photo.getTags()).anyMatch(t -> t.equalsIgnoreCase(tag)))
                     .collect(toList());
             count = photos.size();
