@@ -1,6 +1,5 @@
 package de.toomuchcoffee.figurearchive.repository;
 
-import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static de.toomuchcoffee.figurearchive.entity.ProductLine.KENNER;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.DOCKER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.newArrayList;
@@ -23,9 +21,6 @@ import static org.assertj.core.util.Lists.newArrayList;
 public class PhotoRepositoryTest {
     @Autowired
     private PhotoRepository photoRepository;
-
-    @Autowired
-    private FigureRepository figureRepository;
 
     @Test
     public void findsAll() {
@@ -45,16 +40,4 @@ public class PhotoRepositoryTest {
         assertThat(photoRepository.existsByPostId(456L)).isFalse();
     }
 
-    @Test
-    public void countByFigures() {
-        Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[0], newHashSet());
-        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[0], newHashSet());
-        photoRepository.saveAll(newArrayList(photo1, photo2));
-        Figure figure = new Figure(1L, "foo", KENNER, "123", (short)1977, newHashSet(photo1));
-        figureRepository.save(figure);
-        assertThat(photoRepository.countByFiguresEmpty()).isEqualTo(1);
-        assertThat(photoRepository.findByFiguresEmpty().get(0).getId()).isEqualTo(2L);
-        assertThat(photoRepository.countByFiguresNotEmpty()).isEqualTo(1);
-        assertThat(photoRepository.findByFiguresNotEmpty().get(0).getId()).isEqualTo(1L);
-    }
 }

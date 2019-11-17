@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
@@ -31,10 +32,10 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
 
-    private String searchTerm = "";
+    private List<Photo> foundPhotos;
 
-    private PhotoGallery availableImages = new PhotoGallery(75, 5, 2, photo -> add(this, photo));
-    private PhotoGallery selectedImages = new PhotoGallery(250, 2, 1, photo -> remove(this, photo));
+    private PhotoGallery availableImages;
+    private PhotoGallery selectedImages;
 
     public PhotoSelector(PhotoService photoService, EventBus.SessionEventBus eventBus) {
         super(DEFAULT_VALUE);
@@ -44,7 +45,10 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     @PostConstruct
     public void init() {
+        selectedImages = new PhotoGallery(250, 2, 1, photo -> remove(this, photo));
         getContent().add(selectedImages);
+
+        availableImages = new PhotoGallery(75, 5, 2, photo -> add(this, photo));
         getContent().add(availableImages);
 
         addValueChangeListener(e -> {
@@ -57,14 +61,18 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     @EventBusListenerMethod
     public void update(PhotoSearchByVerbatimEvent event) {
-        this.searchTerm = event.getValue();
+        this.foundPhotos = photoService.suggestPhotos(event.getFilter());
         availableImages.update(availablePhotos());
     }
 
     private List<Photo> availablePhotos() {
-        return photoService.suggestPhotos(searchTerm).stream()
+        return foundPhotos().stream()
                 .filter(this::isSelected)
                 .collect(toList());
+    }
+
+    private List<Photo> foundPhotos() {
+        return this.foundPhotos == null ? newArrayList() : foundPhotos;
     }
 
     private boolean isSelected(Photo photo) {

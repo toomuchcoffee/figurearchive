@@ -1,6 +1,5 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -27,6 +26,7 @@ import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @SpringComponent
 @UIScope
@@ -73,11 +73,12 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         horizontalLayout.setSpacing(true);
 
-        addKeyPressListener(Key.ENTER, e -> save());
-
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> eventBus
-                .publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue())));
+        tfVerbatim.addValueChangeListener(e -> {
+            if (isNotBlank(e.getValue())) {
+                eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0));
+            }
+        });
     }
 
     private void delete() {
