@@ -2,7 +2,8 @@ package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -13,15 +14,17 @@ import de.toomuchcoffee.figurearchive.service.FigureService;
 import javax.annotation.PostConstruct;
 import java.util.*;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.jsoup.helper.StringUtil.isBlank;
 
 @UIScope
 @SpringComponent
 @Tag("div")
-public class FigureSelector extends AbstractCompositeField<HorizontalLayout, FigureSelector, Set<Figure>> {
+public class FigureSelector extends AbstractCompositeField<VerticalLayout, FigureSelector, Set<Figure>> {
     private final FigureService figureService;
 
     private static final Set<Figure> DEFAULT_VALUE = new HashSet<>();
@@ -39,12 +42,12 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         TextField tfSearchTerm = new TextField();
         tfSearchTerm.setPlaceholder("Search...");
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
-        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(availableFigures(e.getValue())));
+        tfSearchTerm.addValueChangeListener(e -> availableFigures.update(isBlank(e.getValue()) ? newArrayList() : availableFigures(e.getValue())));
 
         getContent().add(selectedFigures);
         getContent().add(availableFigures);
 
-        selectedFigures.setHeader("Selected Figures");
+        selectedFigures.setHeader(new Label("Selected Figures"));
         selectedFigures.asSingleSelect().addValueChangeListener(e ->
                 Optional.ofNullable(e.getValue()).ifPresent(v -> remove(this, v)));
 
@@ -55,6 +58,7 @@ public class FigureSelector extends AbstractCompositeField<HorizontalLayout, Fig
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));
             availableFigures.update(new ArrayList<>());
+            tfSearchTerm.setValue("");
         });
     }
 
