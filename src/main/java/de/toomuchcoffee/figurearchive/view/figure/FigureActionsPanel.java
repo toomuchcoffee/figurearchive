@@ -43,9 +43,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         tfVerbatimFilter.setValueChangeMode(EAGER);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
-            if (e.getValue().length() >= 2) {
-                eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
-            }
+            eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
 
         cbProductLineFilter = new ComboBox<>();

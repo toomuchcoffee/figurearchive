@@ -22,6 +22,7 @@ import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @UIScope
 @SpringComponent
@@ -32,7 +33,7 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     private static final Set<Photo> DEFAULT_VALUE = new HashSet<>();
 
-    private List<Photo> foundPhotos;
+    private List<Photo> foundPhotos = newArrayList();
 
     private PhotoGallery availableImages;
     private PhotoGallery selectedImages;
@@ -61,18 +62,18 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
 
     @EventBusListenerMethod
     public void update(PhotoSearchByVerbatimEvent event) {
-        this.foundPhotos = photoService.suggestPhotos(event.getFilter());
+        if (isBlank(event.getFilter())) {
+            foundPhotos = newArrayList();
+        } else {
+            foundPhotos = photoService.suggestPhotos(event.getFilter());
+        }
         availableImages.update(availablePhotos());
     }
 
     private List<Photo> availablePhotos() {
-        return foundPhotos().stream()
+        return foundPhotos.stream()
                 .filter(this::isSelected)
                 .collect(toList());
-    }
-
-    private List<Photo> foundPhotos() {
-        return this.foundPhotos == null ? newArrayList() : foundPhotos;
     }
 
     private boolean isSelected(Photo photo) {

@@ -1,7 +1,9 @@
 package de.toomuchcoffee.figurearchive.service;
 
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
+import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,7 @@ import org.vaadin.spring.events.EventBus;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import static com.google.common.collect.Sets.*;
 import static java.util.Comparator.comparing;
@@ -22,8 +25,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class PhotoService {
     private final PhotoRepository photoRepository;
+    private final FigureRepository figureRepository;
+
     private final EventBus.ApplicationEventBus eventBus;
     private final PermutationService permutationService;
+
+    public List<Photo> findAll() {
+        return photoRepository.findAllByOrderByCompletedAsc();
+    }
 
     public List<Photo> suggestPhotos(String query) {
         if (isBlank(query)) {
@@ -58,4 +67,35 @@ public class PhotoService {
         return photos;
     }
 
+    public OwningSideOfRelation<Figure, Photo> prepareOwningSideOfRelation(Photo photo) {
+        return new OwningSideOfRelation<>(Figure::getPhotos, Photo::getFigures, photo);
+    }
+
+    public void save(Photo photo, OwningSideOfRelation<Figure, Photo> owningSideOfRelation) {
+        photoRepository.save(photo);
+        figureRepository.saveAll(owningSideOfRelation.collectChangedOwners());
+    }
+
+    public static class OwningSideOfRelation<O, E> {
+        private final Function<O, Set<E>> relation;
+        private final Function<E, Set<O>> backRelation;
+        private final E entity;
+        private final Set<O> beforeChange;
+
+        private OwningSideOfRelation(Function<O, Set<E>> relation, Function<E, Set<O>> backRelation, E entity) {
+            this.relation = relation;
+            this.backRelation = backRelation;
+            this.entity = entity;
+            this.beforeChange = backRelation.apply(entity);
+        }
+
+        Set<O> collectChangedOwners() {
+            Set<O> afterChange = backRelation.apply(entity);
+            Set<O> deletedFrom = difference(beforeChange, afterChange);
+            deletedFrom.forEach(e -> relation.apply(e).remove(entity));
+            Set<O> addedTo = difference(afterChange, beforeChange);
+            addedTo.forEach(e -> relation.apply(e).add(entity));
+            return union(addedTo, deletedFrom);
+        }
+    }
 }

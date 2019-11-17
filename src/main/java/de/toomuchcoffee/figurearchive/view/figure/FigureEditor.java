@@ -26,7 +26,6 @@ import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @SpringComponent
 @UIScope
@@ -74,11 +73,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         horizontalLayout.setSpacing(true);
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> {
-            if (isNotBlank(e.getValue()) && e.getValue().length() >= 2) {
-                eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0));
-            }
-        });
+        tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0)));
     }
 
     private void delete() {

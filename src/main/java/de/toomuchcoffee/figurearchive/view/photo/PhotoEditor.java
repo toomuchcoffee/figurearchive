@@ -14,19 +14,15 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
-import de.toomuchcoffee.figurearchive.repository.FigureRepository;
-import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
+import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Sets.difference;
-import static com.google.common.collect.Sets.union;
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.UPDATED;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
@@ -36,15 +32,13 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 @RequiredArgsConstructor
 public class PhotoEditor extends Dialog implements KeyNotifier {
 
-    private final PhotoRepository photoRepository;
-    private final FigureRepository figureRepository;
+    private final PhotoService photoService;
     private final FigureSelector figureSelector;
     private final EventBus.SessionEventBus eventBus;
     private final FigureEditor figureEditor;
 
     private Photo photo;
-    private Set<Figure> figuresBeforeChange;
-    private Set<Figure> figuresAfterChange;
+    private PhotoService.OwningSideOfRelation<Figure, Photo> owningSideOfRelation;
 
     private Binder<Photo> binder;
 
@@ -89,14 +83,12 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         open();
         this.photo = photo;
         binder.setBean(photo);
-        figuresBeforeChange = photo.getFigures();
+        owningSideOfRelation = photoService.prepareOwningSideOfRelation(photo);
         updateDetails();
     }
 
     private void save() {
-        photoRepository.save(photo);
-        figuresAfterChange = photo.getFigures();
-        manageOwningSiteOfRelation();
+        photoService.save(photo, owningSideOfRelation);
         details.removeAll();
         eventBus.publish(this, new DataChangedEvent<>(photo, UPDATED));
 
@@ -107,14 +99,6 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
         this.photo = null;
         binder.removeBean();
         close();
-    }
-
-    private void manageOwningSiteOfRelation() {
-        Set<Figure> deletedFigures = difference(figuresBeforeChange, figuresAfterChange);
-        deletedFigures.forEach(f -> f.getPhotos().remove(photo));
-        Set<Figure> addedFigures = difference(figuresAfterChange, figuresBeforeChange);
-        addedFigures.forEach(f -> f.getPhotos().add(photo));
-        figureRepository.saveAll(union(addedFigures, deletedFigures));
     }
 
 }
