@@ -46,8 +46,12 @@ public class ImportService {
         Figure figure = new Figure();
         figure.setVerbatim(record.get("verbatim"));
         figure.setProductLine(ProductLine.valueOf(record.get("productLine")));
-        figure.setPlacementNo(record.get("placementNo"));
-        figure.setYear(Short.valueOf(record.get("year")));
+        if (record.isMapped("placementNo")) {
+            figure.setPlacementNo(record.get("placementNo"));
+        }
+        if (record.isMapped("year")) {
+            figure.setYear(Short.valueOf(record.get("year")));
+        }
         return figure;
     }
 

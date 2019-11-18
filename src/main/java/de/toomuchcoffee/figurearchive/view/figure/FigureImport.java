@@ -38,6 +38,9 @@ public class FigureImport extends Upload {
             Notification.show("YAY");
             importCsv(((MemoryBuffer) getReceiver()).getInputStream());
         });
+        addUploadErrorListener(e -> {
+           Notification.show("NOPE");
+        });
     }
 
     @SneakyThrows
