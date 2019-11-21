@@ -17,7 +17,7 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 import static java.util.Comparator.*;
 
 public class FigureGrid extends Grid<Figure> {
-    private static final int PAGE_SIZE = 50;
+    private static final int PAGE_SIZE = 100;
 
     private final FigureService figureService;
 

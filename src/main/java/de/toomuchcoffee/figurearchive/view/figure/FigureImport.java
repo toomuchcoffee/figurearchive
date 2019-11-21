@@ -10,7 +10,6 @@ import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.vaadin.spring.events.EventBus;
 
@@ -35,19 +34,19 @@ public class FigureImport extends Upload {
         setUploadButton(new Button("CSV Import", UPLOAD.create()));
         setAcceptedFileTypes(".csv");
         addSucceededListener(e -> {
-            Notification.show("YAY");
             importCsv(((MemoryBuffer) getReceiver()).getInputStream());
-        });
-        addUploadErrorListener(e -> {
-           Notification.show("NOPE");
         });
     }
 
-    @SneakyThrows
     private void importCsv(InputStream is) {
-        byte[] bytes = IOUtils.toByteArray(is);
-        List<Figure> figures = importService.importCsv(bytes);
-        eventBus.publish(this, new DataChangedEvent<>(figures, CREATED));
+        try {
+            byte[] bytes = IOUtils.toByteArray(is);
+            List<Figure> figures = importService.importCsv(bytes);
+            eventBus.publish(this, new DataChangedEvent<>(figures, CREATED));
+        } catch (Exception e) {
+            Notification.show(e.getMessage(), 3600, Notification.Position.MIDDLE);
+            e.printStackTrace();
+        }
     }
 
 }
