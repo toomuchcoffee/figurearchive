@@ -63,7 +63,7 @@ public class ImportService {
         private String verbatim;
         private ProductLine productLine;
         private String placementNo;
-        private short year;
+        private Short year;
 
         ParsedCsvRecord(CSVRecord record) {
             this.verbatim = record.get("verbatim");
