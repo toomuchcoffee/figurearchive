@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
-import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
+import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static java.util.stream.Collectors.toList;
 
 @UIScope
@@ -48,7 +48,8 @@ public class FigureActionsPanel extends HorizontalLayout {
 
         tfVerbatimFilter = new TextField();
         tfVerbatimFilter.setPlaceholder("Filter by Verbatim");
-        tfVerbatimFilter.setValueChangeMode(EAGER);
+        tfVerbatimFilter.setValueChangeMode(LAZY);
+        tfVerbatimFilter.setValueChangeTimeout(500);
         tfVerbatimFilter.addValueChangeListener(e -> {
             figureFilter.setFilterText(e.getValue());
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
@@ -87,7 +88,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         Optional.ofNullable(event.getValue().get(0))
                 .ifPresent(figure -> {
                     cbProductLineFilter.setValue(figure.getProductLine());
-                    tfVerbatimFilter.setValue(null);
+                    tfVerbatimFilter.setValue("");
                 });
     }
 }

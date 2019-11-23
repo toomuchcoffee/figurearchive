@@ -8,7 +8,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
@@ -23,6 +22,7 @@ import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
+import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
@@ -72,7 +72,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
         horizontalLayout.setSpacing(true);
 
-        tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
+        tfVerbatim.setValueChangeMode(LAZY);
+        tfVerbatim.setValueChangeTimeout(500);
         tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0)));
     }
 
