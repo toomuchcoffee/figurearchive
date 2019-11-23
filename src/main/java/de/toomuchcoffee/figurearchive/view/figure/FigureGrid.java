@@ -5,13 +5,19 @@ import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
+import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
+import de.toomuchcoffee.figurearchive.event.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 import static java.util.Comparator.*;
@@ -46,8 +52,43 @@ public class FigureGrid extends Grid<Figure> {
     }
 
     @EventBusListenerMethod
-    public void update(DataChangedEvent event) {
-        setItems(figureService.findFigures(0, PAGE_SIZE, null));
+    public void update(FigureChangedEvent event) {
+        switch (event.getOperation()) {
+            case UPDATED:
+                getDataProvider().refreshItem(event.getValue());
+                break;
+            case CREATED: {
+                List<Figure> items = new ArrayList<>(getItems());
+                items.add(event.getValue());
+                setItems(items);
+                getDataProvider().refreshAll();
+            }
+            ;
+            break;
+            case DELETED: {
+                List<Figure> items = new ArrayList<>(getItems());
+                items.remove(event.getValue());
+                setItems(items);
+                getDataProvider().refreshAll();
+            }
+            ;
+            break;
+            default:
+                getDataProvider().refreshAll();
+        }
+    }
+
+    @EventBusListenerMethod
+    public void update(FigureImportEvent event) {
+        List<Figure> items = new ArrayList<>(getItems());
+        items.addAll(event.getValue());
+        setItems(items);
+        getDataProvider().refreshAll();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Collection<Figure> getItems() {
+        return ((ListDataProvider<Figure>) getDataProvider()).getItems();
     }
 
 

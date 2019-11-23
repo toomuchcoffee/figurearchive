@@ -1,9 +1,9 @@
 package de.toomuchcoffee.figurearchive.service;
 
 
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
+import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.vaadin.spring.events.EventBus;
 
 import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,11 @@ public class FigureService {
         }
         eventBus.publish(this, new FigureSearchResultEvent(count, page, size, filter));
         return figures;
+    }
+
+    public Map<ProductLine, Long>  getProductLineInfo() {
+        return figureRepository.getProductLineCounts().stream()
+                .collect(toMap(o -> (ProductLine) o[0], o -> (Long) o[1]));
     }
 
     @Getter

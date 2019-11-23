@@ -6,12 +6,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.FigureSearchResultEvent;
-import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
-import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
+import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
+import de.toomuchcoffee.figurearchive.event.FigureSearchEvent;
+import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
+import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
 import static com.vaadin.flow.data.value.ValueChangeMode.EAGER;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 @UIScope
 @SpringComponent
@@ -36,10 +36,11 @@ public class FigureActionsPanel extends HorizontalLayout {
     private final FigureQueryInfo figureQueryInfo;
     private final FigureEditor figureEditor;
     private final FigureImport figureImport;
-    private final FigureRepository repository;
+    private final FigureService figureService;
 
-    private TextField tfVerbatimFilter;
     private ComboBox<ProductLine> cbProductLineFilter;
+    private Map<ProductLine, Long> productLinesCount;
+    private TextField tfVerbatimFilter;
 
     @PostConstruct
     public void init() {
@@ -53,9 +54,11 @@ public class FigureActionsPanel extends HorizontalLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
 
+        productLinesCount = figureService.getProductLineInfo();
         cbProductLineFilter = new ComboBox<>();
         cbProductLineFilter.setPlaceholder("Filter by Product Line");
-        updateProductLinesComboBox();
+        cbProductLineFilter.setItems(Arrays.stream(ProductLine.values()).collect(toList()));
+        cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.getOrDefault(l, 0L)));
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
@@ -71,21 +74,20 @@ public class FigureActionsPanel extends HorizontalLayout {
         eventBus.subscribe(this);
     }
 
-    private void updateProductLinesComboBox() {
-        Map<ProductLine, Long> productLinesCount = repository.findAll().stream()
-                .filter(f -> f.getProductLine() != null)
-                .collect(groupingBy(Figure::getProductLine, counting()));
-        List<ProductLine> productLines = Arrays.stream(ProductLine.values())
-                .filter(productLinesCount::containsKey)
-                .collect(toList());
-        cbProductLineFilter.setItems(productLines);
-        cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.get(l)));
+    @EventBusListenerMethod
+    public void update(FigureChangedEvent event) {
+        productLinesCount = figureService.getProductLineInfo();
+        cbProductLineFilter.getDataProvider().refreshAll();
     }
 
     @EventBusListenerMethod
-    public void update(DataChangedEvent event) {
-        tfVerbatimFilter.setValue("");
-        cbProductLineFilter.setValue(null);
-        updateProductLinesComboBox();
+    public void update(FigureImportEvent event) {
+        productLinesCount = figureService.getProductLineInfo();
+        cbProductLineFilter.getDataProvider().refreshAll();
+        Optional.ofNullable(event.getValue().get(0))
+                .ifPresent(figure -> {
+                    cbProductLineFilter.setValue(figure.getProductLine());
+                    tfVerbatimFilter.setValue(null);
+                });
     }
 }

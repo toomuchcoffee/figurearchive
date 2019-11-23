@@ -1,8 +1,8 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
+import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;

@@ -7,9 +7,9 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.UnorderedList;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.entity.Photo;
+import de.toomuchcoffee.figurearchive.event.EntityChangedEvent;
+import de.toomuchcoffee.figurearchive.event.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.util.FigureDisplayNameHelper;
 import org.vaadin.spring.events.EventBus;
@@ -67,7 +67,7 @@ public class PhotoGrid extends Grid<Photo> {
     }
 
     @EventBusListenerMethod
-    public void update(DataChangedEvent event) {
+    public void update(EntityChangedEvent event) {
         setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
     }
 

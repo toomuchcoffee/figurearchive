@@ -6,8 +6,8 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
 import de.toomuchcoffee.figurearchive.service.ImportService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.UPLOAD;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.CREATED;
+import static com.vaadin.flow.component.notification.Notification.Position.MIDDLE;
 
 @UIScope
 @SpringComponent
@@ -42,9 +42,10 @@ public class FigureImport extends Upload {
         try {
             byte[] bytes = IOUtils.toByteArray(is);
             List<Figure> figures = importService.importCsv(bytes);
-            eventBus.publish(this, new DataChangedEvent<>(figures, CREATED));
+            eventBus.publish(this, new FigureImportEvent(figures));
+            Notification.show(String.format("Successfully imported %s figures!", figures.size()), 3600, MIDDLE);
         } catch (Exception e) {
-            Notification.show(e.getMessage(), 3600, Notification.Position.MIDDLE);
+            Notification.show(e.getMessage(), 3600, MIDDLE);
             e.printStackTrace();
         }
     }

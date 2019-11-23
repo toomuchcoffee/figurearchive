@@ -11,10 +11,10 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.PhotoSearchByVerbatimEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
+import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
+import de.toomuchcoffee.figurearchive.event.PhotoSearchByVerbatimEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.*;
+import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 
@@ -78,7 +78,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private void delete() {
         repository.delete(figure);
-        eventBus.publish(this, new DataChangedEvent<>(figure, DELETED));
+        eventBus.publish(this, new FigureChangedEvent(figure, DELETED));
 
         resetAndClose();
     }
@@ -86,7 +86,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private void save() {
         boolean isNew = figure.getId() == null;
         repository.save(figure);
-        eventBus.publish(this, new DataChangedEvent<>(figure, isNew ? CREATED : UPDATED));
+        eventBus.publish(this, new FigureChangedEvent(figure, isNew ? CREATED : UPDATED));
 
         resetAndClose();
     }

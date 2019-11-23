@@ -11,9 +11,9 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
+import de.toomuchcoffee.figurearchive.event.PhotoChangedEvent;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static de.toomuchcoffee.figurearchive.config.EventBusConfig.DataChangedEvent.Operation.UPDATED;
+import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.UPDATED;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 
 @SpringComponent
@@ -90,7 +90,7 @@ public class PhotoEditor extends Dialog implements KeyNotifier {
     private void save() {
         photoService.save(photo, owningSideOfRelation);
         details.removeAll();
-        eventBus.publish(this, new DataChangedEvent<>(photo, UPDATED));
+        eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
 
         resetAndClose();
     }
