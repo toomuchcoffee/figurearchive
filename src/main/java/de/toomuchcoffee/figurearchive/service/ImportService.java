@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.stream;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +73,10 @@ public class ImportService {
                 this.placementNo = record.get("placementNo");
             }
             if (record.isMapped("year")) {
-                this.year = Short.parseShort(record.get("year"));
+                String year = record.get("year");
+                if (isNotBlank(year)) {
+                    this.year = Short.parseShort(year);
+                }
             }
         }
     }

@@ -5,9 +5,8 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -28,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Route(value = "login")
-public class LoginView extends FlexLayout implements BeforeEnterObserver {
+public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final Label label;
     private final TextField userNameTextField;
@@ -41,7 +40,7 @@ public class LoginView extends FlexLayout implements BeforeEnterObserver {
     private HttpServletRequest request;
 
     LoginView() {
-        label = new Label("Please login...");
+        label = new Label("F I G U R E A R C H I V E");
 
         userNameTextField = new TextField();
         userNameTextField.setPlaceholder("Username");
@@ -51,13 +50,12 @@ public class LoginView extends FlexLayout implements BeforeEnterObserver {
         passwordField.addKeyDownListener(Key.ENTER, (ComponentEventListener<KeyDownEvent>) keyDownEvent -> authenticateAndNavigate());
 
         Button submitButton = new Button("Login");
+        submitButton.setWidth("180px");
         submitButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
             authenticateAndNavigate();
         });
 
-        FormLayout formLayout = new FormLayout();
-        formLayout.add(label, userNameTextField, passwordField, submitButton);
-        add(formLayout);
+        add(label, userNameTextField, passwordField, submitButton);
 
         setAlignItems(Alignment.CENTER);
         this.getElement().getStyle().set("height", "100%");
