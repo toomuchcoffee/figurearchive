@@ -49,7 +49,7 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
         selectedImages = new PhotoGallery(250, 2, photo -> remove(this, photo));
         getContent().add(selectedImages);
 
-        availableImages = new PhotoGallery(75, 5, photo -> add(this, photo));
+        availableImages = new PhotoGallery(75, 6, photo -> add(this, photo));
         getContent().add(availableImages);
 
         addValueChangeListener(e -> {

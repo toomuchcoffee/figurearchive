@@ -57,6 +57,13 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));
+            List<Figure> availableFigureList = availableFigures.getItems().stream()
+                    .filter(this::isNotSelected)
+                    .collect(toList());
+            availableFigures.update(availableFigureList);
+        });
+
+        addDetachListener(e -> {
             availableFigures.update(new ArrayList<>());
             tfSearchTerm.setValue("");
         });
@@ -64,12 +71,12 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
     private List<Figure> availableFigures(String query) {
         return figureService.suggestFigures(query).stream()
-                .filter(this::isSelected)
+                .filter(this::isNotSelected)
                 .limit(50)
                 .collect(toList());
     }
 
-    private boolean isSelected(Figure figure) {
+    private boolean isNotSelected(Figure figure) {
         return !getValue().stream().map(Figure::getId).collect(toSet()).contains(figure.getId());
     }
 
