@@ -33,11 +33,11 @@ public class FigureService {
         Pageable pageable = PageRequest.of(page, size);
         if (filter != null) {
             if (!StringUtils.isBlank(filter.getFilterText()) && filter.getProductLine() != null) {
-                count = figureRepository.countByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
-                figures = figureRepository.findByVerbatimStartsWithIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine(), pageable).getContent();
+                count = figureRepository.countByVerbatimContainingIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
+                figures = figureRepository.findByVerbatimContainingIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine(), pageable).getContent();
             } else if (!StringUtils.isBlank(filter.getFilterText())) {
-                count = figureRepository.countByVerbatimStartsWithIgnoreCase(filter.getFilterText());
-                figures = figureRepository.findByVerbatimStartsWithIgnoreCase(filter.getFilterText(), pageable).getContent();
+                count = figureRepository.countByVerbatimContainingIgnoreCase(filter.getFilterText());
+                figures = figureRepository.findByVerbatimContainingIgnoreCase(filter.getFilterText(), pageable).getContent();
             } else if (filter.getProductLine() != null) {
                 count = figureRepository.countByProductLine(filter.getProductLine());
                 figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();

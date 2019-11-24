@@ -11,12 +11,12 @@ import java.util.List;
 
 public interface FigureRepository extends JpaRepository<Figure, Long> {
     List<Figure> findByVerbatimContainingIgnoreCase(String verbatim);
-    Page<Figure> findByVerbatimStartsWithIgnoreCase(String verbatim, Pageable pageable);
-    long countByVerbatimStartsWithIgnoreCase(String verbatim);
+    Page<Figure> findByVerbatimContainingIgnoreCase(String verbatim, Pageable pageable);
+    long countByVerbatimContainingIgnoreCase(String verbatim);
     Page<Figure> findByProductLine(ProductLine productLine, Pageable pageable);
     long countByProductLine(ProductLine productLine);
-    Page<Figure> findByVerbatimStartsWithIgnoreCaseAndProductLine(String verbatim, ProductLine productLine, Pageable pageable);
-    long countByVerbatimStartsWithIgnoreCaseAndProductLine(String verbatim, ProductLine productLine);
+    Page<Figure> findByVerbatimContainingIgnoreCaseAndProductLine(String verbatim, ProductLine productLine, Pageable pageable);
+    long countByVerbatimContainingIgnoreCaseAndProductLine(String verbatim, ProductLine productLine);
 
     @Query("SELECT f.productLine, count(f) " +
             "FROM Figure f " +
