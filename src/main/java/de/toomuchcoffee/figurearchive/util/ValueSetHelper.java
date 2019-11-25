@@ -5,7 +5,7 @@ import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 
 import java.util.Set;
 
-import static com.google.gwt.thirdparty.guava.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class ValueSetHelper {
 

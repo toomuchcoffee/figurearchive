@@ -65,9 +65,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.vaadin.spring</groupId>
-            <artifactId>spring-vaadin-eventbus</artifactId>
-            <version>0.0.5.RELEASE</version>
+            <groupId>org.vaadin.spring.addons</groupId>
+            <artifactId>vaadin-spring-addon-eventbus</artifactId>
+            <version>14.0.0</version>
         </dependency>
 
         <dependency>
