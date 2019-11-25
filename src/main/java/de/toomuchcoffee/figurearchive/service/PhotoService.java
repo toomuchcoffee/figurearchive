@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.service;
 
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusProxy;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,13 +23,15 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@EventBusProxy
+@VaadinSessionScope
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
     private final PhotoRepository photoRepository;
     private final FigureRepository figureRepository;
 
-    private final EventBus.ApplicationEventBus eventBus;
+    private final EventBus.SessionEventBus eventBus;
     private final PermutationService permutationService;
 
     public List<Photo> findAll() {

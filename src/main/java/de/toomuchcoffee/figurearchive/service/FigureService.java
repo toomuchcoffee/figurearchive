@@ -1,6 +1,7 @@
 package de.toomuchcoffee.figurearchive.service;
 
 
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
@@ -11,17 +12,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusProxy;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 
+@EventBusProxy
+@VaadinSessionScope
 @Service
 @RequiredArgsConstructor
 public class FigureService {
     private final FigureRepository figureRepository;
-    private final EventBus.ApplicationEventBus eventBus;
+    private final EventBus.SessionEventBus eventBus;
 
     public List<Figure> suggestFigures(String query) {
         return figureRepository.findByVerbatimContainingIgnoreCase(query);
