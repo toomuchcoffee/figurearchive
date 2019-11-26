@@ -8,7 +8,7 @@ import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.UnorderedList;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
 import de.toomuchcoffee.figurearchive.entity.Photo;
-import de.toomuchcoffee.figurearchive.event.EntityChangedEvent;
+import de.toomuchcoffee.figurearchive.event.PhotoChangedEvent;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.util.FigureDisplayNameHelper;
@@ -33,10 +33,8 @@ public class PhotoGrid extends Grid<Photo> {
             ValueChangeListener<ValueChangeEvent<Photo>> valueChangeListener) {
         super(Photo.class);
         this.photoService = photoService;
-        eventBus.subscribe(this);
 
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
@@ -59,6 +57,9 @@ public class PhotoGrid extends Grid<Photo> {
                 .toArray(new ListItem[0])))
                 .setHeader("Figures")
                 .setComparator(comparing(photo -> photo.getFigures().size(), nullsFirst(naturalOrder())));
+
+        addAttachListener(e -> eventBus.subscribe(this));
+        addDetachListener(e -> eventBus.unsubscribe(this));
     }
 
     @EventBusListenerMethod
@@ -67,7 +68,7 @@ public class PhotoGrid extends Grid<Photo> {
     }
 
     @EventBusListenerMethod
-    public void update(EntityChangedEvent event) {
+    public void update(PhotoChangedEvent event) {
         setItems(photoService.findPhotosByTag(0, PAGE_SIZE, null));
     }
 

@@ -2,6 +2,7 @@ package de.toomuchcoffee.figurearchive.service;
 
 
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import de.toomuchcoffee.figurearchive.aspect.LogExecutionTime;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
@@ -27,10 +28,12 @@ public class FigureService {
     private final FigureRepository figureRepository;
     private final EventBus.SessionEventBus eventBus;
 
+    @LogExecutionTime
     public List<Figure> suggestFigures(String query) {
         return figureRepository.findByVerbatimContainingIgnoreCase(query);
     }
 
+    @LogExecutionTime
     public List<Figure> findFigures(int page, int size, FigureFilter filter) {
         List<Figure> figures;
         long count;
@@ -57,6 +60,7 @@ public class FigureService {
         return figures;
     }
 
+    @LogExecutionTime
     public Map<ProductLine, Long>  getProductLineInfo() {
         return figureRepository.getProductLineCounts().stream()
                 .collect(toMap(o -> (ProductLine) o[0], o -> (Long) o[1]));

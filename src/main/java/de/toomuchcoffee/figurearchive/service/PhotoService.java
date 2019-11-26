@@ -1,6 +1,7 @@
 package de.toomuchcoffee.figurearchive.service;
 
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import de.toomuchcoffee.figurearchive.aspect.LogExecutionTime;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
@@ -34,10 +35,12 @@ public class PhotoService {
     private final EventBus.SessionEventBus eventBus;
     private final PermutationService permutationService;
 
+    @LogExecutionTime
     public List<Photo> findAll() {
         return photoRepository.findAllByOrderByCompletedAsc();
     }
 
+    @LogExecutionTime
     public List<Photo> suggestPhotos(String query) {
         if (isBlank(query)) {
             return photoRepository.findByCompleted(false);
@@ -51,6 +54,7 @@ public class PhotoService {
         }
     }
 
+    @LogExecutionTime
     public List<Photo> findPhotosByTag(int page, int size, String tag) {
         List<Photo> photos;
         long count;
@@ -71,10 +75,12 @@ public class PhotoService {
         return photos;
     }
 
+    @LogExecutionTime
     public OwningSideOfRelation<Figure, Photo> prepareOwningSideOfRelation(Photo photo) {
         return new OwningSideOfRelation<>(Figure::getPhotos, Photo::getFigures, photo);
     }
 
+    @LogExecutionTime
     public void save(Photo photo, OwningSideOfRelation<Figure, Photo> owningSideOfRelation) {
         photoRepository.save(photo);
         figureRepository.saveAll(owningSideOfRelation.collectChangedOwners());

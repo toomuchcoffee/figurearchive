@@ -57,7 +57,8 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
             availableImages.update(availablePhotos());
         });
 
-        eventBus.subscribe(this);
+        addAttachListener(e -> eventBus.subscribe(this));
+        addDetachListener(e -> eventBus.unsubscribe(this));
     }
 
     @EventBusListenerMethod

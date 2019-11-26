@@ -22,7 +22,8 @@ public class PhotoQueryInfo extends Composite<TextField> {
         TextField textField = getContent();
         textField.setEnabled(false);
 
-        eventBus.subscribe(this);
+        addAttachListener(e -> eventBus.subscribe(this));
+        addDetachListener(e -> eventBus.unsubscribe(this));
     }
 
     @EventBusListenerMethod

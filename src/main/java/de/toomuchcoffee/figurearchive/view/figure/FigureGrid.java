@@ -34,16 +34,16 @@ public class FigureGrid extends Grid<Figure> {
             ValueChangeListener<ValueChangeEvent<Figure>> valueChangeListener) {
         super(Figure.class);
         this.figureService = figureService;
-        eventBus.subscribe(this);
-
         asSingleSelect().addValueChangeListener(valueChangeListener);
-        setItems(figureService.findFigures(0, PAGE_SIZE, null));
         setPageSize(properties.getFigures().getPageSize());
         setColumns("placementNo", "verbatim", "productLine", "year");
         getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
         addComponentColumn(f -> f.getPhotos().isEmpty() ? new Span() : new Image(getImageUrl(f.getPhotos().iterator().next(), 75), "n/a"))
                 .setComparator(comparing(figure -> figure.getPhotos().size(), nullsFirst(naturalOrder())))
                 .setHeader("Image");
+
+        addAttachListener(e -> eventBus.subscribe(this));
+        addDetachListener(e -> eventBus.unsubscribe(this));
     }
 
     @EventBusListenerMethod
@@ -88,7 +88,7 @@ public class FigureGrid extends Grid<Figure> {
 
     @SuppressWarnings("unchecked")
     private Collection<Figure> getItems() {
-        return ((ListDataProvider<Figure>) getDataProvider()).getItems();
+        return getDataProvider() == null ? new ArrayList<>() : ((ListDataProvider<Figure>) getDataProvider()).getItems();
     }
 
 

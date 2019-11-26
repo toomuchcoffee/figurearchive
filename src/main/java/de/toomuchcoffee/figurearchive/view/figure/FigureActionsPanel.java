@@ -73,7 +73,11 @@ public class FigureActionsPanel extends HorizontalLayout {
 
         add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo, newFigureButton, figureImport);
 
-        eventBus.subscribe(this);
+        addAttachListener(e -> {
+            eventBus.subscribe(this);
+            eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
+        });
+        addDetachListener(e -> eventBus.unsubscribe(this));
     }
 
     @EventBusListenerMethod

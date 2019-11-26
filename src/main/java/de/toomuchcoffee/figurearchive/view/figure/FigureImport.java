@@ -43,9 +43,9 @@ public class FigureImport extends Upload {
             byte[] bytes = IOUtils.toByteArray(is);
             List<Figure> figures = importService.importCsv(bytes);
             eventBus.publish(this, new FigureImportEvent(figures));
-            Notification.show(String.format("Successfully imported %s figures!", figures.size()), 3600, MIDDLE);
+            Notification.show(String.format("Successfully imported %s figures!", figures.size()), 5000, MIDDLE);
         } catch (Exception e) {
-            Notification.show(e.getMessage(), 3600, MIDDLE);
+            Notification.show(e.getMessage(), 5000, MIDDLE);
             e.printStackTrace();
         }
     }
