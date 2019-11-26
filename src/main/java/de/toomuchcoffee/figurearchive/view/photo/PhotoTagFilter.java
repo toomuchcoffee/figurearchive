@@ -14,6 +14,7 @@ public class PhotoTagFilter extends ComboBox<String> {
 
     public PhotoTagFilter(PhotoService photoService, ValueChangeListener<ValueChangeEvent<String>> valueChangeListener) {
         setPlaceholder("Filter by Tag");
+        setClearButtonVisible(true);
         addValueChangeListener(valueChangeListener);
         setItems(photoService.findAll().stream()
                 .map(Photo::getTags)

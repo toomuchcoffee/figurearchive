@@ -57,6 +57,7 @@ public class FigureActionsPanel extends HorizontalLayout {
 
         productLinesCount = figureService.getProductLineInfo();
         cbProductLineFilter = new ComboBox<>();
+        cbProductLineFilter.setClearButtonVisible(true);
         cbProductLineFilter.setPlaceholder("Filter by Product Line");
         cbProductLineFilter.setItems(Arrays.stream(ProductLine.values()).collect(toList()));
         cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.getOrDefault(l, 0L)));

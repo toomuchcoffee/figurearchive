@@ -60,8 +60,10 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         horizontalLayout.add(verticalLayout, photoSelector);
 
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
+        cbYear.setClearButtonVisible(true);
         cbLine.setItems(ProductLine.values());
         cbLine.setItemLabelGenerator(ProductLine::name);
+        cbLine.setClearButtonVisible(true);
 
         binder = new Binder<>();
         binder.bind(photoSelector, Figure::getPhotos, Figure::setPhotos);
