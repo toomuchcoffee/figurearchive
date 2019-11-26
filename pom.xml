@@ -121,7 +121,7 @@
 
     <profiles>
         <profile>
-            <id>production</id>
+            <id>heroku</id>
             <properties>
                 <vaadin.productionMode>true</vaadin.productionMode>
             </properties>

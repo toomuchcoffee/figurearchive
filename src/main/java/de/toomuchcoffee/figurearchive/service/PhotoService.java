@@ -16,6 +16,7 @@ import org.vaadin.spring.events.annotation.EventBusProxy;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -36,8 +37,8 @@ public class PhotoService {
     private final PermutationService permutationService;
 
     @LogExecutionTime
-    public List<Photo> findAll() {
-        return photoRepository.findAllByOrderByCompletedAsc();
+    public Optional<Photo> findById(Long id) {
+        return photoRepository.findById(id);
     }
 
     @LogExecutionTime
