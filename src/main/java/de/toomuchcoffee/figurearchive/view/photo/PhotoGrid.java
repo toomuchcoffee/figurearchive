@@ -80,7 +80,12 @@ public class PhotoGrid extends Grid<Photo> {
         Long id = event.getValue().getId();
         int indexOf = ids.indexOf(id);
         photoService.findById(id).ifPresent(photo -> {
-            items.set(indexOf, photo);
+            if (event.getValue().isCompleted()) {
+                items.remove(indexOf);
+                items.add(photo);
+            } else {
+                items.set(indexOf, photo);
+            }
         });
         setItems(items);
     }
