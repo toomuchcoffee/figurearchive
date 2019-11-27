@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 
 @UIScope
 @SpringComponent
@@ -24,8 +23,7 @@ public class FigurePanel extends VerticalLayout {
 
     @PostConstruct
     public void init() {
-        FigureGrid figureGrid = new FigureGrid(eventBus, figureService, properties,
-                e -> Optional.ofNullable(e.getValue()).ifPresent(figureEditor::editFigure));
+        FigureGrid figureGrid = new FigureGrid(eventBus, figureService, properties, figureEditor);
 
         add(figureActionsPanel, figureGrid);
     }

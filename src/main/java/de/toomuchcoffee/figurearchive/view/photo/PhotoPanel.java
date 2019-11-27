@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 
 @UIScope
 @SpringComponent
@@ -24,9 +23,7 @@ public class PhotoPanel extends VerticalLayout {
 
     @PostConstruct
     public void init() {
-        PhotoGrid photoGrid = new PhotoGrid(eventBus, photoService, properties,
-                e -> Optional.ofNullable(e.getValue()).ifPresent(photoEditor::editPhoto));
-
+        PhotoGrid photoGrid = new PhotoGrid(eventBus, photoService, properties, photoEditor);
         add(photoActionsPanel, photoGrid);
     }
 

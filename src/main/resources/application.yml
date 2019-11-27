@@ -11,6 +11,10 @@ spring:
 
 vaadin:
   compatibilityMode: true
+  productionMode: true
+  original:
+    frontend:
+      resources: true
 
 tumblr:
   consumer-key: ${API_KEY}

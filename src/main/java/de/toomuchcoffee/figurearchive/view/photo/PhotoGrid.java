@@ -1,7 +1,5 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
@@ -34,25 +32,28 @@ public class PhotoGrid extends Grid<Photo> {
             EventBus.SessionEventBus eventBus,
             PhotoService photoService,
             ConfigProperties properties,
-            ValueChangeListener<ValueChangeEvent<Photo>> valueChangeListener) {
+            PhotoEditor photoEditor) {
         super(Photo.class);
         this.photoService = photoService;
 
-        asSingleSelect().addValueChangeListener(valueChangeListener);
+        addItemClickListener(e -> photoEditor.editPhoto(e.getItem()));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
+                .setWidth("250px")
                 .setHeader("Image");
         addComponentColumn(photo -> new UnorderedList(photo.getUrls().stream()
                 .map(url -> url.getWidth() + "x" + url.getHeight())
                 .map(ListItem::new)
                 .collect(toList())
                 .toArray(new ListItem[0])))
+                .setAutoWidth(true)
                 .setHeader("Available Sizes (WxH)");
         addComponentColumn(photo -> new UnorderedList(Arrays.stream(photo.getTags())
                 .map(ListItem::new)
                 .collect(toList())
                 .toArray(new ListItem[0])))
+                .setAutoWidth(true)
                 .setHeader("Tags");
         addComponentColumn(photo -> new UnorderedList(photo.getFigures().stream()
                 .map(FigureDisplayNameHelper::getDisplayName)
@@ -60,6 +61,7 @@ public class PhotoGrid extends Grid<Photo> {
                 .collect(toList())
                 .toArray(new ListItem[0])))
                 .setHeader("Figures")
+                .setAutoWidth(true)
                 .setComparator(comparing(photo -> photo.getFigures().size(), nullsFirst(naturalOrder())));
 
         addAttachListener(e -> eventBus.subscribe(this));

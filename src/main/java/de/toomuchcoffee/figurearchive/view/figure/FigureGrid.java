@@ -1,7 +1,5 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
@@ -31,15 +29,17 @@ public class FigureGrid extends Grid<Figure> {
             EventBus.SessionEventBus eventBus,
             FigureService figureService,
             ConfigProperties properties,
-            ValueChangeListener<ValueChangeEvent<Figure>> valueChangeListener) {
+            FigureEditor figureEditor) {
         super(Figure.class);
         this.figureService = figureService;
-        asSingleSelect().addValueChangeListener(valueChangeListener);
+        addItemClickListener(e -> figureEditor.editFigure(e.getItem()));
+
         setPageSize(properties.getFigures().getPageSize());
         setColumns("placementNo", "verbatim", "productLine", "year");
-        getColumnByKey("placementNo").setWidth("150px").setFlexGrow(0);
+        getColumns().forEach(column -> column.setAutoWidth(true));
         addComponentColumn(f -> f.getPhotos().isEmpty() ? new Span() : new Image(getImageUrl(f.getPhotos().iterator().next(), 75), "n/a"))
                 .setComparator(comparing(figure -> figure.getPhotos().size(), nullsFirst(naturalOrder())))
+                .setAutoWidth(false)
                 .setHeader("Image");
 
         addAttachListener(e -> eventBus.subscribe(this));
