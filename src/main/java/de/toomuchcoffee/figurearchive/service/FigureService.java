@@ -9,9 +9,13 @@ import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.search.Query;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusProxy;
 
@@ -27,10 +31,17 @@ import static java.util.stream.Collectors.toMap;
 public class FigureService {
     private final FigureRepository figureRepository;
     private final EventBus.SessionEventBus eventBus;
+    private final FullTextEntityManager fullTextEntityManager;
 
     @LogExecutionTime
-    public List<Figure> suggestFigures(String query) {
-        return figureRepository.findByVerbatimContainingIgnoreCase(query);
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Figure> fuzzySearch(String searchTerm){
+        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Figure.class).get();
+        Query luceneQuery = qb.keyword().fuzzy().onFields("verbatim" , /*"productLine",*/ "placementNo")
+                .matching(searchTerm).createQuery();
+
+        return fullTextEntityManager.createFullTextQuery(luceneQuery, Figure.class).getResultList();
     }
 
     @LogExecutionTime

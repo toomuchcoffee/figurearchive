@@ -2,6 +2,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        search:
+          default:
+            directory_provider: local-heap
+
   database:
     driver-class-name: org.postgresql.Driver
   datasource:

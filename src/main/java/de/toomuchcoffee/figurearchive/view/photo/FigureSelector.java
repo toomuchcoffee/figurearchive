@@ -70,7 +70,7 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
     }
 
     private List<Figure> availableFigures(String query) {
-        return figureService.suggestFigures(query).stream()
+        return figureService.fuzzySearch(query).stream()
                 .filter(this::isNotSelected)
                 .limit(50)
                 .collect(toList());

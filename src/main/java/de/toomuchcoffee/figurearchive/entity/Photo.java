@@ -6,6 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,6 +23,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Indexed
 @Entity
 @TypeDefs({
         @TypeDef(name = "json", typeClass = JsonBinaryType.class),
@@ -34,6 +38,8 @@ public class Photo {
     @Column(columnDefinition = "json")
     private List<PhotoUrl> urls;
     @Type(type = "string-array")
+    @Field
+    @IndexedEmbedded
     @Column(columnDefinition = "text[]")
     private String[] tags;
     @ManyToMany(mappedBy = "photos", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})

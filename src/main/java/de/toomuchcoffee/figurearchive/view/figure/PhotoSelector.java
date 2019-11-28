@@ -66,7 +66,7 @@ public class PhotoSelector extends AbstractCompositeField<VerticalLayout, PhotoS
         if (isBlank(event.getFilter())) {
             foundPhotos = newArrayList();
         } else {
-            foundPhotos = photoService.suggestPhotos(event.getFilter());
+            foundPhotos = photoService.fuzzySearch(event.getFilter());
         }
         availableImages.update(availablePhotos());
     }
