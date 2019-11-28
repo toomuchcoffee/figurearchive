@@ -38,7 +38,10 @@ public class FigureService {
     @SuppressWarnings("unchecked")
     public List<Figure> fuzzySearch(String searchTerm){
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Figure.class).get();
-        Query luceneQuery = qb.keyword().fuzzy().onFields("verbatim" , /*"productLine",*/ "placementNo")
+        Query luceneQuery = qb.keyword().fuzzy()
+                .withEditDistanceUpTo(2)
+                .withPrefixLength(2)
+                .onFields("verbatim" , "productLine", "placementNo")
                 .matching(searchTerm).createQuery();
 
         return fullTextEntityManager.createFullTextQuery(luceneQuery, Figure.class).getResultList();

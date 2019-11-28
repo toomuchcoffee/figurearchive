@@ -52,7 +52,10 @@ public class PhotoService {
     @Transactional
     public List<Photo> fuzzySearch(String searchTerm){
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Photo.class).get();
-        Query luceneQuery = qb.keyword().fuzzy().onFields("tags")
+        Query luceneQuery = qb.keyword().fuzzy()
+                .withEditDistanceUpTo(2)
+                .withPrefixLength(2)
+                .onFields("tags")
                 .matching(searchTerm)
                 .createQuery();
 

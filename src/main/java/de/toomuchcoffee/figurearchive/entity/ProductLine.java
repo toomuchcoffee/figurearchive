@@ -30,7 +30,7 @@ public enum ProductLine {
     TLC13("The Legacy Collection 2013"),
     SL("Saga Legends"),
     TBS("The Black Series"),
-    TBS6("The Black Series 6 inch"),
+    TBS6("The Black Series 6\""),
     SWR("Star Wars Rebels Saga Legends"),
     TFA("The Force Awakens"),
     RO("Rogue One"),
