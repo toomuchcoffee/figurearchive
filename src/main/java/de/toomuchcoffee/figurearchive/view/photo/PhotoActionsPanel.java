@@ -6,9 +6,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchEvent;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
-import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.view.controls.PaginationTabs;
-import de.toomuchcoffee.figurearchive.view.controls.TumblrSyncButton;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
@@ -23,8 +21,6 @@ public class PhotoActionsPanel extends HorizontalLayout {
 
     private final EventBus.SessionEventBus eventBus;
     private final PhotoQueryInfo photoQueryInfo;
-    private final TumblrSyncButton tumblrSyncButton;
-    private final PhotoService photoService;
 
     @PostConstruct
     public void init() {
@@ -38,7 +34,7 @@ public class PhotoActionsPanel extends HorizontalLayout {
         PaginationTabs pagination = new PaginationTabs<PhotoSearchResultEvent, PhotoSearchEvent, String>(
                 eventBus, PhotoSearchResultEvent.class, PhotoSearchEvent.class);
 
-        add(tfPhotoTagFilter, pagination, photoQueryInfo, tumblrSyncButton);
+        add(tfPhotoTagFilter, pagination, photoQueryInfo);
 
         addAttachListener(e -> eventBus.publish(this, new PhotoSearchEvent("", 0)));
     }

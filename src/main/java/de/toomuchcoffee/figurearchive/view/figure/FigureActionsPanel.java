@@ -1,6 +1,5 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
 import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static java.util.stream.Collectors.toList;
 
@@ -34,8 +32,6 @@ public class FigureActionsPanel extends HorizontalLayout {
 
     private final EventBus.SessionEventBus eventBus;
     private final FigureQueryInfo figureQueryInfo;
-    private final FigureEditor figureEditor;
-    private final FigureImport figureImport;
     private final FigureService figureService;
 
     private ComboBox<ProductLine> cbProductLineFilter;
@@ -69,9 +65,7 @@ public class FigureActionsPanel extends HorizontalLayout {
         PaginationTabs pagination = new PaginationTabs<FigureSearchResultEvent, FigureSearchEvent, FigureFilter>(
                 eventBus, FigureSearchResultEvent.class, FigureSearchEvent.class);
 
-        Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
-
-        add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo, newFigureButton, figureImport);
+        add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo);
 
         addAttachListener(e -> {
             eventBus.subscribe(this);
