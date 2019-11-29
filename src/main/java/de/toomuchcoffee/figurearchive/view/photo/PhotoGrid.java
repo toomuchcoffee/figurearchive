@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
@@ -32,13 +33,22 @@ public class PhotoGrid extends Grid<Photo> {
             EventBus.SessionEventBus eventBus,
             PhotoService photoService,
             ConfigProperties properties,
-            PhotoEditor photoEditor) {
+            PhotoGridEditor photoGridEditor) {
         super(Photo.class);
         this.photoService = photoService;
 
-        addItemClickListener(e -> photoEditor.editPhoto(e.getItem()));
+        addItemClickListener(e -> photoGridEditor.editPhoto(e.getItem()));
         setPageSize(properties.getPhotos().getPageSize());
         setColumns("postId");
+
+        addComponentColumn(photo -> {
+            Checkbox checkbox = new Checkbox();
+            checkbox.setValue(photo.isCompleted());
+            checkbox.setEnabled(false);
+            return checkbox;
+        })
+                .setAutoWidth(true)
+                .setHeader("Completed?");
         addComponentColumn(photo -> new Image(getImageUrl(photo, 250), "N/A"))
                 .setWidth("250px")
                 .setHeader("Image");

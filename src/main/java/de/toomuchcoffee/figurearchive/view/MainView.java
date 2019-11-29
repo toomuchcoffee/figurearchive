@@ -7,7 +7,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -15,6 +14,7 @@ import de.toomuchcoffee.figurearchive.service.TumblrPostService;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import de.toomuchcoffee.figurearchive.view.figure.FigureImport;
 import de.toomuchcoffee.figurearchive.view.figure.FigurePanel;
+import de.toomuchcoffee.figurearchive.view.photo.PhotoEditor;
 import de.toomuchcoffee.figurearchive.view.photo.PhotoPanel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +32,7 @@ public class MainView extends VerticalLayout {
     private final FigureEditor figureEditor;
     private final FigureImport figureImport;
     private final PhotoPanel photoPanel;
+    private final PhotoEditor photoEditor;
     private final TumblrPostService tumblrPostService;
 
     private final VerticalLayout content = new VerticalLayout();
@@ -54,7 +55,7 @@ public class MainView extends VerticalLayout {
         photos.getSubMenu()
                 .addItem(menuItem(LINES_LIST, "List & Edit"), e -> select(photoPanel));
         photos.getSubMenu()
-                .addItem(menuItem(CONNECT, "Assign Figures"), e -> Notification.show("Implement me!"));
+                .addItem(menuItem(CONNECT, "Assign Figures"), e -> select(photoEditor));
         photos.getSubMenu()
                 .addItem(menuItem(ROTATE_RIGHT, "Tumblr Sync"), e -> tumblrPostService.loadPosts());
         MenuItem special = menuBar.addItem("Special");

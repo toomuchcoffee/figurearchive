@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusProxy;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.google.common.collect.Sets.difference;
@@ -40,7 +37,7 @@ public class PhotoService {
 
     private final EventBus.SessionEventBus eventBus;
 
-
+    private final Random random = new Random();
 
     @LogExecutionTime
     public Optional<Photo> findById(Long id) {
@@ -48,9 +45,19 @@ public class PhotoService {
     }
 
     @LogExecutionTime
+    public Optional<Photo> anyNotCompleted() {
+        List<Long> ids = photoRepository.getIdsOfNotCompleted();
+        if (ids.isEmpty()) {
+            return Optional.empty();
+        }
+        Long id = ids.get(random.nextInt(ids.size()));
+        return photoRepository.findById(id);
+    }
+
+    @LogExecutionTime
     @SuppressWarnings("unchecked")
     @Transactional
-    public List<Photo> fuzzySearch(String searchTerm){
+    public List<Photo> fuzzySearch(String searchTerm) {
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Photo.class).get();
         Query luceneQuery = qb.keyword().fuzzy()
                 .withEditDistanceUpTo(2)
@@ -69,8 +76,8 @@ public class PhotoService {
         long count;
         if (isBlank(tag)) {
             Pageable pageable = PageRequest.of(page, size);
-                count = photoRepository.count();
-                photos = photoRepository.findAllByOrderByCompletedAsc(pageable).getContent();
+            count = photoRepository.count();
+            photos = photoRepository.findAllByOrderByCompletedAsc(pageable).getContent();
         } else {
             photos = photoRepository.findAllByOrderByCompletedAsc().stream()
                     .filter(photo -> Arrays.stream(photo.getTags()).anyMatch(t -> t.equalsIgnoreCase(tag)))
@@ -87,6 +94,11 @@ public class PhotoService {
     @LogExecutionTime
     public OwningSideOfRelation<Figure, Photo> prepareOwningSideOfRelation(Photo photo) {
         return new OwningSideOfRelation<>(Figure::getPhotos, Photo::getFigures, photo);
+    }
+
+    @LogExecutionTime
+    public void save(Photo photo) {
+        photoRepository.save(photo);
     }
 
     @LogExecutionTime

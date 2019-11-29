@@ -17,13 +17,13 @@ public class PhotoPanel extends VerticalLayout {
 
     private final ConfigProperties properties;
     private final PhotoActionsPanel photoActionsPanel;
-    private final PhotoEditor photoEditor;
+    private final PhotoGridEditor photoGridEditor;
     private final PhotoService photoService;
     private final EventBus.SessionEventBus eventBus;
 
     @PostConstruct
     public void init() {
-        PhotoGrid photoGrid = new PhotoGrid(eventBus, photoService, properties, photoEditor);
+        PhotoGrid photoGrid = new PhotoGrid(eventBus, photoService, properties, photoGridEditor);
         add(photoActionsPanel, photoGrid);
     }
 

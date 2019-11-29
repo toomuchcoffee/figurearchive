@@ -65,4 +65,14 @@ public class PhotoRepositoryTest {
         assertThat(photoRepository.findAllByOrderByCompletedAsc(PageRequest.of(1, 2)).getContent()).hasSize(1);
         assertThat(photoRepository.findAllByOrderByCompletedAsc(PageRequest.of(1, 2)).getContent().get(0).isCompleted()).isTrue();
     }
+
+    @Test
+    public void getIdsOfNotCompleted() {
+        Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[0], newHashSet(), false);
+        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[0], newHashSet(), true);
+        Photo photo3 = new Photo(3L, 123L, newArrayList(), new String[0], newHashSet(), false);
+        photoRepository.saveAll(newArrayList(photo1, photo2, photo3));
+        List<Long> result = photoRepository.getIdsOfNotCompleted();
+        assertThat(result).hasSize(2);
+    }
 }
