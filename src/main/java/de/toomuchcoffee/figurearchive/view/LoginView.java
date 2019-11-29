@@ -15,6 +15,7 @@ import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,18 +41,20 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     @Autowired
     private HttpServletRequest request;
 
-    LoginView(@Value("${figurearchive.admin-password:null}") String password) {
+    LoginView(@Autowired Environment environment, @Value("${figurearchive.admin-password:null}") String password) {
         label = new Label("F I G U R E A R C H I V E");
 
         userNameTextField = new TextField();
         userNameTextField.setPlaceholder("Username");
-        userNameTextField.setValue("admin");
 
         passwordField = new PasswordField();
         passwordField.setPlaceholder("Password");
-        if (password != null) {
+
+        if ("local".equals(environment.getActiveProfiles()[0])) {
+            userNameTextField.setValue("admin");
             passwordField.setValue(password);
         }
+
         passwordField.addKeyDownListener(Key.ENTER, (ComponentEventListener<KeyDownEvent>) keyDownEvent -> authenticateAndNavigate());
 
         Button submitButton = new Button("Login");
