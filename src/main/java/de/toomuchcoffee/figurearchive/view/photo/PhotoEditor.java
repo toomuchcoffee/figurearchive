@@ -91,7 +91,8 @@ public class PhotoEditor extends HorizontalLayout {
     }
 
     private void save() {
-        photoService.save(photo, owningSideOfRelation);
+        photoService.save(owningSideOfRelation);
+        photoService.save(photo);
         details.removeAll();
         eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
 
