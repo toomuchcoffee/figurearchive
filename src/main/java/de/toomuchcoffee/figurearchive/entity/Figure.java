@@ -14,7 +14,7 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static javax.persistence.CascadeType.*;
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -45,7 +45,7 @@ public class Figure {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE })
     @JoinTable(
             name = "figure_to_photo",
             joinColumns = {@JoinColumn(name = "figure_id")},
