@@ -102,6 +102,7 @@ public class PhotoService {
     }
 
     @LogExecutionTime
+    @Transactional
     public void save(Photo photo, OwningSideOfRelation<Figure, Photo> owningSideOfRelation) {
         photoRepository.save(photo);
         figureRepository.saveAll(owningSideOfRelation.collectChangedOwners());
