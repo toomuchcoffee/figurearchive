@@ -1,9 +1,6 @@
 package de.toomuchcoffee.figurearchive.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
@@ -11,6 +8,7 @@ import org.hibernate.search.annotations.*;
 import org.hibernate.search.bridge.StringBridge;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +17,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Indexed
@@ -31,7 +30,7 @@ import static javax.persistence.GenerationType.IDENTITY;
         }
 )
 @Entity
-public class Figure {
+public class Figure implements Serializable {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

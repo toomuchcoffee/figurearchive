@@ -21,6 +21,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Indexed
@@ -29,7 +30,7 @@ import static javax.persistence.GenerationType.IDENTITY;
         @TypeDef(name = "json", typeClass = JsonBinaryType.class),
         @TypeDef(name = "string-array", typeClass = StringArrayType.class)
 })
-public class Photo {
+public class Photo implements Serializable {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
