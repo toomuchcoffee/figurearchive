@@ -41,7 +41,6 @@ public class PhotoEditor extends HorizontalLayout {
     private final FigureEditor figureEditor;
 
     private Photo photo;
-    private PhotoService.OwningSideOfRelation<Figure, Photo> owningSideOfRelation;
 
     private Binder<Photo> binder;
 
@@ -60,7 +59,6 @@ public class PhotoEditor extends HorizontalLayout {
         this.photo = photo;
         binder = new Binder<>();
         binder.setBean(photo);
-        owningSideOfRelation = photoService.prepareOwningSideOfRelation(photo);
 
         Button save = new Button("Save", CHECK.create(), e -> save());
 
@@ -91,7 +89,6 @@ public class PhotoEditor extends HorizontalLayout {
     }
 
     private void save() {
-        photoService.save(owningSideOfRelation);
         photoService.save(photo);
         details.removeAll();
         eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));

@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.*;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -44,12 +44,7 @@ public class Figure implements Serializable {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE })
-    @JoinTable(
-            name = "figure_to_photo",
-            joinColumns = {@JoinColumn(name = "figure_id")},
-            inverseJoinColumns = {@JoinColumn(name = "photo_id")}
-    )
+    @ManyToMany(mappedBy = "figures", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
     private Set<Photo> photos = new HashSet<>();
 
     public static class EnumStringBridge implements StringBridge {

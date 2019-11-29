@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
@@ -33,8 +34,9 @@ import static java.util.stream.Collectors.toList;
 public class FigureEditor extends Dialog implements KeyNotifier {
 
     private final FigureRepository repository;
-    private final PhotoSelector photoSelector;
     private final EventBus.SessionEventBus eventBus;
+
+    private final PhotoGallery photoGallery = new PhotoGallery(250);
 
     private Figure figure;
 
@@ -52,12 +54,15 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     @PostConstruct
     public void init() {
+        VerticalLayout wrapper = new VerticalLayout();
+        add(wrapper);
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        add(horizontalLayout);
-
+        wrapper.add(horizontalLayout);
         VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, actions);
-        horizontalLayout.add(verticalLayout, photoSelector);
+        verticalLayout.setHeightFull();
+        verticalLayout.add(tfVerbatim, cbLine, cbYear, tfPlacementNo);
+        horizontalLayout.add(verticalLayout, photoGallery);
+        wrapper.add(actions);
 
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
         cbYear.setClearButtonVisible(true);
@@ -66,7 +71,6 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         cbLine.setClearButtonVisible(true);
 
         binder = new Binder<>();
-        binder.bind(photoSelector, Figure::getPhotos, Figure::setPhotos);
         binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
         binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);
@@ -111,6 +115,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         open();
         this.figure = figure;
         binder.setBean(this.figure);
+        photoGallery.update(new ArrayList<>(figure.getPhotos()));
         tfVerbatim.focus();
     }
 
