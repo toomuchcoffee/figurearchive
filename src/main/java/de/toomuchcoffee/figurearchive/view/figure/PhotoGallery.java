@@ -54,6 +54,7 @@ public class PhotoGallery extends FlexLayout {
                 Set<Figure> figures = photo.getFigures();
                 figures.remove(figure);
                 photo.setFigures(figures);
+                photo.setCompleted(false);
                 photoService.save(photo);
                 photos.remove(photo);
                 figure.setPhotos(photos);

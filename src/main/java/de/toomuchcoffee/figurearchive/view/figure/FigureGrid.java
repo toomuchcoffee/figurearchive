@@ -53,17 +53,15 @@ public class FigureGrid extends Grid<Figure> {
                 items.add(event.getValue());
                 setItems(items);
                 getDataProvider().refreshAll();
+                break;
             }
-            ;
-            break;
             case DELETED: {
                 List<Figure> items = new ArrayList<>(getItems());
                 items.remove(event.getValue());
                 setItems(items);
                 getDataProvider().refreshAll();
+                break;
             }
-            ;
-            break;
             default:
                 getDataProvider().refreshAll();
         }
