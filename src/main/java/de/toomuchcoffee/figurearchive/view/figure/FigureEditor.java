@@ -101,6 +101,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private void resetAndClose() {
         this.figure = null;
         this.binder.removeBean();
+        photoGallery.update(new ArrayList<>());
         close();
     }
 
