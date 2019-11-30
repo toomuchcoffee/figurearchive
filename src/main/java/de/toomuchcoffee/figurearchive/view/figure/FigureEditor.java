@@ -13,7 +13,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
-import de.toomuchcoffee.figurearchive.event.PhotoSearchByVerbatimEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
@@ -75,12 +73,6 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);
         binder.bind(cbLine, Figure::getProductLine, Figure::setProductLine);
-
-        horizontalLayout.setSpacing(true);
-
-        tfVerbatim.setValueChangeMode(LAZY);
-        tfVerbatim.setValueChangeTimeout(500);
-        tfVerbatim.addValueChangeListener(e -> eventBus.publish(this, new PhotoSearchByVerbatimEvent(e.getSource().getValue(), 0)));
     }
 
     private void delete() {
