@@ -34,6 +34,16 @@ public class FigureService {
     private final FullTextEntityManager fullTextEntityManager;
 
     @LogExecutionTime
+    public void save(Figure figure) {
+        figureRepository.save(figure);
+    }
+
+    @LogExecutionTime
+    public void delete(Figure figure) {
+        figureRepository.delete(figure);
+    }
+
+    @LogExecutionTime
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Figure> fuzzySearch(String searchTerm){

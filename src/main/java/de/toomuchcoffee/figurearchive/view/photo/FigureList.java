@@ -11,23 +11,22 @@ import java.util.List;
 
 import static de.toomuchcoffee.figurearchive.util.FigureDisplayNameHelper.getDisplayName;
 
-class FigureList extends Grid<Figure> {
+public class FigureList extends Grid<Figure> {
 
-    FigureList() {
+    public FigureList() {
         super(Figure.class);
         setWidth("500px");
-        setHeight("250px");
-
+        setHeightFull();
         setColumns();
 
         addComponentColumn(f -> new Span(getDisplayName(f)));
     }
 
-    void setHeader(Component component) {
+    public void setHeader(Component component) {
         getColumns().get(0).setHeader(component);
     }
 
-    void update(List<Figure> figures) {
+    public void update(List<Figure> figures) {
         this.setItems(figures);
     }
 

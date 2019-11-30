@@ -1,8 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
 import de.toomuchcoffee.figurearchive.entity.Figure;
@@ -16,9 +14,6 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
-import static java.util.Comparator.*;
 
 public class FigureGrid extends Grid<Figure> {
     private static final int PAGE_SIZE = 100;
@@ -37,10 +32,6 @@ public class FigureGrid extends Grid<Figure> {
         setPageSize(properties.getFigures().getPageSize());
         setColumns("placementNo", "verbatim", "productLine", "year");
         getColumns().forEach(column -> column.setAutoWidth(true));
-        addComponentColumn(f -> f.getPhotos().isEmpty() ? new Span() : new Image(getImageUrl(f.getPhotos().iterator().next(), 75), "n/a"))
-                .setComparator(comparing(figure -> figure.getPhotos().size(), nullsFirst(naturalOrder())))
-                .setAutoWidth(false)
-                .setHeader("Image");
 
         addAttachListener(e -> eventBus.subscribe(this));
         addDetachListener(e -> eventBus.unsubscribe(this));
