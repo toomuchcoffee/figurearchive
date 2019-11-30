@@ -20,4 +20,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
             "FROM Photo " +
             "WHERE completed = 'false'")
     List<Long> getIdsOfNotCompleted();
+
+    @Query("SELECT tags " +
+            "FROM Photo")
+    List<String[]> getTags();
 }

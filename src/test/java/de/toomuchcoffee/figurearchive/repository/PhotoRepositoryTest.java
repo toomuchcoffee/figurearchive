@@ -75,4 +75,13 @@ public class PhotoRepositoryTest {
         List<Long> result = photoRepository.getIdsOfNotCompleted();
         assertThat(result).hasSize(2);
     }
+
+    @Test
+    public void getTags() {
+        Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[]{"foo", "bar"}, newHashSet(), false);
+        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[] {"baz"}, newHashSet(), true);
+        photoRepository.saveAll(newArrayList(photo1, photo2));
+        List<String[]> result = photoRepository.getTags();
+        assertThat(result).hasSize(2);
+    }
 }

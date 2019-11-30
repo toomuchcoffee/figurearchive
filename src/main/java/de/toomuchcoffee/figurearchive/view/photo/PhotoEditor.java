@@ -1,7 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,8 +23,7 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static com.vaadin.flow.component.icon.VaadinIcon.CHECK;
-import static com.vaadin.flow.component.icon.VaadinIcon.PLUS;
+import static com.vaadin.flow.component.icon.VaadinIcon.*;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.CREATED;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.UPDATED;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
@@ -60,21 +58,20 @@ public class PhotoEditor extends HorizontalLayout {
         binder = new Binder<>();
         binder.setBean(photo);
 
-        Button save = new Button("Save", CHECK.create(), e -> save());
+        Button skip = new Button("Skip", FORWARD.create(), e -> save(Action.SKIP));
+        Button save = new Button("Save Work", ENTER.create(), e -> save(Action.SAVE));
+        Button complete = new Button("Complete", CHECK.create(), e -> save(Action.COMPLETE));
 
         Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
 
         details = new VerticalLayout();
-        details.setWidth("100%");
+        details.setWidthFull();
 
-        Checkbox cbCompleted = new Checkbox("Mark as Completed");
-
-        HorizontalLayout actions = new HorizontalLayout(cbCompleted, save, newFigureButton);
+        HorizontalLayout actions = new HorizontalLayout(skip, newFigureButton, save, complete);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout, figureSelector);
 
         binder.bind(figureSelector, Photo::getFigures, Photo::setFigures);
-        binder.bind(cbCompleted, Photo::isCompleted, Photo::setCompleted);
 
         details.removeAll();
         details.add(new Image(getImageUrl(this.photo, 500), "N/A"));
@@ -88,14 +85,27 @@ public class PhotoEditor extends HorizontalLayout {
         details.add(tagsArea);
     }
 
-    private void save() {
-        photoService.save(photo);
-        details.removeAll();
-        eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
+    private enum Action {
+        SKIP, SAVE, COMPLETE
+    }
 
+    private void save(Action action) {
+        switch (action) {
+            case COMPLETE:
+                photo.setCompleted(true);
+                photoService.save(photo);
+                eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
+                break;
+            case SAVE:
+                photoService.save(photo);
+                eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
+                break;
+            case SKIP:
+            default:
+        }
+        details.removeAll();
         this.photo = null;
         binder.removeBean();
-
         photoService.anyNotCompleted().ifPresent(this::nextPhoto);
     }
 
