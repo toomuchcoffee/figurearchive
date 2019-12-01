@@ -41,15 +41,14 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
 
     @PostConstruct
     public void init() {
-        Button needsWork = new Button("Needs work", QUESTION.create(), e -> save(false));
+        Button needsWork = new Button("Needs work", QUESTION.create(), e -> save());
         Button archive = new Button("Archive", FILE_REMOVE.create(), e -> archive());
-        Button complete = new Button("Complete", CHECK.create(), e -> save(true));
         Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
 
         details = new HorizontalLayout();
         details.setWidth("100%");
 
-        HorizontalLayout actions = new HorizontalLayout(needsWork, archive, complete, cancel);
+        HorizontalLayout actions = new HorizontalLayout(needsWork, archive, cancel);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout);
 
@@ -77,8 +76,8 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
         updateDetails();
     }
 
-    private void save(boolean completed) {
-        photo.setCompleted(completed);
+    private void save() {
+        photo.setCompleted(false);
         photoService.save(photo);
         details.removeAll();
         eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));

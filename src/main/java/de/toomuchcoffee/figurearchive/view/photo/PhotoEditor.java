@@ -24,8 +24,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.CREATED;
-import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.UPDATED;
+import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 
 @SpringComponent
@@ -59,7 +58,6 @@ public class PhotoEditor extends HorizontalLayout {
         binder.setBean(photo);
 
         Button skip = new Button("Skip", FORWARD.create(), e -> save(Action.SKIP));
-        Button archive = new Button("Archive", FILE_REMOVE.create(), e -> archive());
         Button save = new Button("Save Work", ENTER.create(), e -> save(Action.SAVE));
         Button complete = new Button("Complete", CHECK.create(), e -> save(Action.COMPLETE));
 
@@ -68,7 +66,7 @@ public class PhotoEditor extends HorizontalLayout {
         details = new VerticalLayout();
         details.setWidthFull();
 
-        HorizontalLayout actions = new HorizontalLayout(skip, archive, newFigureButton, save, complete);
+        HorizontalLayout actions = new HorizontalLayout(skip, newFigureButton, save, complete);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout, figureSelector);
 
@@ -93,9 +91,14 @@ public class PhotoEditor extends HorizontalLayout {
     private void save(Action action) {
         switch (action) {
             case COMPLETE:
-                photo.setCompleted(true);
-                photoService.save(photo);
-                eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
+                if (photo.getFigures().isEmpty()) {
+                    photoService.archive(photo);
+                    eventBus.publish(this, new PhotoChangedEvent(photo, DELETED));
+                } else {
+                    photo.setCompleted(true);
+                    photoService.save(photo);
+                    eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
+                }
                 break;
             case SAVE:
                 photoService.save(photo);
@@ -104,14 +107,6 @@ public class PhotoEditor extends HorizontalLayout {
             case SKIP:
             default:
         }
-        details.removeAll();
-        this.photo = null;
-        binder.removeBean();
-        photoService.anyNotCompleted().ifPresent(this::nextPhoto);
-    }
-
-    private void archive() {
-        photoService.archive(photo);
         details.removeAll();
         this.photo = null;
         binder.removeBean();

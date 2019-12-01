@@ -48,7 +48,9 @@ public class PhotoGrid extends Grid<Photo> {
         addComponentColumn(photo -> new Image(getImageUrl(photo, 75), "N/A"))
                 .setWidth("75px")
                 .setHeader("Image");
-        addColumn((ValueProvider<Photo, Integer>) photo -> photo.getFigures().size()).setHeader("Nr. of Figures");
+        addColumn((ValueProvider<Photo, Integer>) photo -> photo.getFigures().size())
+                .setSortable(true)
+                .setHeader("Nr. of Figures");
 
         addAttachListener(e -> eventBus.subscribe(this));
         addDetachListener(e -> eventBus.unsubscribe(this));

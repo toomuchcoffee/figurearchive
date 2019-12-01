@@ -32,7 +32,9 @@ public class FigureGrid extends Grid<Figure> {
 
         setPageSize(properties.getFigures().getPageSize());
         setColumns("placementNo", "verbatim", "productLine", "year");
-        addColumn((ValueProvider<Figure, Integer>) figure -> figure.getPhotos().size()).setHeader("Nr. of Photos");
+        addColumn((ValueProvider<Figure, Integer>) figure -> figure.getPhotos().size())
+                .setSortable(true)
+                .setHeader("Nr. of Photos");
         getColumns().forEach(column -> column.setAutoWidth(true));
 
         addAttachListener(e -> eventBus.subscribe(this));
