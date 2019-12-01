@@ -13,11 +13,7 @@ public class LuceneIndexConfig {
     @Bean
     public FullTextEntityManager fullTextEntityManager(EntityManagerFactory entityManagerFactory){
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManagerFactory.createEntityManager());
-        try {
-            fullTextEntityManager.createIndexer().startAndWait();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        fullTextEntityManager.createIndexer().start();
         return fullTextEntityManager;
     }
 
