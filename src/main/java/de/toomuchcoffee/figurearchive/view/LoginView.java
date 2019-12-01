@@ -14,6 +14,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.Command;
 import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,20 +93,20 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         dialog.setCloseOnEsc(false);
         dialog.add(progressBar);
         dialog.open();
-        Runnable runnable = () -> {
+
+        new Thread(() -> {
             try {
                 while (!progressMonitor.isDone()) {
-                    progressBar.setValue(progressMonitor.getProgress());
+                    getUI().ifPresent(ui -> {
+                        ui.access((Command) () -> progressBar.setValue(progressMonitor.getProgress()));
+                    });
                     TimeUnit.SECONDS.sleep(1);
                 }
                 dialog.close();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-        };
-
-        Thread thread = new Thread(runnable);
-        thread.start();
+        }).start();
     }
 
     private void authenticateAndNavigate() {
