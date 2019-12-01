@@ -5,13 +5,16 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +30,7 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.TimeUnit;
 
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
@@ -41,7 +45,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     @Autowired
     private HttpServletRequest request;
 
-    LoginView(@Autowired Environment environment, @Value("${figurearchive.admin-password:null}") String password) {
+    private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;
+
+    LoginView(@Autowired LuceneIndexConfig.CustomProgressMonitor progressMonitor,
+              @Autowired Environment environment,
+              @Value("${figurearchive.admin-password:null}") String password) {
+        this.progressMonitor = progressMonitor;
+
         label = new Label("F I G U R E A R C H I V E");
 
         userNameTextField = new TextField();
@@ -68,6 +78,34 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setAlignItems(Alignment.CENTER);
         this.getElement().getStyle().set("height", "100%");
         this.getElement().getStyle().set("justify-content", "center");
+
+        showIndexingProgress();
+    }
+
+    private void showIndexingProgress() {
+        if (progressMonitor.isDone()) {
+            return;
+        }
+        ProgressBar progressBar = new ProgressBar(0, 1);
+        Dialog dialog = new Dialog();
+        dialog.setCloseOnOutsideClick(false);
+        dialog.setCloseOnEsc(false);
+        dialog.add(progressBar);
+        dialog.open();
+        Runnable runnable = () -> {
+            try {
+                while (!progressMonitor.isDone()) {
+                    progressBar.setValue(progressMonitor.getProgress());
+                    TimeUnit.SECONDS.sleep(1);
+                }
+                dialog.close();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
     private void authenticateAndNavigate() {
