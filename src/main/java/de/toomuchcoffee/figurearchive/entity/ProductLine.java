@@ -38,10 +38,11 @@ public enum ProductLine {
     SOLO("Solo: A Star Wars Story"),
     GOA("Galaxy of Adventures"),
     RESISTANCE("Star Wars Resistance"),
+    RETRO("Retro Collection"),
     DISNEY("All Disney Lines"),
     SHFIGUARTS("SH Figuarts"),
     BANDAI("Bandai Model Kit"),
-    HERO("12\" Hero Series");
+    HERO("12\" Hero Series"),;
 
     private final String description;
 }
