@@ -8,13 +8,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.Command;
 import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.concurrent.TimeUnit;
 
+@Push
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -97,9 +98,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         new Thread(() -> {
             try {
                 while (!progressMonitor.isDone()) {
-                    getUI().ifPresent(ui -> {
-                        ui.access((Command) () -> progressBar.setValue(progressMonitor.getProgress()));
-                    });
+                    getUI().ifPresent(ui -> ui.access(() -> progressBar.setValue(progressMonitor.getProgress())));
                     TimeUnit.SECONDS.sleep(1);
                 }
                 dialog.close();
