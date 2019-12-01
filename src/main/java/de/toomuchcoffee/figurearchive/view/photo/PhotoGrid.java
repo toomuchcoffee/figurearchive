@@ -48,7 +48,7 @@ public class PhotoGrid extends Grid<Photo> {
         addComponentColumn(photo -> new Image(getImageUrl(photo, 75), "N/A"))
                 .setWidth("75px")
                 .setHeader("Image");
-        addColumn((ValueProvider<Photo, Integer>)photo -> photo.getFigures().size()).setHeader("Nr. of Figures");
+        addColumn((ValueProvider<Photo, Integer>) photo -> photo.getFigures().size()).setHeader("Nr. of Figures");
 
         addAttachListener(e -> eventBus.subscribe(this));
         addDetachListener(e -> eventBus.unsubscribe(this));
@@ -65,15 +65,27 @@ public class PhotoGrid extends Grid<Photo> {
         List<Long> ids = items.stream().map(Photo::getId).collect(toList());
         Long id = event.getValue().getId();
         int indexOf = ids.indexOf(id);
-        photoService.findById(id).ifPresent(photo -> {
-            if (event.getValue().isCompleted()) {
-                items.remove(indexOf);
-                items.add(photo);
-            } else {
-                items.set(indexOf, photo);
+
+        switch (event.getOperation()) {
+            case UPDATED: {
+                if (event.getValue().isCompleted()) {
+                    items.remove(indexOf);
+                    items.add(event.getValue());
+                } else {
+                    items.set(indexOf, event.getValue());
+                }
+                break;
             }
-        });
+            case DELETED: {
+                items.remove(indexOf);
+                break;
+            }
+            case CREATED:
+            default:
+                break;
+        }
         setItems(items);
+        getDataProvider().refreshAll();
     }
 
     @SuppressWarnings("unchecked")

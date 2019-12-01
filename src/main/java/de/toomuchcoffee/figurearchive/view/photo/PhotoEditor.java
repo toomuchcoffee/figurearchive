@@ -59,6 +59,7 @@ public class PhotoEditor extends HorizontalLayout {
         binder.setBean(photo);
 
         Button skip = new Button("Skip", FORWARD.create(), e -> save(Action.SKIP));
+        Button archive = new Button("Archive", FILE_REMOVE.create(), e -> archive());
         Button save = new Button("Save Work", ENTER.create(), e -> save(Action.SAVE));
         Button complete = new Button("Complete", CHECK.create(), e -> save(Action.COMPLETE));
 
@@ -67,7 +68,7 @@ public class PhotoEditor extends HorizontalLayout {
         details = new VerticalLayout();
         details.setWidthFull();
 
-        HorizontalLayout actions = new HorizontalLayout(skip, newFigureButton, save, complete);
+        HorizontalLayout actions = new HorizontalLayout(skip, archive, newFigureButton, save, complete);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout, figureSelector);
 
@@ -103,6 +104,14 @@ public class PhotoEditor extends HorizontalLayout {
             case SKIP:
             default:
         }
+        details.removeAll();
+        this.photo = null;
+        binder.removeBean();
+        photoService.anyNotCompleted().ifPresent(this::nextPhoto);
+    }
+
+    private void archive() {
+        photoService.archive(photo);
         details.removeAll();
         this.photo = null;
         binder.removeBean();

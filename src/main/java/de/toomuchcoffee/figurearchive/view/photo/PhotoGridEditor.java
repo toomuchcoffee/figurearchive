@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
+import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.DELETED;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.UPDATED;
 import static de.toomuchcoffee.figurearchive.util.FigureDisplayNameHelper.getDisplayName;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
@@ -41,13 +42,14 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
     @PostConstruct
     public void init() {
         Button needsWork = new Button("Needs work", QUESTION.create(), e -> save(false));
+        Button archive = new Button("Archive", FILE_REMOVE.create(), e -> archive());
         Button complete = new Button("Complete", CHECK.create(), e -> save(true));
         Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
 
         details = new HorizontalLayout();
         details.setWidth("100%");
 
-        HorizontalLayout actions = new HorizontalLayout(needsWork, complete, cancel);
+        HorizontalLayout actions = new HorizontalLayout(needsWork, archive, complete, cancel);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout);
 
@@ -81,6 +83,12 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
         details.removeAll();
         eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
 
+        resetAndClose();
+    }
+
+    private void archive() {
+        photoService.archive(photo);
+        eventBus.publish(this, new PhotoChangedEvent(photo, DELETED));
         resetAndClose();
     }
 
