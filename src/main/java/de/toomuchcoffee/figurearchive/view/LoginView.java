@@ -1,21 +1,14 @@
 package de.toomuchcoffee.figurearchive.view;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyDownEvent;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +24,7 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.concurrent.TimeUnit;
 
-@Push
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -47,12 +38,12 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     @Autowired
     private HttpServletRequest request;
 
-    private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;
+    private final IndexingProgress indexingProgress;
 
-    LoginView(@Autowired LuceneIndexConfig.CustomProgressMonitor progressMonitor,
+    LoginView(@Autowired IndexingProgress indexingProgress,
               @Autowired Environment environment,
               @Value("${figurearchive.admin-password:null}") String password) {
-        this.progressMonitor = progressMonitor;
+        this.indexingProgress = indexingProgress;
 
         label = new Label("F I G U R E A R C H I V E");
 
@@ -81,31 +72,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.getElement().getStyle().set("height", "100%");
         this.getElement().getStyle().set("justify-content", "center");
 
-        showIndexingProgress();
     }
 
-    private void showIndexingProgress() {
-        if (progressMonitor.isDone()) {
-            return;
-        }
-        ProgressBar progressBar = new ProgressBar(0, 1);
-        Dialog dialog = new Dialog();
-        dialog.setCloseOnOutsideClick(false);
-        dialog.setCloseOnEsc(false);
-        dialog.add(progressBar);
-        dialog.open();
-
-        new Thread(() -> {
-            try {
-                while (!progressMonitor.isDone()) {
-                    getUI().ifPresent(ui -> ui.access(() -> progressBar.setValue(progressMonitor.getProgress())));
-                    TimeUnit.SECONDS.sleep(1);
-                }
-                dialog.close();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        }).start();
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        indexingProgress.open();
     }
 
     private void authenticateAndNavigate() {
