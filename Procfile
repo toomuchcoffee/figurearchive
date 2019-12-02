@@ -1,1 +1,1 @@
-web: java -Xmx128m -Xss512k -XX:CICompilerCount=2 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dserver.port=$PORT -Dspring.profiles.active=heroku -jar target/*.jar
+web: java -Xmx192m -Xss512k -XX:CICompilerCount=2 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dserver.port=$PORT -Dspring.profiles.active=heroku -jar target/*.jar
