@@ -3,39 +3,34 @@ package de.toomuchcoffee.figurearchive.view;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.shared.communication.PushMode;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.TimeUnit;
 
-@Push(PushMode.MANUAL)
-@Route("push")
-@SpringComponent
-@UIScope
+@Push
+@Route(value = "wait")
 @RequiredArgsConstructor
-public class IndexingProgress extends Dialog {
+public class WaitScreen extends VerticalLayout {
     private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;
-    private ProgressBar progressBar = new ProgressBar(0, 1);
+    private ProgressBar progressBar;
     private Thread thread;
 
     @PostConstruct
     public void init() {
-        setCloseOnOutsideClick(false);
-        setCloseOnEsc(false);
-        add(progressBar);
+        progressBar = new ProgressBar(0, 1);
+        Label text = new Label("Indexing is still going on. Please wait and reload page in a couple of seconds, since Vaadin Push isn't working here for some undocumented reason....");
+        add(text, progressBar);
     }
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        thread = progressThread(attachEvent.getUI());
+        thread = new ProgressThread(attachEvent.getUI(), progressBar, progressMonitor);
         thread.start();
     }
 
@@ -45,18 +40,23 @@ public class IndexingProgress extends Dialog {
         thread = null;
     }
 
-    private Thread progressThread(UI ui) {
-        return new Thread(() -> {
+    @RequiredArgsConstructor
+    static class ProgressThread extends Thread {
+        private final UI ui;
+        private final ProgressBar progressBar;
+        private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;
+
+        @Override
+        public void run() {
             try {
                 while (!progressMonitor.isDone()) {
                     ui.access(() -> progressBar.setValue(progressMonitor.getProgress()));
-                    ui.push();
-                    TimeUnit.SECONDS.sleep(1);
+                    //TimeUnit.SECONDS.sleep(1);
                 }
-                close();
-            } catch (InterruptedException ex) {
+                ui.access(() -> ui.navigate("login"));
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        });
+        }
     }
 }
