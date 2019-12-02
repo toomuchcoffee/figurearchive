@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
-@Push
+@Push(PushMode.MANUAL)
 @Route("push")
 @SpringComponent
 @UIScope
