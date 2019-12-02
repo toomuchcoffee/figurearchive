@@ -6,7 +6,8 @@ spring:
       hibernate:
         search:
           default:
-            directory_provider: local-heap
+            directory_provider: filesystem
+            indexBase: .lucene
 
   database:
     driver-class-name: org.postgresql.Driver
