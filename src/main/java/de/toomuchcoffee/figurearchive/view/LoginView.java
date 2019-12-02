@@ -1,6 +1,9 @@
 package de.toomuchcoffee.figurearchive.view;
 
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -9,8 +12,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.vaadin.flow.spring.annotation.UIScope;
+import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -20,31 +24,32 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+@UIScope
+@RequiredArgsConstructor
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
-    private final Label label;
-    private final TextField userNameTextField;
-    private final PasswordField passwordField;
+    private Label label;
+    private TextField userNameTextField;
+    private PasswordField passwordField;
 
-    @Autowired
-    private AuthenticationManager authManager;
+    private final AuthenticationManager authManager;
 
-    @Autowired
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
-    private final IndexingProgress indexingProgress;
+    private final Environment environment;
 
-    LoginView(@Autowired IndexingProgress indexingProgress,
-              @Autowired Environment environment,
-              @Value("${figurearchive.admin-password:null}") String password) {
-        this.indexingProgress = indexingProgress;
+    @Value("${figurearchive.admin-password}")
+    private String defaultPassword;
 
+    private final LuceneIndexConfig.CustomProgressMonitor customProgressMonitor;
+
+    @PostConstruct
+    public void init() {
         label = new Label("F I G U R E A R C H I V E");
 
         userNameTextField = new TextField();
@@ -55,7 +60,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         if ("local".equals(environment.getActiveProfiles()[0])) {
             userNameTextField.setValue("admin");
-            passwordField.setValue(password);
+            passwordField.setValue(defaultPassword);
         }
 
         passwordField.addKeyDownListener(Key.ENTER, (ComponentEventListener<KeyDownEvent>) keyDownEvent -> authenticateAndNavigate());
@@ -72,11 +77,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.getElement().getStyle().set("height", "100%");
         this.getElement().getStyle().set("justify-content", "center");
 
-    }
-
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        indexingProgress.open();
+        addAttachListener(e -> {
+            if (!customProgressMonitor.isDone()) {
+                e.getUI().navigate("wait");
+            }
+        });
     }
 
     private void authenticateAndNavigate() {
@@ -86,11 +91,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(auth);
 
-            HttpSession session = request.getSession(false);
-            DefaultSavedRequest savedRequest = (DefaultSavedRequest) session.getAttribute("SPRING_SECURITY_SAVED_REQUEST");
-            String requestedURI = savedRequest != null ? savedRequest.getRequestURI() : "/";
-
-            this.getUI().ifPresent(ui -> ui.navigate(StringUtils.removeStart(requestedURI, "/")));
+            this.getUI().ifPresent(ui -> ui.navigate(""));
         } catch (BadCredentialsException e) {
             label.setText("Invalid username or password. Please try again.");
         }
