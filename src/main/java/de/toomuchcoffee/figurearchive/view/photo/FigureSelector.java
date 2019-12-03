@@ -47,6 +47,7 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
         TextField tfSearchTerm = new TextField();
         tfSearchTerm.setPlaceholder("Search...");
+        tfSearchTerm.setClearButtonVisible(true);
         tfSearchTerm.setValueChangeMode(ValueChangeMode.EAGER);
         tfSearchTerm.addValueChangeListener(e -> availableFigures.update(isBlank(e.getValue()) ? newArrayList() : availableFigures(e.getValue())));
 

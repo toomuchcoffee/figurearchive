@@ -26,6 +26,7 @@ public class PhotoActionsPanel extends HorizontalLayout {
     public void init() {
         ComboBox<String> tagFilter = new ComboBox<>();
         tagFilter.setPlaceholder("Filter by Tag");
+        tagFilter.setClearButtonVisible(true);
         tagFilter.addValueChangeListener(e ->
                 eventBus.publish(this, new PhotoSearchEvent(e.getValue(), 0)));
 

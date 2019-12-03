@@ -2,6 +2,7 @@ package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -76,7 +77,14 @@ public class PhotoEditor extends FlexLayout {
 
         details = new VerticalLayout();
         details.setWidth("282px");
-        details.add(new Image(getImageUrl(this.photo, 250), "N/A"));
+        Image image = new Image(getImageUrl(this.photo, 250), "N/A");
+        image.addClickListener(imageClickEvent -> {
+            Dialog dialog = new Dialog();
+            dialog.add(new Image(getImageUrl(this.photo, 500), "N/A"));
+            dialog.add(new Button("Close", EXIT.create(), buttonClickEvent -> dialog.close()));
+            dialog.open();
+        });
+        details.add(image);
         String tagsString = Arrays.stream(this.photo.getTags())
                 .map(t -> "#" + t)
                 .collect(Collectors.joining(", "));

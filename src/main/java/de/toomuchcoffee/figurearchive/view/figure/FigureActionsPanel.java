@@ -45,6 +45,7 @@ public class FigureActionsPanel extends HorizontalLayout {
 
         tfVerbatimFilter = new TextField();
         tfVerbatimFilter.setPlaceholder("Filter by Verbatim");
+        tfVerbatimFilter.setClearButtonVisible(true);
         tfVerbatimFilter.setValueChangeMode(LAZY);
         tfVerbatimFilter.setValueChangeTimeout(500);
         tfVerbatimFilter.addValueChangeListener(e -> {

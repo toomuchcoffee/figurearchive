@@ -61,9 +61,7 @@ public class PhotoGallery extends FlexLayout {
                 update(figure);
                 close();
             });
-            Button close = new Button("Close", EXIT.create(), buttonClickEvent -> {
-                close();
-            });
+            Button close = new Button("Close", EXIT.create(), buttonClickEvent -> close());
             HorizontalLayout actions = new HorizontalLayout(remove, close);
             add(actions);
         }
