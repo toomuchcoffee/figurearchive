@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -46,6 +47,10 @@ public class PhotoEditor extends HorizontalLayout {
     @PostConstruct
     public void init() {
         add("No non completed Photos. Nothing to do...");
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
         photoService.anyNotCompleted().ifPresent(this::nextPhoto);
         eventBus.subscribe(this);
     }

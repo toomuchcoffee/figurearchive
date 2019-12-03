@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -51,12 +52,9 @@ public class FigureActionsPanel extends HorizontalLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
 
-        productLinesCount = figureService.getProductLineInfo();
         cbProductLineFilter = new ComboBox<>();
         cbProductLineFilter.setClearButtonVisible(true);
         cbProductLineFilter.setPlaceholder("Filter by Product Line");
-        cbProductLineFilter.setItems(Arrays.stream(ProductLine.values()).collect(toList()));
-        cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.getOrDefault(l, 0L)));
         cbProductLineFilter.addValueChangeListener(e -> {
             figureFilter.setProductLine(e.getValue());
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
@@ -72,6 +70,14 @@ public class FigureActionsPanel extends HorizontalLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
         addDetachListener(e -> eventBus.unsubscribe(this));
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        productLinesCount = figureService.getProductLineInfo();
+        cbProductLineFilter.setItems(Arrays.stream(ProductLine.values()).collect(toList()));
+        cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.getOrDefault(l, 0L)));
+
     }
 
     @EventBusListenerMethod
