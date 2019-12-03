@@ -1,19 +1,15 @@
 package de.toomuchcoffee.figurearchive.view;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyDownEvent;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -28,7 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-@UIScope
+@Push
 @RequiredArgsConstructor
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
@@ -45,8 +41,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     @Value("${figurearchive.admin-password}")
     private String defaultPassword;
-
-    private final LuceneIndexConfig.CustomProgressMonitor customProgressMonitor;
 
     @PostConstruct
     public void init() {
@@ -76,12 +70,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setAlignItems(Alignment.CENTER);
         this.getElement().getStyle().set("height", "100%");
         this.getElement().getStyle().set("justify-content", "center");
-
-        addAttachListener(e -> {
-            if (!customProgressMonitor.isDone()) {
-                e.getUI().navigate("wait");
-            }
-        });
     }
 
     private void authenticateAndNavigate() {
@@ -101,7 +89,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            beforeEnterEvent.rerouteTo("");
+            UI ui = beforeEnterEvent.getUI();
+            ui.access(() -> ui.navigate(""));
         }
     }
 }
