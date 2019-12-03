@@ -71,12 +71,12 @@ public class PhotoEditor extends FlexLayout {
         Button complete = new Button("Complete", CHECK.create(), e -> save(Action.COMPLETE));
         Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
         FormLayout actions = new FormLayout(skip, newFigureButton, save, complete);
-        actions.setMaxWidth("432px");
-        actions.setMaxWidth("432px");
+        actions.setMaxWidth("282px");
+        actions.setMaxWidth("282px");
 
         details = new VerticalLayout();
-        details.setWidth("432px");
-        details.add(new Image(getImageUrl(this.photo, 400), "N/A"));
+        details.setWidth("282px");
+        details.add(new Image(getImageUrl(this.photo, 250), "N/A"));
         String tagsString = Arrays.stream(this.photo.getTags())
                 .map(t -> "#" + t)
                 .collect(Collectors.joining(", "));

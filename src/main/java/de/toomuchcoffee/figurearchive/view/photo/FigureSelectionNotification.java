@@ -9,6 +9,7 @@ import com.vaadin.flow.server.StreamResource;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
+import static com.vaadin.flow.component.notification.Notification.Position.MIDDLE;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 class FigureSelectionNotification  {
@@ -31,6 +32,7 @@ class FigureSelectionNotification  {
         Notification notification = new Notification(s1, s2, s3, s4);
 
         notification.setDuration(5000);
+        notification.setPosition(MIDDLE);
         notification.open();
     }
 }

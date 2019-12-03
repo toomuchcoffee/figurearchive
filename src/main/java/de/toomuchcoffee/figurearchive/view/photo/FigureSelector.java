@@ -41,7 +41,7 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
     @PostConstruct
     public void init() {
         getContent().setHeightFull();
-        getContent().setWidth("432px");
+        getContent().setWidth("282px");
         FigureList availableFigures = new FigureList();
         FigureList selectedFigures = new FigureList();
 
