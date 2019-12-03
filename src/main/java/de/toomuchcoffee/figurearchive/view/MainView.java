@@ -12,7 +12,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -32,8 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
 
-@Push
-@Route
+@Route(layout = MyLayout.class)
 public class MainView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;

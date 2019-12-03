@@ -15,8 +15,9 @@ public class FigureList extends Grid<Figure> {
 
     public FigureList() {
         super(Figure.class);
-        setWidth("500px");
+        setWidth("400px");
         setHeightFull();
+        setMinHeight("250px");
         setColumns();
 
         addComponentColumn(f -> new Span(getDisplayName(f)));
@@ -28,6 +29,7 @@ public class FigureList extends Grid<Figure> {
 
     public void update(List<Figure> figures) {
         this.setItems(figures);
+        getElement().callJsFunction("_scrollToIndex", 0);
     }
 
     @SuppressWarnings("unchecked")

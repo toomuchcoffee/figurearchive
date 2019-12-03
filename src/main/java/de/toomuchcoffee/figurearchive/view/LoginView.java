@@ -4,7 +4,6 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -24,9 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-@Push
 @RequiredArgsConstructor
-@Route(value = "login")
+@Route(value = "login", layout = MyLayout.class)
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private Label label;
@@ -68,7 +66,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         add(label, userNameTextField, passwordField, submitButton);
 
         setAlignItems(Alignment.CENTER);
-        this.getElement().getStyle().set("height", "100%");
+        setHeightFull();
         this.getElement().getStyle().set("justify-content", "center");
     }
 

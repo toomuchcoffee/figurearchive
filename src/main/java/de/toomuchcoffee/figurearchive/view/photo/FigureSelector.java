@@ -12,9 +12,13 @@ import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static de.toomuchcoffee.figurearchive.util.FigureDisplayNameHelper.getDisplayName;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
@@ -36,6 +40,8 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
 
     @PostConstruct
     public void init() {
+        getContent().setHeightFull();
+        getContent().setWidth("432px");
         FigureList availableFigures = new FigureList();
         FigureList selectedFigures = new FigureList();
 
@@ -48,12 +54,16 @@ public class FigureSelector extends AbstractCompositeField<VerticalLayout, Figur
         getContent().add(availableFigures);
 
         selectedFigures.setHeader(new Label("Selected Figures"));
-        selectedFigures.asSingleSelect().addValueChangeListener(e ->
-                Optional.ofNullable(e.getValue()).ifPresent(v -> remove(this, v)));
+        selectedFigures.addItemClickListener(e -> {
+            remove(this, e.getItem());
+            FigureSelectionNotification.show("removed", getDisplayName(e.getItem()), getValue().size());
+        });
 
         availableFigures.setHeader(tfSearchTerm);
-        availableFigures.asSingleSelect().addValueChangeListener(e ->
-                Optional.ofNullable(e.getValue()).ifPresent(v -> add(this, v)));
+        availableFigures.addItemClickListener(e -> {
+            add(this, e.getItem());
+            FigureSelectionNotification.show("added", getDisplayName(e.getItem()), getValue().size());
+        });
 
         addValueChangeListener(e -> {
             selectedFigures.update(new ArrayList<>(getValue()));

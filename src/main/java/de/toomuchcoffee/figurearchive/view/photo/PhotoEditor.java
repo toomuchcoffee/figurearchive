@@ -2,8 +2,9 @@ package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
@@ -31,7 +32,7 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 @SpringComponent
 @UIScope
 @RequiredArgsConstructor
-public class PhotoEditor extends HorizontalLayout {
+public class PhotoEditor extends FlexLayout {
 
     private final PhotoService photoService;
     private final FigureSelector figureSelector;
@@ -46,7 +47,8 @@ public class PhotoEditor extends HorizontalLayout {
 
     @PostConstruct
     public void init() {
-        add("No non completed Photos. Nothing to do...");
+        setWrapMode(WrapMode.WRAP);
+        add("No non-completed Photos. Nothing to do...");
     }
 
     @Override
@@ -59,26 +61,22 @@ public class PhotoEditor extends HorizontalLayout {
         removeAll();
 
         this.photo = photo;
+
         binder = new Binder<>();
         binder.setBean(photo);
+        binder.bind(figureSelector, Photo::getFigures, Photo::setFigures);
 
         Button skip = new Button("Skip", FORWARD.create(), e -> save(Action.SKIP));
         Button save = new Button("Save Work", ENTER.create(), e -> save(Action.SAVE));
         Button complete = new Button("Complete", CHECK.create(), e -> save(Action.COMPLETE));
-
         Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
+        FormLayout actions = new FormLayout(skip, newFigureButton, save, complete);
+        actions.setMaxWidth("432px");
+        actions.setMaxWidth("432px");
 
         details = new VerticalLayout();
-        details.setWidthFull();
-
-        HorizontalLayout actions = new HorizontalLayout(skip, newFigureButton, save, complete);
-        VerticalLayout verticalLayout = new VerticalLayout(details, actions);
-        add(verticalLayout, figureSelector);
-
-        binder.bind(figureSelector, Photo::getFigures, Photo::setFigures);
-
-        details.removeAll();
-        details.add(new Image(getImageUrl(this.photo, 500), "N/A"));
+        details.setWidth("432px");
+        details.add(new Image(getImageUrl(this.photo, 400), "N/A"));
         String tagsString = Arrays.stream(this.photo.getTags())
                 .map(t -> "#" + t)
                 .collect(Collectors.joining(", "));
@@ -87,6 +85,8 @@ public class PhotoEditor extends HorizontalLayout {
         tagsArea.setWidth("100%");
         tagsArea.setEnabled(false);
         details.add(tagsArea);
+
+        add(details, figureSelector, actions);
     }
 
     private enum Action {
