@@ -27,7 +27,7 @@ public class PhotoGallery extends FlexLayout {
 
         Set<Photo> photos = figure.getPhotos();
 
-        int rowSize = 5;
+        int rowSize = 3;
         int colSize = (int) Math.ceil(((double) photos.size()) / ((double) rowSize));
 
         setWrapMode(FlexLayout.WrapMode.WRAP);

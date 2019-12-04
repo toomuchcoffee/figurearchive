@@ -5,8 +5,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -18,6 +19,7 @@ import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
+import de.toomuchcoffee.figurearchive.view.controls.ScrollableLayout;
 import de.toomuchcoffee.figurearchive.view.photo.FigureList;
 import lombok.RequiredArgsConstructor;
 import org.vaadin.spring.events.EventBus;
@@ -28,6 +30,7 @@ import java.util.stream.IntStream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
@@ -42,9 +45,6 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private final PhotoService photoService;
     private final EventBus.SessionEventBus eventBus;
 
-    private PhotoGallery photoGallery;
-    private final FigureList similarFigures = new FigureList();
-
     private Figure figure;
 
     private TextField tfVerbatim = new TextField(null, "Verbatim");
@@ -55,31 +55,27 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private Button save = new Button("Save", CHECK.create(), e -> save());
     private Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
     private Button delete = new Button("Delete", TRASH.create(), e -> delete());
-    private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+    private FormLayout actions = new FormLayout(save, cancel, delete);
+    private VerticalLayout context = new ScrollableLayout();
 
     private Binder<Figure> binder;
 
     @PostConstruct
     public void init() {
-        VerticalLayout wrapper = new VerticalLayout();
-        wrapper.setHeight("400px");
+        FlexLayout wrapper = new FlexLayout();
+        wrapper.setWrapMode(WRAP);
         add(wrapper);
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setHeightFull();
-        wrapper.add(horizontalLayout);
-        FormLayout attributes = new FormLayout();
-        attributes.setMinWidth("100px");
-        attributes.setMaxWidth("200px");
-        attributes.add(tfVerbatim, cbLine, cbYear, tfPlacementNo);
-        photoGallery = new PhotoGallery(photoService);
-        horizontalLayout.add(attributes, photoGallery, similarFigures);
-        photoGallery.setVisible(false);
-        similarFigures.setVisible(false);
-        similarFigures.setHeader(new Label("Similar Existing Figures"));
-        wrapper.add(actions);
+
+        Div attributes = new Div();
+        FormLayout form = new FormLayout();
+        attributes.add(form);
+        attributes.setWidth("282px");
+        form.add(tfVerbatim, cbLine, cbYear, tfPlacementNo);
+
+        context.setWidth("282px");
+        wrapper.add(attributes, context, actions);
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
-        tfVerbatim.addValueChangeListener(e -> similarFigures.update(isBlank(e.getValue()) ? newArrayList() : similarFigures(e.getValue())));
 
         cbYear.setPlaceholder("Year");
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
@@ -119,9 +115,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private void resetAndClose() {
         this.figure = null;
-        this.binder.removeBean();
-        photoGallery.setVisible(false);
-        similarFigures.setVisible(false);
+        binder.removeBean();
+        context.removeAll();
         close();
     }
 
@@ -129,9 +124,10 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         open();
         this.figure = new Figure();
         binder.setBean(this.figure);
-        photoGallery.update(figure);
-        photoGallery.setVisible(false);
-        similarFigures.setVisible(true);
+        FigureList similarFigures = new FigureList();
+        similarFigures.setHeader(new Span("Similar Existing Figures"));
+        context.add(similarFigures);
+        tfVerbatim.addValueChangeListener(e -> similarFigures.update(isBlank(e.getValue()) ? newArrayList() : similarFigures(e.getValue())));
         tfVerbatim.focus();
     }
 
@@ -139,9 +135,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         open();
         this.figure = figure;
         binder.setBean(this.figure);
+        PhotoGallery photoGallery = new PhotoGallery(photoService);
         photoGallery.update(figure);
-        photoGallery.setVisible(true);
-        similarFigures.setVisible(false);
+        context.add(photoGallery);
         tfVerbatim.focus();
     }
 

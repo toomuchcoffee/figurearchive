@@ -15,7 +15,8 @@ public class FigureList extends Grid<Figure> {
 
     public FigureList() {
         super(Figure.class);
-        setWidth("250px");
+        setMinWidth("250px");
+        setMaxWidth("250px");
         setHeightFull();
         setMinHeight("250px");
         setColumns();

@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -19,11 +20,13 @@ import de.toomuchcoffee.figurearchive.service.PhotoService;
 import de.toomuchcoffee.figurearchive.util.ValueSetHelper;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
@@ -54,11 +57,19 @@ public class PhotoEditor extends FlexLayout {
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        photoService.anyNotCompleted().ifPresent(this::nextPhoto);
+        nextPhoto();
         eventBus.subscribe(this);
     }
 
-    private void nextPhoto(Photo photo) {
+    private void nextPhoto() {
+        Pair<Optional<Photo>, Integer> next = photoService.anyNotCompleted();
+        next.getLeft().ifPresent(photo -> {
+            update(photo);
+            Notification.show(next.getRight() + " non-completed photos remaining.", 3000, Notification.Position.TOP_CENTER);
+        });
+    }
+
+    private void update(Photo photo) {
         removeAll();
 
         this.photo = photo;
@@ -123,7 +134,7 @@ public class PhotoEditor extends FlexLayout {
         details.removeAll();
         this.photo = null;
         binder.removeBean();
-        photoService.anyNotCompleted().ifPresent(this::nextPhoto);
+        nextPhoto();
     }
 
     @EventBusListenerMethod

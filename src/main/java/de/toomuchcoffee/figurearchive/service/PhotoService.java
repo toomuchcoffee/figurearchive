@@ -11,6 +11,7 @@ import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.PhotoArchiveRepository;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.tuple.ImmutablePair.of;
 
 @EventBusProxy
 @VaadinSessionScope
@@ -52,13 +54,13 @@ public class PhotoService {
     }
 
     @LogExecutionTime
-    public Optional<Photo> anyNotCompleted() {
+    public Pair<Optional<Photo>, Integer> anyNotCompleted() {
         List<Long> ids = photoRepository.getIdsOfNotCompleted();
         if (ids.isEmpty()) {
-            return Optional.empty();
+            return of(Optional.empty(), 0);
         }
         Long id = ids.get(random.nextInt(ids.size()));
-        return photoRepository.findById(id);
+        return of(photoRepository.findById(id), ids.size());
     }
 
     @LogExecutionTime
