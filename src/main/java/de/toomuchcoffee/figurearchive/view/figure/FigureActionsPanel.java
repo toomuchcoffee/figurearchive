@@ -2,7 +2,7 @@ package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -23,13 +23,14 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static java.util.stream.Collectors.toList;
 
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class FigureActionsPanel extends HorizontalLayout {
+public class FigureActionsPanel extends FlexLayout {
 
     private final EventBus.SessionEventBus eventBus;
     private final FigureQueryInfo figureQueryInfo;
@@ -41,6 +42,7 @@ public class FigureActionsPanel extends HorizontalLayout {
 
     @PostConstruct
     public void init() {
+        setWrapMode(WRAP);
         FigureFilter figureFilter = new FigureFilter();
 
         tfVerbatimFilter = new TextField();

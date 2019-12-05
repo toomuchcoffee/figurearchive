@@ -30,6 +30,7 @@ public class PaginationTabs<R extends PaginationTabs.SearchResultEvent, S extend
             int pages = (int) Math.ceil((double) event.getCount() / (double) event.getSize());
             if (pages > 0) {
                 tabs = new Tabs();
+                tabs.setMaxWidth("282px");
                 add(tabs);
                 IntStream.range(0, pages).forEach(i -> tabs.add(new Tab(String.valueOf(i + 1))));
                 tabs.setSelectedIndex(0);

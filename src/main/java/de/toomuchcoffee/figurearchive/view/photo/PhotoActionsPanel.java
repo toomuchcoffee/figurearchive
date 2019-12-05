@@ -1,7 +1,7 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchEvent;
@@ -13,10 +13,12 @@ import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
+
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class PhotoActionsPanel extends HorizontalLayout {
+public class PhotoActionsPanel extends FlexLayout {
 
     private final PhotoService photoService;
     private final EventBus.SessionEventBus eventBus;
@@ -24,6 +26,7 @@ public class PhotoActionsPanel extends HorizontalLayout {
 
     @PostConstruct
     public void init() {
+        setWrapMode(WRAP);
         ComboBox<String> tagFilter = new ComboBox<>();
         tagFilter.setPlaceholder("Filter by Tag");
         tagFilter.setClearButtonVisible(true);

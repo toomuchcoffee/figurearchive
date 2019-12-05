@@ -84,7 +84,6 @@ public class PhotoEditor extends FlexLayout {
         Button newFigureButton = new Button("New Figure", PLUS.create(), e -> figureEditor.createFigure());
         FormLayout actions = new FormLayout(skip, newFigureButton, save, complete);
         actions.setMaxWidth("282px");
-        actions.setMaxWidth("282px");
 
         details = new VerticalLayout();
         details.setWidth("282px");
