@@ -10,12 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface FigureRepository extends JpaRepository<Figure, Long> {
-    Page<Figure> findByVerbatimContainingIgnoreCase(String verbatim, Pageable pageable);
-    long countByVerbatimContainingIgnoreCase(String verbatim);
     Page<Figure> findByProductLine(ProductLine productLine, Pageable pageable);
     long countByProductLine(ProductLine productLine);
-    Page<Figure> findByVerbatimContainingIgnoreCaseAndProductLine(String verbatim, ProductLine productLine, Pageable pageable);
-    long countByVerbatimContainingIgnoreCaseAndProductLine(String verbatim, ProductLine productLine);
 
     @Query("SELECT f.productLine, count(f) " +
             "FROM Figure f " +

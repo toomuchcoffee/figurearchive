@@ -1,0 +1,1 @@
+CREATE INDEX idx_figure_product_line ON figure(product_line);

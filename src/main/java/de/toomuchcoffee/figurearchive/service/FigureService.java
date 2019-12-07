@@ -8,7 +8,6 @@ import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -22,7 +21,9 @@ import org.vaadin.spring.events.annotation.EventBusProxy;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @EventBusProxy
 @VaadinSessionScope
@@ -63,12 +64,19 @@ public class FigureService {
         long count;
         Pageable pageable = PageRequest.of(page, size);
         if (filter != null) {
-            if (!StringUtils.isBlank(filter.getFilterText()) && filter.getProductLine() != null) {
-                count = figureRepository.countByVerbatimContainingIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine());
-                figures = figureRepository.findByVerbatimContainingIgnoreCaseAndProductLine(filter.getFilterText(), filter.getProductLine(), pageable).getContent();
-            } else if (!StringUtils.isBlank(filter.getFilterText())) {
-                count = figureRepository.countByVerbatimContainingIgnoreCase(filter.getFilterText());
-                figures = figureRepository.findByVerbatimContainingIgnoreCase(filter.getFilterText(), pageable).getContent();
+            if (!isBlank(filter.getFilterText())) {
+                List<Figure> fetch;
+                if (filter.getProductLine() != null) {
+                    fetch = fuzzySearch(filter.getFilterText()).stream()
+                            .filter(figure -> filter.getProductLine().equals(figure.getProductLine()))
+                            .collect(toList());
+                } else {
+                    fetch = fuzzySearch(filter.getFilterText());
+                }
+                count = fetch.size();
+                int startIndex = page * size;
+                int endIndex = Math.min(startIndex + size, fetch.size());
+                figures = fetch.subList(startIndex, endIndex);
             } else if (filter.getProductLine() != null) {
                 count = figureRepository.countByProductLine(filter.getProductLine());
                 figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
