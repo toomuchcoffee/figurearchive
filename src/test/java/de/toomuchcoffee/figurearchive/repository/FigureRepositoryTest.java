@@ -34,7 +34,7 @@ public class FigureRepositoryTest {
 
     @Test
     public void findsAll() {
-        Figure figure = new Figure(null, "Jawa", KENNER, "10012", (short) 1977, newHashSet());
+        Figure figure = new Figure(null, "Jawa", KENNER, "10012", (short) 1977, newHashSet(), 0);
         figureRepository.save(figure);
         List<Figure> figures = figureRepository.findAll();
         assertThat(figures).hasSize(1);
@@ -46,7 +46,7 @@ public class FigureRepositoryTest {
         photoRepository.save(new Photo());
         List<Photo> photos = photoRepository.findAll();
 
-        Figure figure = new Figure(null, "Jawa", KENNER, "10012", (short) 1977, newHashSet(photos));
+        Figure figure = new Figure(null, "Jawa", KENNER, "10012", (short) 1977, newHashSet(photos), 0);
         Figure save = figureRepository.save(figure);
 
         Optional<Figure> byId = figureRepository.findById(save.getId());
@@ -57,10 +57,10 @@ public class FigureRepositoryTest {
     @Test
     public void getProductLineCounts() {
         figureRepository.saveAll(newArrayList(
-                new Figure(null, "Jawa", KENNER, null, null, newHashSet()),
-                new Figure(null, "Sand People", KENNER, null, null, newHashSet()),
-                new Figure(null, "Tarkin", POTF2, null, null, newHashSet()),
-                new Figure(null, "Anakin", null, null, null, newHashSet())
+                new Figure(null, "Jawa", KENNER, null, null, newHashSet(), 0),
+                new Figure(null, "Sand People", KENNER, null, null, newHashSet(), 0),
+                new Figure(null, "Tarkin", POTF2, null, null, newHashSet(), 0),
+                new Figure(null, "Anakin", null, null, null, newHashSet(), 0)
         ));
 
         List<Object[]> productLineCounts = figureRepository.getProductLineCounts();

@@ -46,6 +46,8 @@ public class Figure implements Serializable {
     private Short year;
     @ManyToMany(mappedBy = "figures", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
     private Set<Photo> photos = new HashSet<>();
+    @Column(name = "figure_count")
+    private int count;
 
     public static class EnumStringBridge implements StringBridge {
         @Override

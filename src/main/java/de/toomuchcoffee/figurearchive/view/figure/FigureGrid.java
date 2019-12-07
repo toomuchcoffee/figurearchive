@@ -31,7 +31,7 @@ public class FigureGrid extends Grid<Figure> {
         addItemClickListener(e -> figureEditor.editFigure(e.getItem()));
 
         setPageSize(properties.getFigures().getPageSize());
-        setColumns("placementNo", "verbatim", "productLine", "year");
+        setColumns("placementNo", "verbatim", "productLine", "year", "count");
         addColumn((ValueProvider<Figure, Integer>) figure -> figure.getPhotos().size())
                 .setSortable(true)
                 .setHeader("Nr. of Photos");

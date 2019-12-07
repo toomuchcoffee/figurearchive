@@ -1,0 +1,1 @@
+ALTER TABLE figure ADD figure_count INTEGER default 0;

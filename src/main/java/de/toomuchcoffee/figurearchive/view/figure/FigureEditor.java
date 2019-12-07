@@ -8,9 +8,11 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -47,16 +49,14 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private Figure figure;
 
-    private TextField tfVerbatim = new TextField(null, "Verbatim");
-    private TextField tfPlacementNo = new TextField(null, "Placement No.");
-    private ComboBox<Short> cbYear = new ComboBox<>();
-    private ComboBox<ProductLine> cbLine = new ComboBox<>();
+    private TextField tfVerbatim;
+
+    private VerticalLayout context;
 
     private Button save = new Button("Save", CHECK.create(), e -> save());
     private Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
     private Button delete = new Button("Delete", TRASH.create(), e -> delete());
-    private FormLayout actions = new FormLayout(save, cancel, delete);
-    private VerticalLayout context = new ScrollableLayout();
+    private FormLayout actions;
 
     private Binder<Figure> binder;
 
@@ -70,9 +70,24 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         FormLayout form = new FormLayout();
         attributes.add(form);
         attributes.setWidth("282px");
-        form.add(tfVerbatim, cbLine, cbYear, tfPlacementNo);
 
+        tfVerbatim = new TextField(null, "Verbatim");
+        ComboBox<ProductLine> cbLine = new ComboBox<>();
+        ComboBox<Short> cbYear = new ComboBox<>();
+        TextField tfPlacementNo = new TextField(null, "Placement No.");
+        TextField tfCount = new TextField(null, "count");
+        tfCount.setWidth("20%");
+        tfCount.setEnabled(false);
+        HorizontalLayout count = new HorizontalLayout(
+                new Button(ARROW_CIRCLE_LEFT.create(), e -> decreaseCount(tfCount)),
+                tfCount,
+                new Button(ARROW_CIRCLE_RIGHT.create(), e -> increaseCount(tfCount)));
+        form.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, count);
+
+        context = new ScrollableLayout();
         context.setWidth("282px");
+
+        actions = new FormLayout();
         wrapper.add(attributes, context, actions);
 
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
@@ -86,10 +101,29 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         cbLine.setClearButtonVisible(true);
 
         binder = new Binder<>();
-        binder.bind(tfVerbatim, Figure::getVerbatim, Figure::setVerbatim);
-        binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
+        binder.forField(tfVerbatim)
+                .asRequired()
+                .bind(Figure::getVerbatim, Figure::setVerbatim);
+        binder.forField(cbLine)
+                .asRequired()
+                .bind(Figure::getProductLine, Figure::setProductLine);
         binder.bind(cbYear, Figure::getYear, Figure::setYear);
-        binder.bind(cbLine, Figure::getProductLine, Figure::setProductLine);
+        binder.bind(tfPlacementNo, Figure::getPlacementNo, Figure::setPlacementNo);
+        binder.forField(tfCount)
+                .withConverter(new StringToIntegerConverter("Not a number!"))
+                .bind(Figure::getCount, Figure::setCount);
+    }
+
+    private void increaseCount(TextField tf) {
+        Integer current = Integer.valueOf(tf.getValue());
+        tf.setValue(String.valueOf(current + 1));
+    }
+
+    private void decreaseCount(TextField tf) {
+        Integer current = Integer.valueOf(tf.getValue());
+        if (current > 0) {
+            tf.setValue(String.valueOf(current - 1));
+        }
     }
 
     private List<Figure> similarFigures(String query) {
@@ -101,16 +135,17 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private void delete() {
         figureService.delete(figure);
         eventBus.publish(this, new FigureChangedEvent(figure, DELETED));
-
         resetAndClose();
     }
 
     private void save() {
-        boolean isNew = figure.getId() == null;
-        figureService.save(figure);
-        eventBus.publish(this, new FigureChangedEvent(figure, isNew ? CREATED : UPDATED));
-
-        resetAndClose();
+        binder.validate();
+        if (binder.isValid()) {
+            boolean isNew = figure.getId() == null;
+            figureService.save(figure);
+            eventBus.publish(this, new FigureChangedEvent(figure, isNew ? CREATED : UPDATED));
+            resetAndClose();
+        }
     }
 
     private void resetAndClose() {
@@ -127,6 +162,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         FigureList similarFigures = new FigureList();
         similarFigures.setHeader(new Span("Similar Existing Figures"));
         context.add(similarFigures);
+        actions.add(save, cancel);
         tfVerbatim.addValueChangeListener(e -> similarFigures.update(isBlank(e.getValue()) ? newArrayList() : similarFigures(e.getValue())));
         tfVerbatim.focus();
     }
@@ -138,6 +174,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         PhotoGallery photoGallery = new PhotoGallery(photoService);
         photoGallery.update(figure);
         context.add(photoGallery);
+        actions.add(save, cancel, delete);
         tfVerbatim.focus();
     }
 
