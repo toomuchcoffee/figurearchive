@@ -52,7 +52,6 @@ public class PhotoEditor extends FlexLayout {
     @PostConstruct
     public void init() {
         setWrapMode(WrapMode.WRAP);
-        add("No non-completed Photos. Nothing to do...");
     }
 
     @Override
@@ -63,10 +62,18 @@ public class PhotoEditor extends FlexLayout {
 
     private void nextPhoto() {
         Pair<Optional<Photo>, Integer> next = photoService.anyNotCompleted();
-        next.getLeft().ifPresent(photo -> {
-            update(photo);
+        Optional<Photo> nextPhoto = next.getLeft();
+        if (nextPhoto.isPresent()) {
+            update(nextPhoto.get());
             Notification.show(next.getRight() + " non-completed photos remaining.", 3000, Notification.Position.TOP_CENTER);
-        });
+        } else {
+            nothingToDo();
+        }
+    }
+
+    private void nothingToDo() {
+        removeAll();
+        add("No non-completed Photos. Nothing to do...");
     }
 
     private void update(Photo photo) {
