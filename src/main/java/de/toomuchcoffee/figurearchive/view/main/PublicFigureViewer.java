@@ -29,11 +29,12 @@ public class PublicFigureViewer extends Dialog {
         Label count = new Label(figure.getCount() + " figure(s)");
         fields.add(verbatim, productLine, year, placementNo, count);
 
-        ScrollableLayout context = new ScrollableLayout();
-        context.setWidth("282px");
-
+        ScrollableLayout scrollableLayout = new ScrollableLayout();
+        scrollableLayout.setWidth("282px");
         PublicPhotoGallery publicPhotoGallery = new PublicPhotoGallery(figure);
-        wrapper.add(attributes, publicPhotoGallery);
+        scrollableLayout.add(publicPhotoGallery);
+
+        wrapper.add(attributes, scrollableLayout);
     }
 
 }
