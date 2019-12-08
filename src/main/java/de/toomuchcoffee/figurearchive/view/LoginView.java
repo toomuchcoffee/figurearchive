@@ -21,7 +21,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 @Route(value = "login", layout = MyLayout.class)
@@ -32,8 +31,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private PasswordField passwordField;
 
     private final AuthenticationManager authManager;
-
-    private final HttpServletRequest request;
 
     private final Environment environment;
 
@@ -77,7 +74,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(auth);
 
-            this.getUI().ifPresent(ui -> ui.navigate(""));
+            this.getUI().ifPresent(ui -> ui.navigate("admin"));
         } catch (BadCredentialsException e) {
             label.setText("Invalid username or password. Please try again.");
         }
@@ -88,7 +85,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             UI ui = beforeEnterEvent.getUI();
-            ui.access(() -> ui.navigate(""));
+            ui.access(() -> ui.navigate("admin"));
         }
     }
 }

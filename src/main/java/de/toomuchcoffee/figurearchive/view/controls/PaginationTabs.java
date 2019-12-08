@@ -10,13 +10,13 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import java.util.stream.IntStream;
 
 public class PaginationTabs<R extends PaginationTabs.SearchResultEvent, S extends PaginationTabs.SearchEvent, F> extends Div {
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
     private final Class<R> searchResultEventType;
     private final Class<S> searchEventType;
 
     private Tabs tabs;
 
-    public PaginationTabs(EventBus.SessionEventBus eventBus, Class<R> searchResultEventType, Class<S> searchEventType) {
+    public PaginationTabs(EventBus.UIEventBus eventBus, Class<R> searchResultEventType, Class<S> searchEventType) {
         this.eventBus = eventBus;
         this.searchEventType = searchEventType;
         this.searchResultEventType = searchResultEventType;

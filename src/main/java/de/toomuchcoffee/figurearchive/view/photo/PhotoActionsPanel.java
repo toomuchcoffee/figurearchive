@@ -21,7 +21,7 @@ import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 public class PhotoActionsPanel extends FlexLayout {
 
     private final PhotoService photoService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     @PostConstruct
     public void init() {

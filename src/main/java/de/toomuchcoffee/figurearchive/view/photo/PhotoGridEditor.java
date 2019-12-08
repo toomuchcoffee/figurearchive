@@ -33,7 +33,7 @@ import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 public class PhotoGridEditor extends Dialog implements KeyNotifier {
 
     private final PhotoService photoService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     private Photo photo;
 

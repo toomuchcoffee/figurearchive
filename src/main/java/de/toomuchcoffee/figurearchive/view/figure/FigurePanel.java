@@ -19,7 +19,7 @@ public class FigurePanel extends VerticalLayout {
     private final FigureActionsPanel figureActionsPanel;
     private final FigureEditor figureEditor;
     private final FigureService figureService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     @PostConstruct
     public void init() {

@@ -45,7 +45,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private final FigureService figureService;
     private final PhotoService photoService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     private Figure figure;
 

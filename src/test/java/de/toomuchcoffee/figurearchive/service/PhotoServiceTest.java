@@ -29,7 +29,7 @@ public class PhotoServiceTest {
     private PhotoRepository photoRepository;
 
     @MockBean
-    private EventBus.SessionEventBus eventBus;
+    private EventBus.UIEventBus eventBus;
 
     private PhotoService photoService;
 

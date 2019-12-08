@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,10 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().logout().logoutSuccessUrl("/")
                 .and()
                 .authorizeRequests()
-                .regexMatchers("/frontend/.*", "/VAADIN/.*", "/login.*", "/accessDenied").permitAll() // allow Vaadin URLs and the login URL without authentication
-                .regexMatchers(HttpMethod.POST, "/\\?v-r=.*").permitAll()
-                // deny any other URL until authenticated
-                .antMatchers("/**").fullyAuthenticated()
+                .antMatchers("/admin").authenticated()
+                .antMatchers("/**").permitAll();
         ;
     }
 

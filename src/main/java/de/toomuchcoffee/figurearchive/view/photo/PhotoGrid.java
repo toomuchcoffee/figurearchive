@@ -29,7 +29,7 @@ public class PhotoGrid extends Grid<Photo> {
     private final PhotoService photoService;
 
     PhotoGrid(
-            EventBus.SessionEventBus eventBus,
+            EventBus.UIEventBus eventBus,
             PhotoService photoService,
             ConfigProperties properties,
             PhotoGridEditor photoGridEditor) {

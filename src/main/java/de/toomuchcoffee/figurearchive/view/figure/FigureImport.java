@@ -25,7 +25,7 @@ import static com.vaadin.flow.component.notification.Notification.Position.MIDDL
 @RequiredArgsConstructor
 public class FigureImport extends Upload {
     private final ImportService importService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     @PostConstruct
     public void init() {

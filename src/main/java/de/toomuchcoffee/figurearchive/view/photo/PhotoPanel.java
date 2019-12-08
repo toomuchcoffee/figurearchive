@@ -19,7 +19,7 @@ public class PhotoPanel extends VerticalLayout {
     private final PhotoActionsPanel photoActionsPanel;
     private final PhotoGridEditor photoGridEditor;
     private final PhotoService photoService;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     @PostConstruct
     public void init() {

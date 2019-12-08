@@ -1,4 +1,4 @@
-package de.toomuchcoffee.figurearchive.view.figure;
+package de.toomuchcoffee.figurearchive.view.main;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -6,7 +6,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
-import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
 import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
 import de.toomuchcoffee.figurearchive.event.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
@@ -29,7 +28,7 @@ import static java.util.stream.Collectors.toList;
 @UIScope
 @SpringComponent
 @RequiredArgsConstructor
-public class FigureActionsPanel extends FlexLayout {
+public class PublicFigureActionsPanel extends FlexLayout {
 
     private final EventBus.UIEventBus eventBus;
     private final FigureService figureService;
@@ -74,12 +73,6 @@ public class FigureActionsPanel extends FlexLayout {
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });
         addDetachListener(e -> eventBus.unsubscribe(this));
-    }
-
-    @EventBusListenerMethod
-    public void update(FigureChangedEvent event) {
-        productLinesCount = figureService.getProductLineInfo();
-        cbProductLineFilter.getDataProvider().refreshAll();
     }
 
     @EventBusListenerMethod

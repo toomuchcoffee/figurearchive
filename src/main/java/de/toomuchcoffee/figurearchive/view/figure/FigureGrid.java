@@ -26,7 +26,7 @@ public class FigureGrid extends Grid<Figure> {
     private final FigureService figureService;
 
     public FigureGrid(
-            EventBus.SessionEventBus eventBus,
+            EventBus.UIEventBus eventBus,
             FigureService figureService,
             ConfigProperties properties,
             FigureEditor figureEditor) {

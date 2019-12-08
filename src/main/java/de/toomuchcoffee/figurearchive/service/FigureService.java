@@ -31,7 +31,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class FigureService {
     private final FigureRepository figureRepository;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
     private final FullTextEntityManager fullTextEntityManager;
 
     @LogExecutionTime

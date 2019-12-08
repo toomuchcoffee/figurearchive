@@ -34,7 +34,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final PhotoArchiveRepository photoArchiveRepository;
 
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
 
     private final Random random = new Random();
 

@@ -40,7 +40,7 @@ public class PhotoEditor extends FlexLayout {
 
     private final PhotoService photoService;
     private final FigureSelector figureSelector;
-    private final EventBus.SessionEventBus eventBus;
+    private final EventBus.UIEventBus eventBus;
     private final FigureEditor figureEditor;
 
     private Photo photo;
