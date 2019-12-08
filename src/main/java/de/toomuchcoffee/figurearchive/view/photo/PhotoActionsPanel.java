@@ -22,7 +22,6 @@ public class PhotoActionsPanel extends FlexLayout {
 
     private final PhotoService photoService;
     private final EventBus.SessionEventBus eventBus;
-    private final PhotoQueryInfo photoQueryInfo;
 
     @PostConstruct
     public void init() {
@@ -36,7 +35,7 @@ public class PhotoActionsPanel extends FlexLayout {
         PaginationTabs pagination = new PaginationTabs<PhotoSearchResultEvent, PhotoSearchEvent, String>(
                 eventBus, PhotoSearchResultEvent.class, PhotoSearchEvent.class);
 
-        add(tagFilter, pagination, photoQueryInfo);
+        add(tagFilter, pagination);
 
         addAttachListener(e -> {
             tagFilter.setItems(photoService.getAllTags());

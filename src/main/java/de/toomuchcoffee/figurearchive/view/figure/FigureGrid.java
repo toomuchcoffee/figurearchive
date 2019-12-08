@@ -1,6 +1,7 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.ValueProvider;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
@@ -8,6 +9,7 @@ import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
 import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
 import de.toomuchcoffee.figurearchive.event.FigureSearchEvent;
+import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -15,6 +17,8 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static com.vaadin.flow.component.notification.Notification.Position.TOP_CENTER;
 
 public class FigureGrid extends Grid<Figure> {
     private static final int PAGE_SIZE = 100;
@@ -44,6 +48,11 @@ public class FigureGrid extends Grid<Figure> {
     @EventBusListenerMethod
     public void update(FigureSearchEvent event) {
         setItems(figureService.findFigures(event.getPage(), PAGE_SIZE, event.getFilter()));
+    }
+
+    @EventBusListenerMethod
+    public void update(FigureSearchResultEvent event) {
+        Notification.show(event.getCount() + " figures found!", 5000, TOP_CENTER);
     }
 
     @EventBusListenerMethod

@@ -33,7 +33,6 @@ import static java.util.stream.Collectors.toList;
 public class FigureActionsPanel extends FlexLayout {
 
     private final EventBus.SessionEventBus eventBus;
-    private final FigureQueryInfo figureQueryInfo;
     private final FigureService figureService;
 
     private ComboBox<ProductLine> cbProductLineFilter;
@@ -66,7 +65,7 @@ public class FigureActionsPanel extends FlexLayout {
         PaginationTabs pagination = new PaginationTabs<FigureSearchResultEvent, FigureSearchEvent, FigureFilter>(
                 eventBus, FigureSearchResultEvent.class, FigureSearchEvent.class);
 
-        add(tfVerbatimFilter, cbProductLineFilter, pagination, figureQueryInfo);
+        add(tfVerbatimFilter, cbProductLineFilter, pagination);
 
         addAttachListener(e -> {
             eventBus.subscribe(this);
