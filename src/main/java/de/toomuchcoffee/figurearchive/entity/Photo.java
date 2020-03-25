@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -37,7 +38,7 @@ public class Photo implements Serializable {
     @Type(type = "string-array")
     @Column(columnDefinition = "text[]")
     private String[] tags;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE, REFRESH})
     @JoinTable(
             name = "figure_to_photo",
             joinColumns = {@JoinColumn(name = "photo_id")},
