@@ -55,7 +55,6 @@ public class FigureService {
                 .onFields("verbatim" , "productLine", "placementNo")
                 .matching(searchTerm).createQuery();
 
-        fullTextEntityManager.flush();
         return fullTextEntityManager.createFullTextQuery(luceneQuery, Figure.class).getResultList();
     }
 
