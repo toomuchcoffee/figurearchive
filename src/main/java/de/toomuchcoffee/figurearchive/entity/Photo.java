@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+import org.hibernate.search.annotations.ContainedIn;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class Photo implements Serializable {
     @Type(type = "string-array")
     @Column(columnDefinition = "text[]")
     private String[] tags;
+    @ContainedIn
     @ManyToMany(fetch = FetchType.EAGER, cascade = {MERGE, REFRESH})
     @JoinTable(
             name = "figure_to_photo",

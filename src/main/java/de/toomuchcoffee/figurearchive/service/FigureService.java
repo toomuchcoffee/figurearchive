@@ -37,7 +37,6 @@ public class FigureService {
     @LogExecutionTime
     public void save(Figure figure) {
         figureRepository.save(figure);
-        fullTextEntityManager.refresh(figure);
     }
 
     @LogExecutionTime
