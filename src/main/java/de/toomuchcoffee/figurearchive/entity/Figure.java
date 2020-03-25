@@ -44,6 +44,7 @@ public class Figure implements Serializable {
     private String placementNo;
     @Column(name = "year_released")
     private Short year;
+    @IndexedEmbedded
     @ManyToMany(mappedBy = "figures", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
     private Set<Photo> photos = new HashSet<>();
     @Column(name = "figure_count")
