@@ -12,6 +12,7 @@ import de.toomuchcoffee.figurearchive.repository.PhotoArchiveRepository;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.search.jpa.FullTextEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,15 +34,11 @@ import static org.apache.commons.lang3.tuple.ImmutablePair.of;
 public class PhotoService {
     private final PhotoRepository photoRepository;
     private final PhotoArchiveRepository photoArchiveRepository;
+    private final FullTextEntityManager fullTextEntityManager;
 
     private final EventBus.UIEventBus eventBus;
 
     private final Random random = new Random();
-
-    @LogExecutionTime
-    public Optional<Photo> findById(Long id) {
-        return photoRepository.findById(id);
-    }
 
     @LogExecutionTime
     public List<String> getAllTags() {
@@ -87,6 +84,7 @@ public class PhotoService {
     @LogExecutionTime
     public void save(Photo photo) {
         photoRepository.save(photo);
+        photo.getFigures().forEach(fullTextEntityManager::refresh);
     }
 
     private PhotoArchive getPhotoArchive() {

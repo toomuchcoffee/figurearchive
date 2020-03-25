@@ -37,6 +37,7 @@ public class FigureService {
     @LogExecutionTime
     public void save(Figure figure) {
         figureRepository.save(figure);
+        fullTextEntityManager.refresh(figure);
     }
 
     @LogExecutionTime
@@ -55,6 +56,7 @@ public class FigureService {
                 .onFields("verbatim" , "productLine", "placementNo")
                 .matching(searchTerm).createQuery();
 
+        fullTextEntityManager.flush();
         return fullTextEntityManager.createFullTextQuery(luceneQuery, Figure.class).getResultList();
     }
 
