@@ -6,13 +6,16 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import de.toomuchcoffee.figurearchive.entity.Figure;
+import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.view.controls.ScrollableLayout;
+
+import java.util.Set;
 
 import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 
 public class PublicFigureViewer extends Dialog {
 
-    public PublicFigureViewer(Figure figure) {
+    public PublicFigureViewer(Figure figure, Set<Photo> photos) {
         FlexLayout wrapper = new FlexLayout();
         wrapper.setWrapMode(WRAP);
         add(wrapper);
@@ -31,7 +34,7 @@ public class PublicFigureViewer extends Dialog {
 
         ScrollableLayout scrollableLayout = new ScrollableLayout();
         scrollableLayout.setWidth("282px");
-        PublicPhotoGallery publicPhotoGallery = new PublicPhotoGallery(figure);
+        PublicPhotoGallery publicPhotoGallery = new PublicPhotoGallery(photos);
         scrollableLayout.add(publicPhotoGallery);
 
         wrapper.add(attributes, scrollableLayout);

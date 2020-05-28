@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.repository;
 
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,10 +8,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
     boolean existsByPostId(Long postId);
+    Set<Photo> findByFigures(Set<Figure> figure);
     List<Photo> findByCompleted(boolean completed);
     long countByCompleted(boolean completed);
     List<Photo> findAllByOrderByCompletedAsc();

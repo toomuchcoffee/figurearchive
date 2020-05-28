@@ -147,7 +147,7 @@ public class PhotoEditor extends FlexLayout {
     public void update(FigureChangedEvent event) {
         if (photo != null && event.getOperation().equals(CREATED)) {
             Figure figure = event.getValue();
-            boolean assigned = figure.getPhotos().stream().anyMatch(p -> p.getId().equals(photo.getId()));
+            boolean assigned = photoService.findByFigure(figure).stream().anyMatch(p -> p.getId().equals(photo.getId()));
             if (assigned) {
                 ValueSetHelper.add(figureSelector, figure);
             } else {

@@ -25,7 +25,7 @@ public class PhotoGallery extends FlexLayout {
     public void update(Figure figure) {
         removeAll();
 
-        Set<Photo> photos = figure.getPhotos();
+        Set<Photo> photos = photoService.findByFigure(figure);
 
         int rowSize = 3;
         int colSize = (int) Math.ceil(((double) photos.size()) / ((double) rowSize));
@@ -47,7 +47,7 @@ public class PhotoGallery extends FlexLayout {
 
     private class PhotoViewer extends Dialog {
         PhotoViewer(Figure figure, Photo photo) {
-            Set<Photo> photos = figure.getPhotos();
+            Set<Photo> photos = photoService.findByFigure(figure);
 
             add(new Image(PhotoUrlHelper.getImageUrl(photo, 500), ""));
             Button remove = new Button("Remove Image from Figure?", FILE_REMOVE.create(), buttonClickEvent -> {
@@ -57,7 +57,6 @@ public class PhotoGallery extends FlexLayout {
                 photo.setCompleted(false);
                 photoService.save(photo);
                 photos.remove(photo);
-                figure.setPhotos(photos);
                 update(figure);
                 close();
             });

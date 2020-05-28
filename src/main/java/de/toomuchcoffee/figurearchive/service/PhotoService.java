@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import de.toomuchcoffee.figurearchive.aspect.LogExecutionTime;
+import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.entity.PhotoArchive;
 import de.toomuchcoffee.figurearchive.event.PhotoSearchResultEvent;
@@ -56,6 +57,11 @@ public class PhotoService {
         }
         Long id = ids.get(random.nextInt(ids.size()));
         return of(photoRepository.findById(id), ids.size());
+    }
+
+    @LogExecutionTime
+    public Set<Photo> findByFigure(Figure figure) {
+        return photoRepository.findByFigures(Sets.newHashSet(figure));
     }
 
     @LogExecutionTime

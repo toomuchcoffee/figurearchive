@@ -9,10 +9,7 @@ import org.hibernate.search.bridge.StringBridge;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
-import static javax.persistence.CascadeType.*;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -45,8 +42,6 @@ public class Figure implements Serializable {
     @Column(name = "year_released")
     private Short year;
     @IndexedEmbedded
-    @ManyToMany(mappedBy = "figures", fetch = FetchType.EAGER, cascade = {REMOVE, REFRESH, DETACH})
-    private Set<Photo> photos = new HashSet<>();
     @Column(name = "figure_count")
     private int count;
 

@@ -3,16 +3,13 @@ package de.toomuchcoffee.figurearchive.view.main;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.util.PhotoUrlHelper;
 
 import java.util.Set;
 
 class PublicPhotoGallery extends FlexLayout {
-    PublicPhotoGallery(Figure figure) {
-        Set<Photo> photos = figure.getPhotos();
-
+    PublicPhotoGallery(Set<Photo> photos) {
         int rowSize = 3;
         int colSize = (int) Math.ceil(((double) photos.size()) / ((double) rowSize));
 

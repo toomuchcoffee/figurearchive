@@ -3,7 +3,6 @@ package de.toomuchcoffee.figurearchive.view.figure;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.ValueProvider;
 import de.toomuchcoffee.figurearchive.config.ConfigProperties;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
@@ -36,9 +35,6 @@ public class FigureGrid extends Grid<Figure> {
 
         setPageSize(properties.getFigures().getPageSize());
         setColumns("placementNo", "verbatim", "productLine", "year", "count");
-        addColumn((ValueProvider<Figure, Integer>) figure -> figure.getPhotos().size())
-                .setSortable(true)
-                .setHeader("Nr. of Photos");
         getColumns().forEach(column -> column.setAutoWidth(true));
 
         addAttachListener(e -> eventBus.subscribe(this));
