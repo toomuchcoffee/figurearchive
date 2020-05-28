@@ -42,7 +42,8 @@ public enum ProductLine {
     DISNEY("All Disney Lines"),
     SHFIGUARTS("SH Figuarts"),
     BANDAI("Bandai Model Kit"),
-    HERO("12\" Hero Series"),;
+    HERO("12\" Hero Series"),
+    GGJ("12\" Gentle Giant Jumbo");
 
     private final String description;
 }
