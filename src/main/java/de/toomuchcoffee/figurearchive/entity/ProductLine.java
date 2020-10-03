@@ -39,6 +39,7 @@ public enum ProductLine {
     GOA("Galaxy of Adventures"),
     RESISTANCE("Star Wars Resistance"),
     RETRO("Retro Collection"),
+    MISSIONFLEET("Mission Fleet Series"),
     DISNEY("All Disney Lines"),
     SHFIGUARTS("SH Figuarts"),
     BANDAI("Bandai Model Kit"),
