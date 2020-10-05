@@ -17,11 +17,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 import org.vaadin.spring.events.annotation.EventBusProxy;
 
 import java.util.*;
 
+import static de.toomuchcoffee.figurearchive.util.PaginationHelper.paginate;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -35,7 +36,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final PhotoArchiveRepository photoArchiveRepository;
 
-    private final EventBus.UIEventBus eventBus;
+    private final UIEventBus eventBus;
 
     private final Random random = new Random();
 
@@ -61,15 +62,15 @@ public class PhotoService {
 
     @LogExecutionTime
     public Set<Photo> findByFigure(Figure figure) {
-        return photoRepository.findByFigures(Sets.newHashSet(figure));
+        return photoRepository.findByFigures(figure);
     }
 
     @LogExecutionTime
     public List<Photo> findPhotosByTag(int page, int size, String tag) {
         List<Photo> photos;
         long count;
+        Pageable pageable = PageRequest.of(page, size);
         if (isBlank(tag)) {
-            Pageable pageable = PageRequest.of(page, size);
             count = photoRepository.count();
             photos = photoRepository.findAllByOrderByCompletedAsc(pageable).getContent();
         } else {
@@ -77,9 +78,7 @@ public class PhotoService {
                     .filter(photo -> Arrays.stream(photo.getTags()).anyMatch(t -> t.equalsIgnoreCase(tag)))
                     .collect(toList());
             count = photos.size();
-            int startIndex = page * size;
-            int endIndex = Math.min(startIndex + size, photos.size());
-            photos = photos.subList(startIndex, endIndex);
+            photos = paginate(photos, pageable);
         }
         eventBus.publish(this, new PhotoSearchResultEvent(count, page, size, tag));
         return photos;

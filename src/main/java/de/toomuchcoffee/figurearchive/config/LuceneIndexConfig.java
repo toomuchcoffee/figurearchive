@@ -29,9 +29,9 @@ public class LuceneIndexConfig {
     }
 
     public static class CustomProgressMonitor extends SimpleIndexingProgressMonitor {
-        private AtomicInteger count = new AtomicInteger(0);
-        private AtomicLong max = new AtomicLong(0);
-        private AtomicBoolean done = new AtomicBoolean(false);
+        private final AtomicInteger count = new AtomicInteger(0);
+        private final AtomicLong max = new AtomicLong(0);
+        private final AtomicBoolean done = new AtomicBoolean(false);
 
         @Override
         public void addToTotalCount(long count) {
@@ -55,8 +55,8 @@ public class LuceneIndexConfig {
             return (double) count.get() / (double) max.get();
         }
 
-        public boolean isDone() {
-           return done.get();
+        public boolean isIndexing() {
+           return !done.get();
         }
     }
 

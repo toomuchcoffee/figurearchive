@@ -4,19 +4,19 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import lombok.SneakyThrows;
-import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import java.util.stream.IntStream;
 
-public class PaginationTabs<R extends PaginationTabs.SearchResultEvent, S extends PaginationTabs.SearchEvent, F> extends Div {
-    private final EventBus.UIEventBus eventBus;
+public class PaginationTabs<R extends PaginationTabs.SearchResultEvent<F>, S extends PaginationTabs.SearchEvent<F>, F> extends Div {
+    private final UIEventBus eventBus;
     private final Class<R> searchResultEventType;
     private final Class<S> searchEventType;
 
     private Tabs tabs;
 
-    public PaginationTabs(EventBus.UIEventBus eventBus, Class<R> searchResultEventType, Class<S> searchEventType) {
+    public PaginationTabs(UIEventBus eventBus, Class<R> searchResultEventType, Class<S> searchEventType) {
         this.eventBus = eventBus;
         this.searchEventType = searchEventType;
         this.searchResultEventType = searchResultEventType;
@@ -43,7 +43,6 @@ public class PaginationTabs<R extends PaginationTabs.SearchResultEvent, S extend
     }
 
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     private S newSearchEvent(F filter, int page) {
         S instance = searchEventType.newInstance();
         instance.setFilter(filter);

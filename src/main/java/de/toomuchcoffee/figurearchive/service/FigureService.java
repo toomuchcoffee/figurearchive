@@ -13,6 +13,7 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.spring.events.EventBus;
@@ -21,6 +22,7 @@ import org.vaadin.spring.events.annotation.EventBusProxy;
 import java.util.List;
 import java.util.Map;
 
+import static de.toomuchcoffee.figurearchive.util.PaginationHelper.paginate;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -47,43 +49,31 @@ public class FigureService {
     @LogExecutionTime
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Figure> fuzzySearch(String searchTerm){
+    public List<Figure> fuzzySearch(String searchTerm) {
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Figure.class).get();
         Query luceneQuery = qb.keyword().fuzzy()
                 .withEditDistanceUpTo(2)
                 .withPrefixLength(2)
-                .onFields("verbatim" , "productLine", "placementNo")
+                .onFields("verbatim", "productLine", "placementNo")
                 .matching(searchTerm).createQuery();
 
         return fullTextEntityManager.createFullTextQuery(luceneQuery, Figure.class).getResultList();
     }
 
     @LogExecutionTime
-    public List<Figure> findFigures(int page, int size, FigureFilter filter) {
+    public List<Figure> findFigures(int page, int size, @NonNull FigureFilter filter) {
         List<Figure> figures;
         long count;
         Pageable pageable = PageRequest.of(page, size);
-        if (filter != null) {
-            if (!isBlank(filter.getFilterText())) {
-                List<Figure> fetch;
-                if (filter.getProductLine() != null) {
-                    fetch = fuzzySearch(filter.getFilterText()).stream()
-                            .filter(figure -> filter.getProductLine().equals(figure.getProductLine()))
-                            .collect(toList());
-                } else {
-                    fetch = fuzzySearch(filter.getFilterText());
-                }
-                count = fetch.size();
-                int startIndex = page * size;
-                int endIndex = Math.min(startIndex + size, fetch.size());
-                figures = fetch.subList(startIndex, endIndex);
-            } else if (filter.getProductLine() != null) {
-                count = figureRepository.countByProductLine(filter.getProductLine());
-                figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
-            } else {
-                count = figureRepository.count();
-                figures = figureRepository.findAll(pageable).getContent();
-            }
+        if (!isBlank(filter.getFilterText())) {
+            List<Figure> fetch = fuzzySearch(filter.getFilterText()).stream()
+                    .filter(figure -> filter.getProductLine() == null || filter.getProductLine().equals(figure.getProductLine()))
+                    .collect(toList());
+            count = fetch.size();
+            figures = paginate(fetch, pageable);
+        } else if (filter.getProductLine() != null) {
+            count = figureRepository.countByProductLine(filter.getProductLine());
+            figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
         } else {
             count = figureRepository.count();
             figures = figureRepository.findAll(pageable).getContent();
@@ -93,7 +83,7 @@ public class FigureService {
     }
 
     @LogExecutionTime
-    public Map<ProductLine, Long>  getProductLineInfo() {
+    public Map<ProductLine, Long> getProductLineInfo() {
         return figureRepository.getProductLineCounts().stream()
                 .collect(toMap(o -> (ProductLine) o[0], o -> (Long) o[1]));
     }

@@ -50,7 +50,7 @@ public class TumblrPostService {
     }
 
     @PostConstruct
-    private void initialize() throws IOException {
+    public void initialize() throws IOException {
         if (shouldInitialize) {
             loadPosts();
         }

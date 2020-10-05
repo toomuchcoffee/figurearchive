@@ -44,14 +44,14 @@ public class PhotoRepositoryTest {
     @Test
     public void findsByCompleted() {
         Photo photo1 = new Photo(1L, 123L, newArrayList(), new String[0], newHashSet(), false);
-        Photo photo2 = new Photo(2L, 123L, newArrayList(), new String[0], newHashSet(), true);
+        Photo photo2 = new Photo(2L, 456L, newArrayList(), new String[0], newHashSet(), true);
         photoRepository.saveAll(newArrayList(photo1, photo2));
         assertThat(photoRepository.countByCompleted(true)).isEqualTo(1);
         assertThat(photoRepository.findByCompleted(true)).hasSize(1);
-        assertThat(photoRepository.findByCompleted(true).get(0).getId()).isEqualTo(2L);
+        assertThat(photoRepository.findByCompleted(true).get(0).getPostId()).isEqualTo(456L);
         assertThat(photoRepository.countByCompleted(false)).isEqualTo(1);
         assertThat(photoRepository.findByCompleted(false)).hasSize(1);
-        assertThat(photoRepository.findByCompleted(false).get(0).getId()).isEqualTo(1L);
+        assertThat(photoRepository.findByCompleted(false).get(0).getPostId()).isEqualTo(123L);
     }
 
     @Test

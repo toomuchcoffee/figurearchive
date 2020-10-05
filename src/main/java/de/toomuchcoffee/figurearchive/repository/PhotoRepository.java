@@ -13,7 +13,7 @@ import java.util.Set;
 
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
     boolean existsByPostId(Long postId);
-    Set<Photo> findByFigures(Set<Figure> figure);
+    Set<Photo> findByFigures(Figure figure);
     List<Photo> findByCompleted(boolean completed);
     long countByCompleted(boolean completed);
     List<Photo> findAllByOrderByCompletedAsc();

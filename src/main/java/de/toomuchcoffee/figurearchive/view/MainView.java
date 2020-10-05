@@ -36,7 +36,7 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (!progressMonitor.isDone()) {
+        if (progressMonitor.isIndexing()) {
             thread = new ProgressThread(beforeEnterEvent.getUI(), progressMonitor);
             thread.start();
         }
@@ -69,7 +69,7 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
                 dialog.add(progressBar);
                 ui.access(dialog::open);
 
-                while (!progressMonitor.isDone()) {
+                while (progressMonitor.isIndexing()) {
                     double progress = progressMonitor.getProgress();
                     ui.access(() -> progressBar.setValue(progress));
                     TimeUnit.SECONDS.sleep(1);

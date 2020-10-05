@@ -8,7 +8,11 @@ spring:
           default:
             directory_provider: filesystem
             indexBase: .lucene
-
+          lucene_version: LATEST
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode=default:
   database:
     driver-class-name: org.postgresql.Driver
   datasource:

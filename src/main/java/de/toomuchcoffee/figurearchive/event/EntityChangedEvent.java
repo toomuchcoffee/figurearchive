@@ -4,7 +4,7 @@ public interface EntityChangedEvent<T> {
     T getValue();
     Operation getOperation();
 
-    public enum Operation {
+    enum Operation {
         CREATED, UPDATED, DELETED
     }
 }
