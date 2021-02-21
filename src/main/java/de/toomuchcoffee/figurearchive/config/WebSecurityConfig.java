@@ -37,7 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin").authenticated()
                 .antMatchers("/**").permitAll();
-        ;
     }
 
     @Autowired

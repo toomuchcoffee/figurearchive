@@ -61,7 +61,7 @@ public class FigureServiceTest {
 
         verify(figureRepository).count();
         verify(figureRepository).findAll(any(PageRequest.class));
-        verifyZeroInteractions(fullTextEntityManager.createFullTextQuery(any(Query.class), any()));
+        verifyNoInteractions(fullTextEntityManager.createFullTextQuery(any(Query.class), any()));
         verify(eventBus).publish(eq(figureService), any(FigureSearchResultEvent.class));
     }
 
@@ -70,7 +70,7 @@ public class FigureServiceTest {
         figureService.findFigures(0, 1, new FigureFilter("foo", null));
 
         assertThat(FIGURES).hasSize(2);
-        verifyZeroInteractions(figureRepository);
+        verifyNoInteractions(figureRepository);
         verify(fullTextEntityManager).createFullTextQuery(any(Query.class), eq(Figure.class));
         verify(eventBus).publish(eq(figureService), any(FigureSearchResultEvent.class));
     }
@@ -82,7 +82,7 @@ public class FigureServiceTest {
         assertThat(figures).hasSize(2);
         verify(figureRepository).countByProductLine(any(ProductLine.class));
         verify(figureRepository).findByProductLine(any(ProductLine.class), any(PageRequest.class));
-        verifyZeroInteractions(fullTextEntityManager.createFullTextQuery(any(Query.class), any()));
+        verifyNoInteractions(fullTextEntityManager.createFullTextQuery(any(Query.class), any()));
         verify(eventBus).publish(eq(figureService), any(FigureSearchResultEvent.class));
     }
 
@@ -91,7 +91,7 @@ public class FigureServiceTest {
         List<Figure> figures = figureService.findFigures(0, 1, new FigureFilter("foo", KENNER));
 
         assertThat(figures).hasSize(1);
-        verifyZeroInteractions(figureRepository);
+        verifyNoInteractions(figureRepository);
         verify(fullTextEntityManager).createFullTextQuery(any(Query.class), eq(Figure.class));
         verify(eventBus).publish(eq(figureService), any(FigureSearchResultEvent.class));
     }

@@ -36,7 +36,7 @@ import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
-import static org.jsoup.helper.StringUtil.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @SpringComponent
 @UIScope
@@ -53,9 +53,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private VerticalLayout context;
 
-    private Button save = new Button("Save", CHECK.create(), e -> save());
-    private Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
-    private Button delete = new Button("Delete", TRASH.create(), e -> delete());
+    private final Button save = new Button("Save", CHECK.create(), e -> save());
+    private final Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
+    private final Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private FormLayout actions;
 
     private Binder<Figure> binder;

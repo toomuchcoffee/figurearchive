@@ -61,8 +61,8 @@ public class ImportService {
 
     @Getter
     private static class ParsedCsvRecord {
-        private String verbatim;
-        private ProductLine productLine;
+        private final String verbatim;
+        private final ProductLine productLine;
         private String placementNo;
         private Short year;
 

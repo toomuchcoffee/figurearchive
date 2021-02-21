@@ -23,7 +23,7 @@ import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.add;
 import static de.toomuchcoffee.figurearchive.util.ValueSetHelper.remove;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.jsoup.helper.StringUtil.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @UIScope
 @SpringComponent
