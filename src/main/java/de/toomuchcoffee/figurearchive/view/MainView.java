@@ -11,7 +11,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import de.toomuchcoffee.figurearchive.config.LuceneIndexConfig;
-import de.toomuchcoffee.figurearchive.view.main.PublicFigurePanel;
+import de.toomuchcoffee.figurearchive.view.main.FiguresShuffle;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @Route(value = "", layout = MyLayout.class)
 public class MainView extends VerticalLayout implements BeforeEnterObserver {
 
-    private final PublicFigurePanel publicFigurePanel;
+    private final FiguresShuffle figuresShuffle;
 
     private final LuceneIndexConfig.CustomProgressMonitor progressMonitor;
     private final RouterLink adminLogin = new RouterLink("Admin Login", LoginView.class);
@@ -31,7 +31,7 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
     @PostConstruct
     public void init() {
         add(adminLogin);
-        add(publicFigurePanel);
+        add(figuresShuffle);
     }
 
     @Override

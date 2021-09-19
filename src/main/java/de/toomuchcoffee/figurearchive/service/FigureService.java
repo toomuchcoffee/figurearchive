@@ -22,6 +22,8 @@ import org.vaadin.spring.events.annotation.EventBusProxy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 import static de.toomuchcoffee.figurearchive.util.PaginationHelper.paginate;
 import static java.util.stream.Collectors.toList;
@@ -37,6 +39,7 @@ public class FigureService {
     private final ProductLineRepository productLineRepository;
     private final EventBus.UIEventBus eventBus;
     private final FullTextEntityManager fullTextEntityManager;
+    private final Random random = new Random();
 
     @LogExecutionTime
     public void save(Figure figure) {
@@ -95,6 +98,18 @@ public class FigureService {
         return productLineRepository.findAllByOrderByYear().stream()
                 .map(ProductLine::getCode)
                 .collect(toList());
+    }
+
+    @LogExecutionTime
+    public Optional<Figure> getRandomFigure() {
+        List<Long> ids = figureRepository.findAll().stream()
+                .map(Figure::getId)
+                .collect(toList());
+        if (ids.isEmpty()) {
+            return Optional.empty();
+        }
+        Long id = ids.get(random.nextInt(ids.size()));
+        return figureRepository.findById(id);
     }
 
     @Getter
