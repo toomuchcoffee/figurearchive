@@ -5,7 +5,6 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureImportEvent;
 import de.toomuchcoffee.figurearchive.event.FigureSearchEvent;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
@@ -17,13 +16,11 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
 import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
-import static java.util.stream.Collectors.toList;
 
 @UIScope
 @SpringComponent
@@ -33,8 +30,8 @@ public class PublicFigureActionsPanel extends FlexLayout {
     private final EventBus.UIEventBus eventBus;
     private final FigureService figureService;
 
-    private ComboBox<ProductLine> cbProductLineFilter;
-    private Map<ProductLine, Long> productLinesCount;
+    private ComboBox<String> cbProductLineFilter;
+    private Map<String, Long> productLinesCount;
     private TextField tfVerbatimFilter;
 
     @PostConstruct
@@ -67,8 +64,8 @@ public class PublicFigureActionsPanel extends FlexLayout {
 
         addAttachListener(e -> {
             productLinesCount = figureService.getProductLineInfo();
-            cbProductLineFilter.setItems(Arrays.stream(ProductLine.values()).collect(toList()));
-            cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l.name(), productLinesCount.getOrDefault(l, 0L)));
+            cbProductLineFilter.setItems(figureService.getProductLines());
+            cbProductLineFilter.setItemLabelGenerator(l -> String.format("%s (%s)", l, productLinesCount.getOrDefault(l, 0L)));
             eventBus.subscribe(this);
             eventBus.publish(this, new FigureSearchEvent(figureFilter, 0));
         });

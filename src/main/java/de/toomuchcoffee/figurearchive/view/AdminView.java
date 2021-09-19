@@ -16,6 +16,7 @@ import de.toomuchcoffee.figurearchive.view.figure.FigureImport;
 import de.toomuchcoffee.figurearchive.view.figure.FigurePanel;
 import de.toomuchcoffee.figurearchive.view.photo.PhotoEditor;
 import de.toomuchcoffee.figurearchive.view.photo.PhotoPanel;
+import de.toomuchcoffee.figurearchive.view.special.SettingsPanel;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ public class AdminView extends VerticalLayout {
                      FigureImport figureImport,
                      PhotoPanel photoPanel,
                      PhotoEditor photoEditor,
+                     SettingsPanel settingsPanel,
                      TumblrPostService tumblrPostService,
                      HttpServletRequest request) {
         this.request = request;
@@ -55,7 +57,10 @@ public class AdminView extends VerticalLayout {
                 .addItem(menuItem(CONNECT, "Assign Figures"), e -> select(photoEditor));
         photos.getSubMenu()
                 .addItem(menuItem(ROTATE_RIGHT, "Tumblr Sync"), e -> tumblrPostService.loadPosts());
+
         MenuItem special = menuBar.addItem("Special");
+        special.getSubMenu()
+                .addItem(menuItem(WRENCH, "Settings"), e -> select(settingsPanel));
         special.getSubMenu()
                 .addItem(menuItem(SIGN_OUT, "Logout"), e -> requestLogout());
         add(menuBar, content);

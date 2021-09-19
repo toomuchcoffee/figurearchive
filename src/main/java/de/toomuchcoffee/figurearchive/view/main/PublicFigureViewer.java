@@ -26,7 +26,7 @@ public class PublicFigureViewer extends Dialog {
         attributes.setWidth("282px");
 
         Label verbatim = new Label(figure.getVerbatim());
-        Label productLine = new Label(figure.getProductLine().getDescription() + " (" + figure.getProductLine().name() + ")");
+        Label productLine = new Label(figure.getProductLine());
         Label year = new Label(figure.getYear() != null ? String.valueOf(figure.getYear()) : "");
         Label placementNo = new Label(figure.getPlacementNo());
         Label count = new Label(figure.getCount() + " figure(s)");

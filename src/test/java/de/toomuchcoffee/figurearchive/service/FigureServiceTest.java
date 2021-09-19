@@ -1,9 +1,9 @@
 package de.toomuchcoffee.figurearchive.service;
 
 import de.toomuchcoffee.figurearchive.entity.Figure;
-import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.repository.ProductLineRepository;
 import de.toomuchcoffee.figurearchive.service.FigureService.FigureFilter;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -19,8 +19,6 @@ import org.vaadin.spring.events.EventBus.UIEventBus;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static de.toomuchcoffee.figurearchive.entity.ProductLine.KENNER;
-import static de.toomuchcoffee.figurearchive.entity.ProductLine.POTF2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,23 +31,26 @@ public class FigureServiceTest {
     private FigureRepository figureRepository;
 
     @Mock
+    private ProductLineRepository productLineRepository;
+
+    @Mock
     private UIEventBus eventBus;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private FullTextEntityManager fullTextEntityManager;
 
     private static final List<Figure> FIGURES = newArrayList(
-            new Figure(0L, "foo", KENNER, null, null, 0),
-            new Figure(1L, "foo", POTF2, null, null, 0)
+            new Figure(0L, "foo", "KENNER", null, null, 0),
+            new Figure(1L, "foo", "POTF2", null, null, 0)
     );
 
     private FigureService figureService;
 
     @Before
     public void setUp() throws Exception {
-        figureService = new FigureService(figureRepository, eventBus, fullTextEntityManager);
+        figureService = new FigureService(figureRepository, productLineRepository, eventBus, fullTextEntityManager);
         when(figureRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(FIGURES));
-        when(figureRepository.findByProductLine(any(ProductLine.class), any(PageRequest.class))).thenReturn(new PageImpl<>(FIGURES));
+        when(figureRepository.findByProductLine(any(String.class), any(PageRequest.class))).thenReturn(new PageImpl<>(FIGURES));
         when(fullTextEntityManager.createFullTextQuery(any(Query.class), any()).getResultList()).thenReturn(FIGURES);
     }
 
@@ -77,18 +78,18 @@ public class FigureServiceTest {
 
     @Test
     public void findWithFilterByProductLineOnly() {
-        List<Figure> figures = figureService.findFigures(0, 1, new FigureFilter(null, KENNER));
+        List<Figure> figures = figureService.findFigures(0, 1, new FigureFilter(null, "KENNER"));
 
         assertThat(figures).hasSize(2);
-        verify(figureRepository).countByProductLine(any(ProductLine.class));
-        verify(figureRepository).findByProductLine(any(ProductLine.class), any(PageRequest.class));
+        verify(figureRepository).countByProductLine(any(String.class));
+        verify(figureRepository).findByProductLine(any(String.class), any(PageRequest.class));
         verifyNoInteractions(fullTextEntityManager.createFullTextQuery(any(Query.class), any()));
         verify(eventBus).publish(eq(figureService), any(FigureSearchResultEvent.class));
     }
 
     @Test
     public void findWithFilterByVerbatimAndProductLine() {
-        List<Figure> figures = figureService.findFigures(0, 1, new FigureFilter("foo", KENNER));
+        List<Figure> figures = figureService.findFigures(0, 1, new FigureFilter("foo", "KENNER"));
 
         assertThat(figures).hasSize(1);
         verifyNoInteractions(figureRepository);

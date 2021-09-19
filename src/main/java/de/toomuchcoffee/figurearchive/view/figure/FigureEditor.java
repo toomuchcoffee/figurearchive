@@ -17,7 +17,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
-import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureChangedEvent;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
@@ -72,7 +71,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         attributes.setWidth("282px");
 
         tfVerbatim = new TextField(null, "Verbatim");
-        ComboBox<ProductLine> cbLine = new ComboBox<>();
+        ComboBox<String> cbLine = new ComboBox<>();
         ComboBox<Short> cbYear = new ComboBox<>();
         TextField tfPlacementNo = new TextField(null, "Placement No.");
         TextField tfCount = new TextField(null, "count");
@@ -96,8 +95,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
         cbYear.setClearButtonVisible(true);
         cbLine.setPlaceholder("Product Line");
-        cbLine.setItems(ProductLine.values());
-        cbLine.setItemLabelGenerator(ProductLine::name);
+        cbLine.setItems(figureService.getProductLines());
+        cbLine.setItemLabelGenerator(String::toString);
         cbLine.setClearButtonVisible(true);
 
         binder = new Binder<>();
@@ -115,12 +114,12 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     }
 
     private void increaseCount(TextField tf) {
-        Integer current = Integer.valueOf(tf.getValue());
+        int current = Integer.parseInt(tf.getValue());
         tf.setValue(String.valueOf(current + 1));
     }
 
     private void decreaseCount(TextField tf) {
-        Integer current = Integer.valueOf(tf.getValue());
+        int current = Integer.parseInt(tf.getValue());
         if (current > 0) {
             tf.setValue(String.valueOf(current - 1));
         }

@@ -1,7 +1,6 @@
 package de.toomuchcoffee.figurearchive.service;
 
 import de.toomuchcoffee.figurearchive.entity.Figure;
-import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -62,13 +61,13 @@ public class ImportService {
     @Getter
     private static class ParsedCsvRecord {
         private final String verbatim;
-        private final ProductLine productLine;
+        private final String productLine;
         private String placementNo;
         private Short year;
 
         ParsedCsvRecord(CSVRecord record) {
             this.verbatim = record.get("verbatim");
-            this.productLine = ProductLine.valueOf(record.get("productLine"));
+            this.productLine = record.get("productLine");
             if (record.isMapped("placementNo")) {
                 this.placementNo = record.get("placementNo");
             }

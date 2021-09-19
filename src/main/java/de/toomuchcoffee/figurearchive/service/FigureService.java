@@ -7,6 +7,7 @@ import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.event.FigureSearchResultEvent;
 import de.toomuchcoffee.figurearchive.repository.FigureRepository;
+import de.toomuchcoffee.figurearchive.repository.ProductLineRepository;
 import lombok.*;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -33,6 +34,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class FigureService {
     private final FigureRepository figureRepository;
+    private final ProductLineRepository productLineRepository;
     private final EventBus.UIEventBus eventBus;
     private final FullTextEntityManager fullTextEntityManager;
 
@@ -83,9 +85,16 @@ public class FigureService {
     }
 
     @LogExecutionTime
-    public Map<ProductLine, Long> getProductLineInfo() {
-        return figureRepository.getProductLineCounts().stream()
-                .collect(toMap(o -> (ProductLine) o[0], o -> (Long) o[1]));
+    public Map<String, Long> getProductLineInfo() {
+        return productLineRepository.getProductLineCounts().stream()
+                .collect(toMap(o -> (String) o[0], o -> (Long) o[1]));
+    }
+
+    @LogExecutionTime
+    public List<String> getProductLines() {
+        return productLineRepository.findAllByOrderByYear().stream()
+                .map(ProductLine::getCode)
+                .collect(toList());
     }
 
     @Getter
@@ -94,6 +103,6 @@ public class FigureService {
     @AllArgsConstructor
     public static class FigureFilter {
         private String filterText;
-        private ProductLine productLine;
+        private String productLine;
     }
 }

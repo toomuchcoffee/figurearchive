@@ -32,7 +32,7 @@ public class PhotoActionsPanel extends FlexLayout {
         tagFilter.addValueChangeListener(e ->
                 eventBus.publish(this, new PhotoSearchEvent(e.getValue(), 0)));
 
-        PaginationTabs pagination = new PaginationTabs<PhotoSearchResultEvent, PhotoSearchEvent, String>(
+        PaginationTabs<PhotoSearchResultEvent, PhotoSearchEvent, String> pagination = new PaginationTabs<>(
                 eventBus, PhotoSearchResultEvent.class, PhotoSearchEvent.class);
 
         add(tagFilter, pagination);

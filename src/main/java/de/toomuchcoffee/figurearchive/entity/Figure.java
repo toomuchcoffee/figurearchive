@@ -5,9 +5,11 @@ import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.annotations.*;
-import org.hibernate.search.bridge.StringBridge;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -34,9 +36,8 @@ public class Figure implements Serializable {
     @Field
     @Analyzer(definition = "customanalyzer")
     private String verbatim;
-    @Field(bridge = @FieldBridge(impl = EnumStringBridge.class))
-    @Enumerated(EnumType.STRING)
-    private ProductLine productLine;
+    @Field
+    private String productLine;
     @Field
     private String placementNo;
     @Column(name = "year_released")
@@ -44,15 +45,4 @@ public class Figure implements Serializable {
     @IndexedEmbedded
     @Column(name = "figure_count")
     private int count;
-
-    public static class EnumStringBridge implements StringBridge {
-        @Override
-        public String objectToString(Object o) {
-            if (o instanceof ProductLine) {
-                ProductLine line = (ProductLine) o;
-                return line.name() + " " + line.getDescription();
-            }
-            return (String) o;
-        }
-    }
 }
