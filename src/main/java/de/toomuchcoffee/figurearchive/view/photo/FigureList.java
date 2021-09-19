@@ -33,7 +33,7 @@ public class FigureList extends Grid<Figure> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<Figure> getItems() {
-        return ((ListDataProvider<Figure>)getDataProvider()).getItems();
+    Collection<Figure> getItems() {
+        return ((ListDataProvider<Figure>) getDataProvider()).getItems();
     }
 }

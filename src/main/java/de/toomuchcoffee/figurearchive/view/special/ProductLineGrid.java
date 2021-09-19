@@ -40,9 +40,9 @@ public class ProductLineGrid extends Grid<ProductLine> {
 
     @EventBusListenerMethod
     public void update(ProductLineChangedEvent event) {
+        List<ProductLine> items = new ArrayList<>(getItems());
         switch (event.getOperation()) {
             case UPDATED: {
-                List<ProductLine> items = new ArrayList<>(getItems());
                 if (!items.contains(event.getValue())) {
                     items.add(event.getValue());
                     setItems(items);
@@ -53,7 +53,6 @@ public class ProductLineGrid extends Grid<ProductLine> {
                 break;
             }
             case DELETED: {
-                List<ProductLine> items = new ArrayList<>(getItems());
                 items.remove(event.getValue());
                 setItems(items);
                 getDataProvider().refreshAll();
@@ -66,7 +65,7 @@ public class ProductLineGrid extends Grid<ProductLine> {
 
     @SuppressWarnings("unchecked")
     private Collection<ProductLine> getItems() {
-        return getDataProvider() == null ? new ArrayList<>() : ((ListDataProvider<ProductLine>) getDataProvider()).getItems();
+        return ((ListDataProvider<ProductLine>) getDataProvider()).getItems();
     }
 
 }

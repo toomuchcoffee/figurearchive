@@ -86,7 +86,7 @@ public class FigureGrid extends Grid<Figure> {
 
     @SuppressWarnings("unchecked")
     private Collection<Figure> getItems() {
-        return getDataProvider() == null ? new ArrayList<>() : ((ListDataProvider<Figure>) getDataProvider()).getItems();
+        return ((ListDataProvider<Figure>) getDataProvider()).getItems();
     }
 
 

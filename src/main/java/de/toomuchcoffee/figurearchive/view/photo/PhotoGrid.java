@@ -100,7 +100,7 @@ public class PhotoGrid extends Grid<Photo> {
 
     @SuppressWarnings("unchecked")
     private Collection<Photo> getItems() {
-        return getDataProvider() == null ? new ArrayList<>() : ((ListDataProvider<Photo>) getDataProvider()).getItems();
+        return ((ListDataProvider<Photo>) getDataProvider()).getItems();
     }
 
 }
