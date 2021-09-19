@@ -31,10 +31,10 @@ public class ProductLineRepositoryTest {
 
     @Test
     public void findsAll() {
-        ProductLine productLine = new ProductLine("KENNER", "Vintage Figures", (short) 1977);
+        ProductLine productLine = new ProductLine("KENNER", "Vintage Figures", (short) 1970);
         productLineRepository.save(productLine);
-        List<ProductLine> productLines = productLineRepository.findAll();
-        assertThat(productLines).hasSize(1);
+        List<ProductLine> productLines = productLineRepository.findAllByOrderByYear();
+        assertThat(productLines).isNotEmpty();
         assertThat(productLines.get(0)).isEqualTo(productLine);
     }
 
