@@ -122,7 +122,7 @@
 
     <properties>
         <java.version>15</java.version>
-        <vaadin-version>14.4.0</vaadin-version>
+        <vaadin-version>21.0.1</vaadin-version>
     </properties>
 
     <build>
