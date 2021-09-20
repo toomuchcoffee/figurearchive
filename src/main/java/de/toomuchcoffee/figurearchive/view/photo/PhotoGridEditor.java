@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.photo;
 
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -43,7 +44,7 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
     public void init() {
         Button needsWork = new Button("Needs work", QUESTION.create(), e -> save());
         Button archive = new Button("Archive", FILE_REMOVE.create(), e -> archive());
-        Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
+        Button cancel = new Button("Cancel", EXIT.create(), e -> close());
 
         details = new HorizontalLayout();
         details.setWidth("100%");
@@ -51,7 +52,13 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
         HorizontalLayout actions = new HorizontalLayout(needsWork, archive, cancel);
         VerticalLayout verticalLayout = new VerticalLayout(details, actions);
         add(verticalLayout);
+    }
 
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        this.photo = null;
+
+        super.onDetach(detachEvent);
     }
 
     private void updateDetails() {
@@ -82,18 +89,12 @@ public class PhotoGridEditor extends Dialog implements KeyNotifier {
         details.removeAll();
         eventBus.publish(this, new PhotoChangedEvent(photo, UPDATED));
 
-        resetAndClose();
+        close();
     }
 
     private void archive() {
         photoService.archive(photo);
         eventBus.publish(this, new PhotoChangedEvent(photo, DELETED));
-        resetAndClose();
-    }
-
-    private void resetAndClose() {
-        this.photo = null;
         close();
     }
-
 }

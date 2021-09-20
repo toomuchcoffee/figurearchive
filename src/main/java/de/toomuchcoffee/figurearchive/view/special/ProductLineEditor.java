@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.special;
 
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -41,7 +42,7 @@ public class ProductLineEditor extends Dialog implements KeyNotifier {
     private VerticalLayout context;
 
     private final Button save = new Button("Save", CHECK.create(), e -> save());
-    private final Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
+    private final Button cancel = new Button("Cancel", EXIT.create(), e -> close());
     private final Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private FormLayout actions;
 
@@ -87,10 +88,19 @@ public class ProductLineEditor extends Dialog implements KeyNotifier {
         binder.bind(cbYear, ProductLine::getYear, ProductLine::setYear);
     }
 
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        this.productLine = null;
+        binder.removeBean();
+        context.removeAll();
+
+        super.onDetach(detachEvent);
+    }
+
     private void delete() {
         productLineService.delete(productLine);
         eventBus.publish(this, new ProductLineChangedEvent(productLine, DELETED));
-        resetAndClose();
+        close();
     }
 
     private void save() {
@@ -98,15 +108,8 @@ public class ProductLineEditor extends Dialog implements KeyNotifier {
         if (binder.isValid()) {
             productLineService.save(productLine);
             eventBus.publish(this, new ProductLineChangedEvent(productLine, UPDATED));
-            resetAndClose();
+            close();
         }
-    }
-
-    private void resetAndClose() {
-        this.productLine = null;
-        binder.removeBean();
-        context.removeAll();
-        close();
     }
 
     public final void createProductLine() {

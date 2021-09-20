@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -53,7 +54,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private VerticalLayout context;
 
     private final Button save = new Button("Save", CHECK.create(), e -> save());
-    private final Button cancel = new Button("Cancel", EXIT.create(), e -> resetAndClose());
+    private final Button cancel = new Button("Cancel", EXIT.create(), e -> close());
     private final Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private FormLayout actions;
 
@@ -113,6 +114,15 @@ public class FigureEditor extends Dialog implements KeyNotifier {
                 .bind(Figure::getCount, Figure::setCount);
     }
 
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        this.figure = null;
+        binder.removeBean();
+        context.removeAll();
+
+        super.onDetach(detachEvent);
+    }
+
     private void increaseCount(TextField tf) {
         int current = Integer.parseInt(tf.getValue());
         tf.setValue(String.valueOf(current + 1));
@@ -134,7 +144,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private void delete() {
         figureService.delete(figure);
         eventBus.publish(this, new FigureChangedEvent(figure, DELETED));
-        resetAndClose();
+        close();
     }
 
     private void save() {
@@ -143,15 +153,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
             boolean isNew = figure.getId() == null;
             figureService.save(figure);
             eventBus.publish(this, new FigureChangedEvent(figure, isNew ? CREATED : UPDATED));
-            resetAndClose();
+            close();
         }
-    }
-
-    private void resetAndClose() {
-        this.figure = null;
-        binder.removeBean();
-        context.removeAll();
-        close();
     }
 
     public final void createFigure() {

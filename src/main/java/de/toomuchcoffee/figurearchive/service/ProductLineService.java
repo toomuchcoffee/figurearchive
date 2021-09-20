@@ -9,12 +9,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductLineService {
     private final ProductLineRepository productLineRepository;
     private final FigureRepository figureRepository;
+
+    @LogExecutionTime
+    public Optional<ProductLine> findByCode(String code) {
+        return productLineRepository.findById(code);
+    }
 
     @LogExecutionTime
     public void save(ProductLine productLine) {

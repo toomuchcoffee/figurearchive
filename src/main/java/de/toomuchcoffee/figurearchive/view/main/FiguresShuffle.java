@@ -8,12 +8,13 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import de.toomuchcoffee.figurearchive.entity.Figure;
 import de.toomuchcoffee.figurearchive.entity.Photo;
+import de.toomuchcoffee.figurearchive.entity.ProductLine;
 import de.toomuchcoffee.figurearchive.service.FigureService;
 import de.toomuchcoffee.figurearchive.service.PhotoService;
+import de.toomuchcoffee.figurearchive.service.ProductLineService;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 import java.util.Set;
 
 @SpringComponent
@@ -23,6 +24,7 @@ public class FiguresShuffle extends VerticalLayout {
 
     private final FigureService figureService;
     private final PhotoService photoService;
+    private final ProductLineService productLineService;
 
     @PostConstruct
     public void init() {
@@ -34,20 +36,22 @@ public class FiguresShuffle extends VerticalLayout {
     }
 
     private void shuffleFigures() {
-        Optional<Figure> figure = figureService.getRandomFigure();
-        if (figure.isPresent()) {
-            Set<Photo> photos = photoService.findByFigure(figure.get());
-            update(figure.get(), photos);
-            add(new Button("Shuffle", e -> shuffleFigures()));
-            Notification.show("Random figure is: " + figure.get().getVerbatim(), 3000, Notification.Position.TOP_CENTER);
-        } else {
-            removeAll();
-        }
+        figureService.getRandomFigure()
+                .ifPresentOrElse(
+                        figure -> {
+                            ProductLine productLine = productLineService.findByCode(figure.getProductLine()).orElse(null);
+                            Set<Photo> photos = photoService.findByFigure(figure);
+                            update(figure, productLine, photos);
+                            add(new Button("Shuffle", e -> shuffleFigures()));
+                            Notification.show("Random figure is: " + figure.getVerbatim(), 3000, Notification.Position.TOP_CENTER);
+                        },
+                        this::removeAll
+                );
     }
 
-    private void update(Figure figure, Set<Photo> photos) {
+    private void update(Figure figure, ProductLine productLine, Set<Photo> photos) {
         removeAll();
-        add(new PublicFigureViewer(figure, photos));
+        add(new PublicFigureViewer(figure, productLine, photos));
         setAlignItems(Alignment.CENTER);
         setHeightFull();
     }
