@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "status": 200,
+    "msg": "OK"
+  },
+  "response": {
+    "blog": {
+      "posts": 2271,
+      "total_posts": 2271
+    }
+  }
+}

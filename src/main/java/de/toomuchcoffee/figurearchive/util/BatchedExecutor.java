@@ -9,7 +9,7 @@ public class BatchedExecutor {
     private final int pageSize;
     private final int totalCount;
 
-    public <T> void execute(BiConsumer<Integer, Integer> function) {
+    public void execute(BiConsumer<Integer, Integer> function) {
         int count = 0;
         while ((count * pageSize) < totalCount) {
             int offset = count * pageSize;

@@ -9,6 +9,7 @@ spring:
             non_contextual_creation=true:
 
 tumblr:
+  url: http://localhost:9561
   consumer-key: foo
   consumer-secret: bar
 

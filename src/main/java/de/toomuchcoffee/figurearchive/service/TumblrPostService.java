@@ -1,24 +1,23 @@
 package de.toomuchcoffee.figurearchive.service;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import com.tumblr.jumblr.JumblrClient;
-import com.tumblr.jumblr.types.Blog;
-import com.tumblr.jumblr.types.PhotoPost;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import de.toomuchcoffee.figurearchive.entity.Photo;
 import de.toomuchcoffee.figurearchive.entity.Photo.PhotoUrl;
 import de.toomuchcoffee.figurearchive.repository.PhotoArchiveRepository;
 import de.toomuchcoffee.figurearchive.repository.PhotoRepository;
+import de.toomuchcoffee.figurearchive.tumblr.BlocksPost;
+import de.toomuchcoffee.figurearchive.tumblr.Content;
+import de.toomuchcoffee.figurearchive.tumblr.ResponseWrapper;
+import de.toomuchcoffee.figurearchive.tumblr.TumblrClient;
 import de.toomuchcoffee.figurearchive.util.BatchedExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 
@@ -29,9 +28,11 @@ import static java.util.stream.Collectors.toList;
 @VaadinSessionScope
 public class TumblrPostService {
     private static final int MAX_PAGE_SIZE = 50;
+    public static final String POST_TYPE_BLOCKS = "blocks";
 
     private final boolean shouldInitialize;
-    private final JumblrClient jumblrClient;
+    private final String consumerKey;
+    private final TumblrClient tumblrClient;
     private final PhotoRepository photoRepository;
     private final PhotoArchiveRepository photoArchiveRepository;
 
@@ -40,46 +41,53 @@ public class TumblrPostService {
     private TumblrPostService(
             @Value("${figurearchive.tumblr.initialize:false}") boolean shouldInitialize,
             @Value("${tumblr.consumer-key}") String consumerKey,
-            @Value("${tumblr.consumer-secret}") String consumerSecret,
+            @Autowired TumblrClient tumblrClient,
             @Autowired PhotoRepository photoRepository,
             @Autowired PhotoArchiveRepository photoArchiveRepository) {
         this.shouldInitialize = shouldInitialize;
-        this.jumblrClient = new JumblrClient(consumerKey, consumerSecret);
+        this.consumerKey = consumerKey;
+        this.tumblrClient = tumblrClient;
         this.photoRepository = photoRepository;
         this.photoArchiveRepository = photoArchiveRepository;
     }
 
     @PostConstruct
-    public void initialize() throws IOException {
+    public void initialize() {
         if (shouldInitialize) {
             loadPosts();
         }
     }
 
     public void loadPosts() {
-        Blog blog = jumblrClient.blogInfo("yaswb.tumblr.com");
-        Integer postCount = blog.getPostCount();
+        ResponseWrapper responseWrapper = tumblrClient.getInfo(consumerKey);
+        int postCount = responseWrapper.getResponse().getBlog().getTotalPosts();
 
-        BiConsumer<Integer, Integer> function = (offset, pageSize) -> {
-            Map<String, Integer> options = ImmutableMap.of("limit", pageSize, "offset", offset);
-            executor.submit(() ->
-                    jumblrClient.blogPosts("yaswb", options).stream()
-                            .filter(post -> post instanceof PhotoPost)
-                            .map(post -> (PhotoPost) post)
-                            .filter(this::notSkipped)
-                            .forEach(post -> post.getPhotos().stream()
-                                    .map(photo -> mapToPhotoEntity(post, photo))
-                                    .forEach(photoRepository::save)));
-        };
+        BiConsumer<Integer, Integer> function = (offset, pageSize) -> executor.submit(() ->
+                tumblrClient.getPosts(consumerKey, offset, pageSize).getResponse().getPosts().stream()
+                        .filter(p -> POST_TYPE_BLOCKS.equals(p.getType()))
+                        .filter(this::notSkipped)
+                        .forEach(post -> post.getContent().stream()
+                                .filter(content -> !CollectionUtils.isEmpty(content.getMedia()))
+                                .forEach(content -> createPhotoFromPost(post, content))));
 
         new BatchedExecutor(MAX_PAGE_SIZE, postCount).execute(function);
     }
 
-    private boolean notSkipped(PhotoPost post) {
+    private void createPhotoFromPost(BlocksPost post, Content content) {
+        Photo photoEntity = new Photo();
+        photoEntity.setPostId(post.getId());
+        photoEntity.setTags(post.getTags().toArray(new String[0]));
+        photoEntity.setUrls(content.getMedia().stream()
+                .map(s -> new PhotoUrl(s.getWidth(), s.getHeight(), s.getUrl()))
+                .collect(toList()));
+        photoRepository.save(photoEntity);
+    }
+
+    private boolean notSkipped(BlocksPost post) {
         return !isSynced(post) && !isArchived(post.getId());
     }
 
-    private boolean isSynced(PhotoPost post) {
+    private boolean isSynced(BlocksPost post) {
         return photoRepository.existsByPostId(post.getId());
     }
 
@@ -89,16 +97,6 @@ public class TumblrPostService {
                 .flatMap(Collection::stream)
                 .map(Long::valueOf)
                 .anyMatch(e -> e.equals(postId));
-    }
-
-    private Photo mapToPhotoEntity(PhotoPost post, com.tumblr.jumblr.types.Photo photo) {
-        Photo photoEntity = new Photo();
-        photoEntity.setPostId(post.getId());
-        photoEntity.setTags(post.getTags().toArray(new String[0]));
-        photoEntity.setUrls(photo.getSizes().stream()
-                .map(s -> new PhotoUrl(s.getWidth(), s.getHeight(), s.getUrl()))
-                .collect(toList()));
-        return photoEntity;
     }
 
 }

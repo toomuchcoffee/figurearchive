@@ -28,6 +28,7 @@ vaadin:
       resources: true
 
 tumblr:
+  url: https://api.tumblr.com
   consumer-key: ${API_KEY}
   consumer-secret: ${API_SECRET}
 
