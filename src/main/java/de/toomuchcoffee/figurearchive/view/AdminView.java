@@ -10,7 +10,7 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import de.toomuchcoffee.figurearchive.service.TumblrPostService;
+import de.toomuchcoffee.figurearchive.service.PhotoSyncService;
 import de.toomuchcoffee.figurearchive.view.figure.FigureEditor;
 import de.toomuchcoffee.figurearchive.view.figure.FigureImport;
 import de.toomuchcoffee.figurearchive.view.figure.FigurePanel;
@@ -34,7 +34,7 @@ public class AdminView extends VerticalLayout {
                      PhotoPanel photoPanel,
                      PhotoEditor photoEditor,
                      SettingsPanel settingsPanel,
-                     TumblrPostService tumblrPostService,
+                     PhotoSyncService photoSyncService,
                      HttpServletRequest request) {
         this.request = request;
 
@@ -56,7 +56,7 @@ public class AdminView extends VerticalLayout {
         photos.getSubMenu()
                 .addItem(menuItem(CONNECT, "Assign Figures"), e -> select(photoEditor));
         photos.getSubMenu()
-                .addItem(menuItem(ROTATE_RIGHT, "Tumblr Sync"), e -> tumblrPostService.loadPosts());
+                .addItem(menuItem(ROTATE_RIGHT, "Tumblr Sync"), e -> photoSyncService.loadPosts());
 
         MenuItem special = menuBar.addItem("Special");
         special.getSubMenu()
