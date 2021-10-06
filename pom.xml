@@ -135,7 +135,7 @@
 
     <properties>
         <java.version>15</java.version>
-        <vaadin-version>14.4.0</vaadin-version>
+        <vaadin-version>21.0.2</vaadin-version>
         <spring-cloud.version>2020.0.1</spring-cloud.version>
     </properties>
 
