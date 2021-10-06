@@ -58,6 +58,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     private final Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private FormLayout actions;
 
+    private FigureList similarFigures;
+    private PhotoGallery photoGallery;
+
     private Binder<Figure> binder;
 
     @PostConstruct
@@ -90,7 +93,19 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         actions = new FormLayout();
         wrapper.add(attributes, context, actions);
 
+        similarFigures = new FigureList();
+        similarFigures.setHeader(new Span("Similar Existing Figures"));
+        similarFigures.setVisible(false);
+        context.add(similarFigures);
+
         tfVerbatim.setValueChangeMode(ValueChangeMode.EAGER);
+        tfVerbatim.addValueChangeListener(e -> similarFigures.update(isBlank(e.getValue()) ? newArrayList() : similarFigures(e.getValue())));
+
+        photoGallery = new PhotoGallery(photoService);
+        photoGallery.setVisible(false);
+        context.add(photoGallery);
+
+        actions.add(save, cancel);
 
         cbYear.setPlaceholder("Year");
         cbYear.setItems(IntStream.range(1977, now().getYear() + 1).mapToObj(value -> (short) value).collect(toList()));
@@ -118,7 +133,9 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     protected void onDetach(DetachEvent detachEvent) {
         this.figure = null;
         binder.removeBean();
-        context.removeAll();
+        similarFigures.setVisible(false);
+        photoGallery.setVisible(false);
+        tfVerbatim.setValue("");
 
         super.onDetach(detachEvent);
     }
@@ -161,11 +178,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         open();
         this.figure = new Figure();
         binder.setBean(this.figure);
-        FigureList similarFigures = new FigureList();
-        similarFigures.setHeader(new Span("Similar Existing Figures"));
-        context.add(similarFigures);
-        actions.add(save, cancel);
-        tfVerbatim.addValueChangeListener(e -> similarFigures.update(isBlank(e.getValue()) ? newArrayList() : similarFigures(e.getValue())));
+        similarFigures.setVisible(true);
         tfVerbatim.focus();
     }
 
@@ -173,9 +186,8 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         open();
         this.figure = figure;
         binder.setBean(this.figure);
-        PhotoGallery photoGallery = new PhotoGallery(photoService);
         photoGallery.update(figure);
-        context.add(photoGallery);
+        photoGallery.setVisible(true);
         actions.add(save, cancel, delete);
         tfVerbatim.focus();
     }
