@@ -8,12 +8,14 @@ import de.toomuchcoffee.figurearchive.util.PhotoUrlHelper;
 
 import java.util.Set;
 
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
+
 class PublicPhotoGallery extends FlexLayout {
     PublicPhotoGallery(Set<Photo> photos) {
         int rowSize = 3;
         int colSize = (int) Math.ceil(((double) photos.size()) / ((double) rowSize));
 
-        setWrapMode(WrapMode.WRAP);
+        setFlexWrap(WRAP);
         setWidth(rowSize * 75 + "px");
         setHeight(colSize * 75 + "px");
         photos.forEach(photo -> {

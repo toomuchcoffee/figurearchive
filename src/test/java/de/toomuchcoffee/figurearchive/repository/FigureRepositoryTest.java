@@ -28,7 +28,7 @@ public class FigureRepositoryTest {
         figureRepository.save(figure);
         List<Figure> figures = figureRepository.findAll();
         assertThat(figures).hasSize(1);
-        assertThat(figures.get(0)).isEqualToIgnoringGivenFields(figure, "id");
+        assertThat(figures.get(0)).usingRecursiveComparison().ignoringFields("id").isEqualTo(figure);
     }
 
     @Test

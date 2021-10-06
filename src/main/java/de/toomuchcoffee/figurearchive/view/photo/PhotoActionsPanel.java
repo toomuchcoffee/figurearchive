@@ -13,7 +13,7 @@ import org.vaadin.spring.events.EventBus;
 
 import javax.annotation.PostConstruct;
 
-import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 
 @UIScope
 @SpringComponent
@@ -25,7 +25,7 @@ public class PhotoActionsPanel extends FlexLayout {
 
     @PostConstruct
     public void init() {
-        setWrapMode(WRAP);
+        setFlexWrap(WRAP);
         ComboBox<String> tagFilter = new ComboBox<>();
         tagFilter.setPlaceholder("Filter by Tag");
         tagFilter.setClearButtonVisible(true);

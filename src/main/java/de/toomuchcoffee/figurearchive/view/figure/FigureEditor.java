@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
@@ -63,7 +63,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
     @PostConstruct
     public void init() {
         FlexLayout wrapper = new FlexLayout();
-        wrapper.setWrapMode(WRAP);
+        wrapper.setFlexWrap(WRAP);
         add(wrapper);
 
         Div attributes = new Div();

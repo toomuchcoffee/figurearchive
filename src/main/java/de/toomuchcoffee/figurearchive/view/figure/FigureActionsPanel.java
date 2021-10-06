@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 
 @UIScope
@@ -37,7 +37,7 @@ public class FigureActionsPanel extends FlexLayout {
 
     @PostConstruct
     public void init() {
-        setWrapMode(WRAP);
+        setFlexWrap(WRAP);
         FigureFilter figureFilter = new FigureFilter();
 
         tfVerbatimFilter = new TextField();

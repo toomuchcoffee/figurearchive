@@ -29,7 +29,7 @@ public class PhotoRepositoryTest {
         photoRepository.save(photo);
         List<Photo> photos = photoRepository.findAll();
         assertThat(photos).hasSize(1);
-        assertThat(photos.get(0)).isEqualToIgnoringGivenFields(photo, "id");
+        assertThat(photos.get(0)).usingRecursiveComparison().ignoringFields("").isEqualTo(photo);
     }
 
     @Test

@@ -25,7 +25,7 @@ import javax.annotation.PostConstruct;
 import java.util.stream.IntStream;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
-import static com.vaadin.flow.component.orderedlayout.FlexLayout.WrapMode.WRAP;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.DELETED;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.UPDATED;
 import static java.time.LocalDate.now;
@@ -53,7 +53,7 @@ public class ProductLineEditor extends Dialog implements KeyNotifier {
     @PostConstruct
     public void init() {
         FlexLayout wrapper = new FlexLayout();
-        wrapper.setWrapMode(WRAP);
+        wrapper.setFlexWrap(WRAP);
         add(wrapper);
 
         Div attributes = new Div();

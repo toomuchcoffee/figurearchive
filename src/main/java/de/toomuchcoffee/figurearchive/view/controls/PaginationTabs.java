@@ -44,7 +44,7 @@ public class PaginationTabs<R extends PaginationTabs.SearchResultEvent<F>, S ext
 
     @SneakyThrows
     private S newSearchEvent(F filter, int page) {
-        S instance = searchEventType.newInstance();
+        S instance = searchEventType.getDeclaredConstructor().newInstance();
         instance.setFilter(filter);
         instance.setPage(page);
         return instance;

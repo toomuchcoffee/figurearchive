@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.*;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 import static de.toomuchcoffee.figurearchive.event.EntityChangedEvent.Operation.*;
 import static de.toomuchcoffee.figurearchive.util.PhotoUrlHelper.getImageUrl;
 
@@ -51,7 +52,7 @@ public class PhotoEditor extends FlexLayout {
 
     @PostConstruct
     public void init() {
-        setWrapMode(WrapMode.WRAP);
+        setFlexWrap(WRAP);
     }
 
     @Override

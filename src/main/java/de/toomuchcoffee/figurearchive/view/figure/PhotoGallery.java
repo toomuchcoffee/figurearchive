@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static com.vaadin.flow.component.icon.VaadinIcon.EXIT;
 import static com.vaadin.flow.component.icon.VaadinIcon.FILE_REMOVE;
+import static com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP;
 
 @UIScope
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class PhotoGallery extends FlexLayout {
         int rowSize = 3;
         int colSize = (int) Math.ceil(((double) photos.size()) / ((double) rowSize));
 
-        setWrapMode(FlexLayout.WrapMode.WRAP);
+        setFlexWrap(WRAP);
         setWidth(rowSize * 75 + "px");
         setHeight(colSize * 75 + "px");
         photos.forEach(photo -> {
