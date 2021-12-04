@@ -1,5 +1,6 @@
 package de.toomuchcoffee.figurearchive.view.figure;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
@@ -51,12 +52,15 @@ public class FigureEditor extends Dialog implements KeyNotifier {
 
     private TextField tfVerbatim;
 
-    private VerticalLayout context;
-
     private final Button save = new Button("Save", CHECK.create(), e -> save());
     private final Button cancel = new Button("Cancel", EXIT.create(), e -> close());
     private final Button delete = new Button("Delete", TRASH.create(), e -> delete());
     private FormLayout actions;
+    private ComboBox<String> cbLine;
+    private ComboBox<Short> cbYear;
+    private TextField tfPlacementNo;
+    private TextField tfCount;
+
 
     private FigureList similarFigures;
     private PhotoGallery photoGallery;
@@ -75,10 +79,10 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         attributes.setWidth("282px");
 
         tfVerbatim = new TextField(null, "Verbatim");
-        ComboBox<String> cbLine = new ComboBox<>();
-        ComboBox<Short> cbYear = new ComboBox<>();
-        TextField tfPlacementNo = new TextField(null, "Placement No.");
-        TextField tfCount = new TextField(null, "count");
+        cbLine = new ComboBox<>();
+        cbYear = new ComboBox<>();
+        tfPlacementNo = new TextField(null, "Placement No.");
+        tfCount = new TextField(null, "count");
         tfCount.setWidth("20%");
         tfCount.setEnabled(false);
         HorizontalLayout count = new HorizontalLayout(
@@ -87,7 +91,7 @@ public class FigureEditor extends Dialog implements KeyNotifier {
                 new Button(ARROW_CIRCLE_RIGHT.create(), e -> increaseCount(tfCount)));
         form.add(tfVerbatim, cbLine, cbYear, tfPlacementNo, count);
 
-        context = new ScrollableLayout();
+        VerticalLayout context = new ScrollableLayout();
         context.setWidth("282px");
 
         actions = new FormLayout();
@@ -116,6 +120,14 @@ public class FigureEditor extends Dialog implements KeyNotifier {
         cbLine.setClearButtonVisible(true);
 
         binder = new Binder<>();
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+
+        cbLine.setItems(figureService.getProductLines());
+
         binder.forField(tfVerbatim)
                 .asRequired()
                 .bind(Figure::getVerbatim, Figure::setVerbatim);
