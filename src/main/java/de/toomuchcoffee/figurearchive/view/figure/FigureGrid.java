@@ -48,7 +48,7 @@ public class FigureGrid extends Grid<Figure> {
 
     @EventBusListenerMethod
     public void update(FigureSearchResultEvent event) {
-        Notification.show(event.getCount() + " figures found!", 5000, TOP_CENTER);
+        Notification.show(event.getCount() + " figures found!, (owned: " + event.getOwned() +")", 5000, TOP_CENTER);
     }
 
     @EventBusListenerMethod
