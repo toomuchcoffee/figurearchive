@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FigureSearchResultEvent implements PaginationTabs.SearchResultEvent<FigureService.FigureFilter> {
     private final long count;
+    private final long owned;
     private final int page;
     private final int size;
     private final FigureService.FigureFilter filter;

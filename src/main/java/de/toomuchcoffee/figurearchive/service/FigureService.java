@@ -69,21 +69,25 @@ public class FigureService {
     public List<Figure> findFigures(int page, int size, @NonNull FigureFilter filter) {
         List<Figure> figures;
         long count;
+        long owned;
         Pageable pageable = PageRequest.of(page, size);
         if (!isBlank(filter.getFilterText())) {
             List<Figure> fetch = fuzzySearch(filter.getFilterText()).stream()
                     .filter(figure -> filter.getProductLine() == null || filter.getProductLine().equals(figure.getProductLine()))
                     .collect(toList());
             count = fetch.size();
+            owned = fetch.stream().mapToLong(Figure::getCount).sum();
             figures = paginate(fetch, pageable);
         } else if (filter.getProductLine() != null) {
             count = figureRepository.countByProductLine(filter.getProductLine());
             figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
+            owned = figures.stream().mapToLong(Figure::getCount).sum();
         } else {
             count = figureRepository.count();
             figures = figureRepository.findAll(pageable).getContent();
+            owned = figures.stream().mapToLong(Figure::getCount).sum();
         }
-        eventBus.publish(this, new FigureSearchResultEvent(count, page, size, filter));
+        eventBus.publish(this, new FigureSearchResultEvent(count, owned, page, size, filter));
         return figures;
     }
 
