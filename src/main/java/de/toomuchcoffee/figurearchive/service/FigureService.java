@@ -81,11 +81,11 @@ public class FigureService {
         } else if (filter.getProductLine() != null) {
             count = figureRepository.countByProductLine(filter.getProductLine());
             figures = figureRepository.findByProductLine(filter.getProductLine(), pageable).getContent();
-            owned = figures.stream().mapToLong(Figure::getCount).sum();
+            owned = figureRepository.findByProductLine(filter.getProductLine()).stream().mapToLong(Figure::getCount).sum();
         } else {
             count = figureRepository.count();
             figures = figureRepository.findAll(pageable).getContent();
-            owned = figures.stream().mapToLong(Figure::getCount).sum();
+            owned = figureRepository.findAll().stream().mapToLong(Figure::getCount).sum();
         }
         eventBus.publish(this, new FigureSearchResultEvent(count, owned, page, size, filter));
         return figures;

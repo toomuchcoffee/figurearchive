@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FigureRepository extends JpaRepository<Figure, Long> {
     Page<Figure> findByProductLine(String productLine, Pageable pageable);
 
+    Page<Figure> findByProductLine(String productLine);
+
     long countByProductLine(String productLine);
 }
